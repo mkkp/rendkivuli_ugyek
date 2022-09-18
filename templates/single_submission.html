@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+{% block content %}
+
+<head>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.css' rel='stylesheet' />
+    <style></style>
+</head>
+
+<body>
+
+    <div class="container">
+        <hr>
+        
+        <h3><b>{{ submission[0].title }}</b></h3>
+        <hr>
+        <p><strong>Leírás:</strong>
+        {{ submission[0].description }}</p>
+ 
+        <p><strong>Megoldási javaslat:</strong>
+        {{ submission[0].suggestion }}</p>       
+        
+        {% if current_user.username == submission[0].owner_user or current_user.username == 'admin' %}
+        
+        <form action="" method="post">
+        <input hidden type=text, value={{current_user.username}} name="current_user"/>
+        <label for="status"><strong>Státusz</strong></label>
+         <select class="form-select" aria-label="Select status" name="status">
+	 <option selected>{{ submission[0].status }}</option>
+	 <option value="folyamatban">Folyamatban</option>
+	 <option value="befejezve">Befejezve</option>
+	 </select>
+          <button 
+            type="submit" 
+            id="change_status" 
+            name="change_status" 
+            class="btn btn-primary rounded-0">Módosít</button>
+	</form>
+	 
+	{% else %}
+	
+	<p><strong>Státusz:</strong> {{ submission[0].status }}</p>
+	 
+	{% endif %}
+        
+        <p><strong>Típus:</strong> {{ submission[0].problem_type }}</p>
+        <p><strong>Bejelentve:</strong> {{ submission[0].created_date }}</p>
+        <p><strong>Megye:</strong> {{ submission[0].county }}</p>
+        <p><strong>Cím:</strong> {{ submission[0].address }}</p>
+        {% if submission[0].owner_user %}
+        <p><strong>Kijelölt:</strong> {{ submission[0].owner_user }}</p>
+        {% endif%}
+
+        <hr>
+
+        {% if current_user.username == submission[0].owner_user or current_user.username == 'admin' %}
+        <form action="" method="post" enctype="multipart/form-data">
+          <div class="form-group">
+            <input type="file" 
+              id="files" 
+              name="files"
+              class="btn rounded-0" 
+              multiple="true" 
+              autocomplete="off" 
+              required
+              />
+          <button 
+            type="submit"
+            id="upload_before_images" 
+            name="upload_before_images" 
+            class="btn rounded-0">Előtte Képek feltöltése
+            </button>           
+          </div>
+          </form>
+          
+        <form action="" method="post" enctype="multipart/form-data">
+          <div class="form-group">
+            <input type="file" 
+              id="files" 
+              name="files"
+              class="btn rounded-0" 
+              multiple="true" 
+              autocomplete="off" 
+              required
+              />
+          <button 
+            type="submit"
+            id="upload_after_images" 
+            name="upload_after_images" 
+            class="btn rounded-0">Utána Képek feltöltése
+            </button>           
+          </div>
+        </form>          
+          
+        {% endif %}
+        
+        <h4>Előtte képek:</h4>
+        <br>
+        {% for img in before_img_list %}
+            <figure class="figure">
+              <a href={{url_for( 'static',filename='upload/' + submission[0].id | string + "/" + img.file_name)}}>
+              <img src={{url_for( 'static',filename='upload/' + submission[0].id | string + "/" + img.thumb_file_name)}}/>
+              </a>
+              {% if current_user.username == submission[0].owner_user or current_user.username == 'admin' %}  
+               <a href="/delete_picture/before/{{img.id}}">
+                X
+               </a>
+              {% endif %}
+            </figure>
+        {% endfor %}
+        <br>
+        <h4>Utána képek:</h4>
+        <br>
+        {% for img in after_img_list %}
+            <figure class="figure">
+              <a href={{url_for('static',filename='upload/'  + submission[0].id | string + "/" + img.file_name)}}>
+              <img src={{url_for('static',filename='upload/' + submission[0].id | string + "/" + img.thumb_file_name)}}/>
+              </a>
+              {% if submission[0].owner_user == current_user.username or current_user.username == 'admin' %} 
+               <a href="/delete_picture/after/{{img.id}}">
+                X
+               </a>
+              {% endif %}
+            </figure>
+        {% endfor %}
+        <br>
+        <hr>
+        <label for="comment">Korábbi hozzászólások</label>
+        <br>
+          {% for comment in comment_list %}
+          
+           {% if comment.commenter == current_user.username or current_user.username == 'admin' %} 
+             <a href="/delete_comment/{{comment.id}}">
+              <button class="btn btn-danger rounded-0" id="comment-delete" name="comment-delete">törlés</button>
+             </a>
+           {% endif %}
+          
+           <p style="color: black; background: MediumSeaGreen; padding:0.3em"> 
+             <strong>{{ comment.commenter}} | {{ comment.created_date}}</strong>
+           </p>
+           
+           {% if comment.commenter == current_user.username or current_user.username == 'admin' %}
+            <form action="" method="post">
+             <textarea class="form-control rounded-0" 
+                       id="comment" 
+                       rows="1" 
+                       name="comment" 
+                       style="padding:0.2em; word-wrap: break-word;">
+              {{ comment.body }}
+             </textarea>
+             <button class="btn btn-warning rounded-0" 
+                     id="comment-edit" 
+                     name="comment-edit">szerkesztés mentése</button>
+             <input hidden 
+                    type=text, 
+                    value={{comment.id}} 
+                    name="comment_id"/>
+            </form>
+           {% else %}
+            <blockquote disabled class="form-control rounded-0" 
+                      id="comment" 
+                      rows="1" 
+                      name="comment" 
+                      style="padding:0.2em; word-wrap: break-word;">
+             {{ comment.body }}
+            </blockquote>
+           {% endif %}
+          <br>
+          {% endfor %}      
+        
+        {% if current_user.is_authenticated or current_user.username == 'admin' %}
+        <form action="" method="post">
+          <input hidden type=text, value={{current_user.username}} name="current_user"/>
+          <label for="comment">Na ehhez hozzászólok én is!</label>
+          
+          <textarea class="form-control rounded-0" id="comment" rows="1" name="comment"></textarea>
+          <br>
+          <button 
+            type="submit"
+            id="comment-submit" 
+            name="comment-submit" 
+            class="btn btn-primary rounded-0">Hozzáaszólás beküldése
+            </button>
+        </form>
+        <hr>
+        
+        {% if not current_user.username == submission[0].owner_user %}
+        <a href="/adopt/{{submission[0].id}}">
+            <button class="btn btn-success form-control rounded-0">Örökbefogadom!</button>
+        </a>
+        {% endif %}
+        {% endif %}
+
+        <hr>
+        
+        <div id='map' style='width: auto; height: 30em;'></div>
+        
+        <a href="https://www.google.com/maps/@{{submission[0].lat}},{{submission[0].lng}},17z" target="_blank" rel="noopener noreferrer">
+        <p>De nekem a Google Maps kell!</p>
+        </a>
+        
+        
+        {% if current_user.username == submission[0].owner_user or current_user.username == 'admin' %}
+        <br>
+        <a href="/delete_submission/{{submission[0].id}}">
+            <button class="btn btn-danger form-control rounded-0">Bejelentés törlése!</button>
+        </a>
+        {% endif %}
+        <hr>
+        <br>
+        <br>
+    </div>
+  
+<script>
+    mapboxgl.accessToken = '{{ACCESS_KEY}}';
+    var map = new mapboxgl.Map({
+    container: 'map',
+    center: [{{submission[0].lng}}, {{submission[0].lat}}],
+    zoom: 13,
+    style: 'mapbox://styles/mapbox/streets-v11' //'mapbox://styles/mapbox/navigation-night-v1'
+    });
+
+    map.on('load', () => {
+    map.addSource('points', {
+     'type': 'geojson',
+     'data': {
+     'type': 'FeatureCollection',
+     'features': [
+     {
+     'type': 'Feature',
+     'properties': {},
+     'geometry': {
+     'type': 'Point',
+     'coordinates': [{{submission[0].lng}}, {{submission[0].lat}}]
+     }}]}
+    });
+
+    // Add a circle layer
+    map.addLayer({
+     'id': 'circle',
+     'type': 'circle',
+     'source': 'points', //refers to first parameter of addSource
+     'paint': {
+     'circle-color': '#ff0000',
+     'circle-radius': 10,
+     'circle-stroke-width': 2,
+     'circle-stroke-color': '#000000'
+     }})
+    });
+</script>
+
+ </body>
+
+{% endblock %}

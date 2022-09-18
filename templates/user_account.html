@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container">
+<div class="panel panel-default">
+<h3>Flehasználói fiók beállítások</h3>
+</div>
+<hr>
+
+<p><strong>Felhasználónév: </strong>{{current_user.username}}
+
+  {% if current_user.username  == 'admin' %}
+  <i>Ki az admin? Te vagy az admin!</i>
+  {% endif %}
+  </p>
+  
+<p><strong>Email cím: </strong>{{current_user.email}}</p>
+
+<p><strong>Létrehozva: </strong>{{current_user.created}}</p>
+<hr>
+<p>[Levelezési beállítások]</p>
+<hr>
+<form action = "" method = "post">
+<button class="btn btn-info">Ügyeim listája</button>
+<br>
+<b>Bejelentések</b>
+{% for row in post_list %}
+  {% if row.submitter_email == current_user.email %}
+   <a href="/single_submission/{{row.id}}">
+   <p>Cím: {{ row.title }}</p>
+   </a>
+  {% endif %}
+{% endfor %}
+
+<b>Örökbefogadott ügyek</b>
+{% for row in post_list %}
+  {% if row.owner_email == current_user.email %}
+   <a href="/single_submission/{{row.id}}">
+   <p>Cím: {{ row.title }}</p>
+   </a>
+  {% endif %}
+{% endfor %}
+</form>
+
+<hr>
+<a href="/logout">
+<button type="button" class="btn btn-primary">Kijelentkezés</button>
+</a>
+<a href="/reset_password">
+<button type="button" class="btn btn-warning">Elfelejtett jelszó</button>
+</a>
+<a href="/delete_account">
+<button type="button" class="btn btn-danger">Fiók törlése</button>
+</a>
+<hr>
+
+<p>[Felhasználói feltételek link]</p>
+<p>[Adatvédelmi tájékoztató link]</p>
+  
+</div>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+
+<html>
+    <head></head>
+    <body>
+    <div class="container">
+	<h3>Statisztikák</h3>
+	<hr>
+	<p><strong>Összes bejelentés a honlapon: </strong>{{post_count}}</p>
+	<p><strong>Összes bolygó száma a Naprendszerben: </strong>8</p>
+	<p><strong>Összes regisztrált felhasználó: </strong>{{user_count}}</p>	
+	<p><strong>Magyarországon található települések száma:</strong> 3155</p>
+	<p><strong>Összes bejelentett státuszú bejelentés: </strong>{{submitted_count}}</p>
+	<p><strong>Összes folyamatban státuszú bejelentés: </strong>{{wip_count}}</p>
+	<p><strong>Összes befejezett státuszú bejelentés: </strong>{{completed_count}}</p>
+	<p><strong>Ételautomaták által évente átlagosan megölt emberek száma a világban: </strong>10</p>	
+    </div>
+    </body>
+</html>
+{% endblock %}

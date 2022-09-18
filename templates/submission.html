@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!--TODO az összes opciót hozzáadni!-->
+<!--TODO kód formázást szebbre-->
+
+<html>
+
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.css' rel='stylesheet' />
+    <style>
+        .cabinet {
+        	  color: white;
+        	  background-color: blue;
+        	  cursor: pointer;
+        	  }	  
+        	  
+        	  .cabinet:hover {
+        	  color: white;
+        	  background-color: coral;
+        	  cursor: pointer;
+        	  }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+
+        <h2>Probléma bejelentése</h2>
+        
+        <hr>
+        
+        <form action="" method="post" enctype="multipart/form-data">
+
+            <div class="form-group">
+                <strong><label for="megnevezes">Probléma megnevezése</label></strong>
+                <input value="" type="text" class="form-control" id="megnevezes" placeholder="" name="title" autofocus>
+            </div>
+
+            <br>
+
+            <div class="form-group">
+                <strong><label for="tipus">Típus</label></strong>
+                <select class="form-select form-control rounded-0" aria-label="Select Problem Type" name="type" required>
+	         <option selected>Válassz a típusok közül!</option>
+	         <option value="Utca">Utca</option>
+	         <option value="Szemét">Szemét</option>
+	         <option value="Közmű">Közmű</option>
+	         <option value="Út">Út</option>
+	         <option value="Járda">Járda</option>
+	         <option value="Akadálymentesítés">Akadálymentesítés</option>
+	         <option value="Növény">Növény</option>
+	         <option value="Épület">Épület</option>
+	         <option value="Közlekedés">Közlekedés</option>
+                 <option value="Tájékoztatás">Tájékoztatás</option>
+                 <option value="Műemlék">Műemlék</option>
+	  </select>
+            </div>
+
+            <br>
+
+            <div class="form-group">
+                <strong><label for="reszletes_leiras">Részletes leírás</label></strong>
+                <textarea class="form-control rounded-0" id="reszletes" rows="3" name="description" required></textarea>
+            </div>
+
+            <br>
+
+            <div class="form-group">
+                <strong><label for="megoldas">Megoldási javaslat</label></strong>
+                <textarea class="form-control rounded-0" id="megoldas" rows="3" name="suggestion" required></textarea>
+            </div>
+
+            <br>
+
+            <div class="form-group">
+                <strong><label for="files" class="" style=>Képek feltöltése</label></strong>
+                <input type="file" 
+                       id="files" 
+                       name="files" 
+                       class="btn btn-secondary form-control rounded-0 border border-dark" 
+                       multiple="true" 
+                       autocomplete="off" 
+                       required
+                       accept="image/x-png, image/jpeg"/>
+            </div>
+
+            <br>
+
+            <div class="form-group">
+                <strong><label for="email">Email cím</label></strong>
+                <input type="text" 
+                       inputmode="email" 
+                       class="form-control" 
+                       id="email" 
+                       autocomplete="on" 
+                       name="email"
+                       {% if current_user.is_authenticated %}
+                        value={{current_user.email}}
+                       {% endif %}
+                       required>
+            </div>
+
+            <div class="form-group">
+                <strong><label for="address">Cím</label></strong> 
+                <br> 
+                <small> Minta: <i>16 Petőfi utca </i></small>
+                <input type="text" class="form-control" id="address" name="address" placeholder="Klikk a térképre!" autocomplete="street-address">
+                <input hidden type="text" id="lng" name="lng"></p>
+                <input hidden type="text" id="lat" name="lat"></p>
+                <input hidden type="text" id="city" name="city"></p>
+                <input hidden type="text" id="county" name="county"></p>
+            </div>
+            <br>
+            <div id='map' style='width: auto; height: 30em;'></div>
+            <hr>
+            <button type="submit" class="btn btn-success form-control rounded-0 border border-dark">Bejelent</button>
+            <hr>
+        </form>
+        <br>
+        <br>
+
+    </div>
+
+</body>
+	
+<script>
+    //MAPBOX autofill address
+    const script = document.getElementById("search-js");
+    script.onload = function () {
+        mapboxsearch.autofill({
+            accessToken: "{{ACCESS_KEY}}",
+            options: { country: "hu" },
+        });
+    };
+</script>
+
+<script>
+    mapboxgl.accessToken = '{{ACCESS_KEY}}';
+    var map = new mapboxgl.Map({
+    container: 'map',
+    center: [{{lat}}, {{lng}}],
+    zoom: 13,
+    style: 'mapbox://styles/mapbox/streets-v11'
+    });
+
+    map.on("click", (e) => {
+    coordinates = e.lngLat;
+    const url =
+    "https://api.mapbox.com/geocoding/v5/mapbox.places/" +
+    coordinates.lng +
+    "," +
+    coordinates.lat +
+    ".json?access_token=" +
+    '{{ACCESS_KEY}}' +
+    "&types=address";
+    map.flyTo({center: coordinates});
+
+    if (map.getLayer('circle')) {
+      map.removeLayer('circle');
+    }
+    if (map.getSource('points')) {
+      map.removeSource('points');
+    }
+
+    map.addSource('points', {
+    'type': 'geojson',
+    'data': {
+      'type': 'FeatureCollection',
+      'features': [
+        {
+        'type': 'Feature',
+        'properties': {},
+        'geometry': {
+          'type': 'Point',
+          'coordinates': [coordinates.lng,coordinates.lat]
+          }
+        }
+      ]
+    }
+    });
+
+    map.addLayer({
+    'id': 'circle',
+    'type': 'circle',
+    'source': 'points', //refers to first parameter of addSource
+    'paint': {
+      'circle-color': '#ff0000',
+      'circle-radius': 10,
+      'circle-stroke-width': 2,
+      'circle-stroke-color': '#000000',
+      'circle-opacity' : 0.5
+    }});
+
+    $.get(url, function (data) {
+    var address = data.features[0].place_name;
+    var city = address.split(",")[0].trim()
+    var street = address.split(",")[1].trim()
+    var postal_code = address.split(",")[2].trim()
+    
+    if (city == "Budapest"){
+      var county = "Pest"
+    } else {
+      var county = address.split(",")[3].trim()
+    };
+    
+    var county = county.replace("County", "").trim()
+
+    const popups = document.getElementsByClassName("mapboxgl-popup");
+    if (popups.length) {
+    popups[0].remove();
+    }
+
+    const popup = new mapboxgl.Popup({ closeOnClick: false })
+    .setLngLat([coordinates.lng,coordinates.lat])
+    .setHTML(`<p>${address}</p>`)
+    .addTo(map);
+
+    document.getElementById("city").value = city
+    document.getElementById("county").value = county
+    console.log(county)
+    document.getElementById("address").value = address
+    document.getElementById("lng").value = coordinates.lng
+    document.getElementById("lat").value = coordinates.lat
+    });
+     });
+</script>
+
+
+</html>
+
+{% endblock %}

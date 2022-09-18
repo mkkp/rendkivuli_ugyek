@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<html>
+
+<head>
+ <style>
+	/* unvisited link */
+	a:link {
+	  color: black;
+	}
+
+	/* visited link */
+	a:visited {
+	  color: grey;
+	}
+
+	/* mouse over link */
+	a:hover {
+	  color: red;
+	  text-decoration: none;
+	}
+
+
+	/* selected link */
+	a:active {
+	  color: blue;
+	}
+
+	.cropped {
+	  width: auto; 
+	  height: 10em; 
+	  object-fit: cover;
+	  object-position: 50% 50%; 
+	  border: 1px solid black;
+	}
+</style>
+
+</head>
+ <body>
+ 
+  <div class="container">
+  
+  <br>
+  
+  <h2>Összes bejelentés</h2>
+  
+  <form action="" method="post" enctype="multipart/form-data">
+  
+   <div class="form-group">
+   
+    <label for="type">Típus</label>
+    
+    <select class="form-select form-control rounded-0" 
+            aria-label="Select Problem Type" 
+            name="county">
+     <option selected>Válassz a megyék közül!</option>
+     <option>Pest</option>
+     <option>Bács-Kiskun</option>
+     <option>Baranya</option>
+     <option>Békés</option>
+     <option>Borsod-Abaúj-Zemplén</option>
+     <option>Csongrád</option>
+     <option>Fejér</option>
+     <option>Győr-Moson-Sopron</option>
+     <option>Hajdú-Bihar</option>
+     <option>Heves</option>
+     <option>Jász-Nagykun-Szolnok</option>
+     <option>Komárom-Esztergom</option>
+     <option>Nógrád</option>
+     <option>Szabolcs-Szatmár-Bereg</option>
+     <option>Tolna</option>
+     <option>Vas</option>
+     <option>Veszprém</option>
+     <option>Zala</option>
+     <!--TODO az összes opciót hozzáadni!-->
+    </select>
+    
+   </div> 
+   
+    <button type="submit" class="btn btn-light form-control rounded-0">Mutasd!</button>
+    
+   </form>
+   
+   <hr>
+   
+   <div class="row">
+ 
+    {% for row in post_list.items %}
+    
+     <div class="col-sm-3">
+     
+      <div class="card">
+      
+       <img class="cropped" src="/static/upload/{{ row.id }}/{{row.cover_image}}" alt={{ row.title }}/>
+           
+       <a href="/single_submission/{{ row.id }}" target="_blank" rel="noopener noreferrer">
+           
+       <table class="table table-light">
+           
+        <tr>
+         <thead class="thead">
+          <th>
+           {{ row.title }}
+          </th>
+         </thead>
+        </tr>
+           
+        <tr>
+         <td>{{ row.status }}</td>
+        </tr>
+                      
+        <tr>
+         <td>{{ row.created_date }}</td>
+        </tr>
+           
+        <tr>
+         <td>{{ row.problem_type }}</td>
+        </tr>
+           
+        <tr>
+         <td>{{ row.address }}</td>
+        </tr>
+
+       </table>
+       
+       </a>
+       
+       </div>
+
+       <nav aria-label="Page navigation example">
+
+     </div>
+
+    {% endfor %}
+    
+   </div>
+   <hr>
+   
+
+  <!-- Pagination Links-->
+  <div class="text-right">
+    <a href="{{ url_for('all_submission', page=post_list.prev_num) }}"
+       class="btn btn-outline-dark 
+       {% if post_list.page == 1 %}disabled{% endif %}">
+        &laquo;
+    </a>
+  <!-- Loop through the number of pages to display a link for each-->
+    {% for page_num in post_list.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+     {% if page_num %}
+     <!-- Check for the active page and set the link to "Active"-->
+      {% if post_list.page == page_num %}
+       <a href="{{ url_for('all_submission', page=page_num) }}"
+          class="btn btn-dark">
+          {{ page_num }}
+       </a>
+      {% else %}
+       <a href="{{ url_for('all_submission', page=page_num) }}"
+          class="btn btn-outline-dark">
+          {{ page_num }}
+       </a>
+      {% endif %}
+      {% else %}
+      ...
+      {% endif %}
+    {% endfor %}
+    <a href="{{ url_for('all_submission', page=post_list.next_num) }}"
+       class="btn btn-outline-dark 
+       {% if post_list.page == post_list.pages %}disabled{% endif %}">
+        &raquo;
+    </a>
+   </div>
+  </div>
+
+ </body>
+ 
+</html>
+
+{% endblock %}

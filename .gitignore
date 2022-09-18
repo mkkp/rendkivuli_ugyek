@@ -1,3 +1,7 @@
+app.db
+config.py
+static/upload
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
