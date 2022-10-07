@@ -1,12 +1,5 @@
 """
 SQLAlchemy schema model definitons
-* UserModel
-* SubmissionModel
-* ImageBeforeModel
-* ImageAfterModel 
-
-https://flask-sqlalchemy.palletsprojects.com/en/2.x/models/
-https://www.fullstackpython.com/sqlalchemy-model-examples.html
 """
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
@@ -22,30 +15,29 @@ db = SQLAlchemy()
 def load_user(id):
     return UserModel.query.get(int(id))
 
-  
 class UserModel(UserMixin, db.Model):
     """
     table schema for users
+    UPDATE user SET role = 'coordinator' WHERE email = 'feher.aron@gmail.com';
+    UPDATE user SET role = 'admin' WHERE email = 'feher.aron@gmail.com';
     """
     __tablename__ = 'user'
 
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(80), unique=True)
-    phone = db.Column(db.String(20), unique=True)
-    username = db.Column(db.String(100), unique=True)
-    verified = db.Column(db.Boolean())
-    verification_code = db.Column(db.String(25))
+    create = db.Column(db.Boolean())
+    read = db.Column(db.Boolean())
+    update = db.Column(db.Boolean())
+    delete = db.Column(db.Boolean())
+    active = db.Column(db.Boolean())
+    role = db.Column(db.String(10))
     created_date = db.Column(db.String(10)) #2022-09-01
+    email = db.Column(db.String(80), unique=True) #GDPR
+    inactive_date = db.Column(db.String(10)) #2022-09-01
     last_login = db.Column(db.String(10)) #2022-09-01
-    password_hash = db.Column(db.String())
-
-    def set_password(self,password):
-        self.password_hash = generate_password_hash(password)
-
-    def check_password(self,password):
-        return check_password_hash(self.password_hash,password)
-
-            
+    phone = db.Column(db.String(20), unique=True) #GDPR
+    user_name = db.Column(db.String(100), unique=True)
+    verified = db.Column(db.Boolean())
+         
 class SubmissionModel(db.Model):
     """
     table schema for submitted cases
@@ -57,6 +49,7 @@ class SubmissionModel(db.Model):
     problem_type = db.Column(db.String(), index=True)
     description = db.Column(db.String())
     suggestion = db.Column(db.String())
+    solution = db.Column(db.String())
     address = db.Column(db.String())
     city = db.Column(db.String())
     county = db.Column(db.String())

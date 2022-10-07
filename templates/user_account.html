@@ -4,55 +4,54 @@
 
 <div class="container">
 <div class="panel panel-default">
-<h3>Flehasználói fiók beállítások</h3>
+<h3>Felhasználói fiók beállítások</h3>
 </div>
 <hr>
-
-<p><strong>Felhasználónév: </strong>{{current_user.username}}
-
-  {% if current_user.username  == 'admin' %}
-  <i>Ki az admin? Te vagy az admin!</i>
-  {% endif %}
-  </p>
-  
+<p><strong>Felhasználónév: </strong>{{current_user.user_name}}
+<form action="" method="post">
+<label><strong>Felhasználónév módosítása:</label>
+<input hidden id="user_id" name="user_id" type="text" value={{current_user.id}}>
+<input type="text" class="form-control rounded-0" id="new_user_name" name="new_user_name">
+<button class="btn btn-warning rounded-0" name="new_user_name">Új felhasználónév mentése</button>
+</form>
+<br>
+<br>
 <p><strong>Email cím: </strong>{{current_user.email}}</p>
-
-<p><strong>Létrehozva: </strong>{{current_user.created}}</p>
-<hr>
-<p>[Levelezési beállítások]</p>
+<p><strong>Létrehozva: </strong>{{current_user.created_date}}</p>
+<p><strong>Szint: </strong> {{ role }}</p>
 <hr>
 <form action = "" method = "post">
-<button class="btn btn-info">Ügyeim listája</button>
+<input hidden id="user_id" name="user_id" type="text" value={{current_user.id}}>
+<button class="btn btn-info" name="own_submissions">Ügyeim listája</button>
 <br>
-<b>Bejelentések</b>
+{% if post_list is defined%}
+<p><strong>Bejelentve általam:</strong></p>
+<ul class="list-group">
 {% for row in post_list %}
-  {% if row.submitter_email == current_user.email %}
-   <a href="/single_submission/{{row.id}}">
-   <p>Cím: {{ row.title }}</p>
-   </a>
-  {% endif %}
+   {% if row.title %}
+   <li class="list-group-item">
+    <a href="/single_submission/{{row.id}}">{{ row.title }}</a>
+   </li>
+   {% endif %}
 {% endfor %}
+</ul>
+{% endif%}
+<br>
+{% if owner_list is defined %}
+<p><strong>Rendező vagyok:</strong></p>
+<ul class="list-group">
+{% for row in owner_list %}
+   {% if row.title %}
+   <li class="list-group-item">
+    <a href="/single_submission/{{row.id}}">{{ row.title }}</a>
+   </li>
+   {% endif %}
+{% endfor %}
+</ul>
+{% endif%}
 
-<b>Örökbefogadott ügyek</b>
-{% for row in post_list %}
-  {% if row.owner_email == current_user.email %}
-   <a href="/single_submission/{{row.id}}">
-   <p>Cím: {{ row.title }}</p>
-   </a>
-  {% endif %}
-{% endfor %}
 </form>
 
-<hr>
-<a href="/logout">
-<button type="button" class="btn btn-primary">Kijelentkezés</button>
-</a>
-<a href="/reset_password">
-<button type="button" class="btn btn-warning">Elfelejtett jelszó</button>
-</a>
-<a href="/delete_account">
-<button type="button" class="btn btn-danger">Fiók törlése</button>
-</a>
 <hr>
 
 <p>[Felhasználói feltételek link]</p>

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<body>
+<div class="container">
+<h3>Felhasználó kezelése</h3>
+<hr>
+{% if role == 'admin' %}
+    <form action="" method="post">
+    <p><strong>Felhasználó név: </strong>{{ user.user_name }}</p>
+    <label for="status"><strong>Jogosultsági szint:</strong></label>
+     <select class="form-select" aria-label="Select role" id="role" name="role">
+      <option selected>{{ role }}</option>
+      <option value="registered">regisztrált</option>
+      <option value="coordinator">koordinátor</option>
+      <option value="admin">admin</option>
+     </select>
+    <p><strong>Email: </strong>{{ user.email }}</p>
+    {% if user.phone is not none%}
+     <p><strong>Telefon: </strong>{{ user.phone }}</p> 
+    {% else %}
+     <p><strong>Telefon: </strong>-</p>
+    {% endif %}
+    <p><strong>Felhasználó létrehozva: </strong>{{ user.created_date }}</p>
+    <p><strong>Utolsó bejelentkezés: </strong>{{ user.last_login }}</p>
+    <button type="submit" id="change_role" name="change_role" class="btn btn-warning rounded-0">Módosít</button>
+    </form>
+{% endif %}
+</div>
+</body>
+{% endblock %}
+

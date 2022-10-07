@@ -6,9 +6,11 @@ MKKP városfelújítós alkalmazás
 #-------------------------------
 
 #BUILTINS
+import json
+import jwt
 import os
 import shutil
-from random import random
+from random import randint
 from pathlib import Path
 
 #THIRD PARTY MODULES
@@ -21,7 +23,10 @@ from flask import flash
 from flask import redirect 
 from flask import render_template
 from flask import request
+from flask import session
+from flask import url_for
 
+#Flask Login
 from flask_login import current_user
 from flask_login import login_required 
 from flask_login import login_user
@@ -30,6 +35,12 @@ from flask_login import logout_user
 from flask_cors import CORS
 from flask_paranoid import Paranoid
 from werkzeug.utils import secure_filename
+
+#AUTH0
+#from os import environ as env
+#from dotenv import find_dotenv, load_dotenv
+from urllib.parse import quote_plus, urlencode
+from authlib.integrations.flask_client import OAuth
 
 #SQLAlchemy
 from sqlalchemy import update
@@ -49,6 +60,7 @@ from models import CommentModel
 from utils import valid_email
 from utils import get_date
 from utils import save_picture
+from utils import get_random_name
 
 #-------------------------------
 #---------C O N F I G-----------
@@ -69,11 +81,36 @@ from config import UPLOAD_FOLDER
 from config import APP_SECRET_KEY
 from config import ROWS_PER_PAGE
 
+#AUTH0
+from config import AUTH0_CLIENT_ID
+from config import AUTH0_CLIENT_SECRET
+from config import AUTH0_DOMAIN
+from config import APP_SECRET_KEY
+from config import AUT0_DB
+
 ##APP
 app = Flask(__name__)
 
+##OAUTH
+oauth = OAuth(app)
+
+oauth.register(
+    "auth0",
+    client_id = AUTH0_CLIENT_ID,
+    client_secret= AUTH0_CLIENT_SECRET,
+    client_kwargs = {
+        "scope": "openid profile email",
+    },
+    server_metadata_url=f'https://{AUTH0_DOMAIN}/.well-known/openid-configuration'
+)
+
 ##DATABASE
 db.init_app(app)
+
+#APP CONFIG
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(BASE_DIR, DB_NAME)
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.secret_key = APP_SECRET_KEY
 
 #CORS
 #https://flask-cors.readthedocs.io/en/latest/
@@ -83,11 +120,6 @@ CORS(app, resources={r'/*': {'origins': '*'}})
 #https://pypi.org/project/Flask-Paranoid/
 paranoid = Paranoid(app)
 paranoid.redirect_view = '/'
-
-#APP CONFIG
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(BASE_DIR, DB_NAME)
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.secret_key = APP_SECRET_KEY
 
 #FLASK-LOGIN Config
 login.init_app(app)
@@ -110,33 +142,47 @@ def create_all():
     db.create_all()
 
 
- 
- 
-#CONTEXT PROCESSOR
-@app.context_processor
-def utility_processor():
-    def hello():
-        return "hello"
+#BEJELENTKEZÉS
+@app.route("/login")
+def login():
+    return oauth.auth0.authorize_redirect(
+        redirect_uri=url_for("callback", _external=True))
     
-    return dict(hello=hello)
-
-
-#STATISZTIKA
-@app.route('/statistics', methods = ['POST', 'GET'])
-def statistics():
-    post_count = SubmissionModel.query.count()
-    user_count = UserModel.query.count()
-    submitted_count = SubmissionModel.query.filter_by(status="Bejelentve").count()
-    wip_count = SubmissionModel.query.filter_by(status="Folyamatban").count()
-    completed_count = SubmissionModel.query.filter_by(status="Befejezve").count()
-    return render_template('statistics.html',
-                            post_count=post_count,
-                            user_count=user_count,
-                            submitted_count = submitted_count,
-                            wip_count=wip_count,
-                            completed_count=completed_count
-                          )  
+@app.route("/callback", methods=["GET", "POST"])
+def callback():
+    token = oauth.auth0.authorize_access_token()
+    access_token = token['access_token']
+    session["user"] = token
+    user_email = token['userinfo']['email']
+    aud = token['userinfo']['aud']
+    user_name = token['userinfo']['name']
+    user = UserModel.query.filter_by(email = user_email).first()
     
+    if aud != AUTH0_CLIENT_ID:
+        flash("sikertelen bejelentkezés","danger")
+        return redirect("/")
+    
+    if not user:
+        user_name = get_random_name() + " " + str(randint(1,1000))
+        reg_user = UserModel(email=user_email,
+                             created_date=get_date(),
+                             role="registered",
+                             user_name = user_name,
+                             active=True)
+        db.session.add(reg_user)
+        db.session.commit()
+        user = UserModel.query.filter_by(email = user_email).first()
+        login_user(user)
+        user.last_login = get_date()
+        
+    if user:
+        login_user(user)
+        user.last_login = get_date()
+        db.session.commit()
+        
+    flash("Sikeres bejelentkezés!","success")
+    return redirect("/")
+
 
 #INDEX
 @app.route('/', methods = ['GET'])
@@ -145,7 +191,6 @@ def index():
     Kezdőoldal
     Bejelentkezés nem szükséges
     """
-    
     return render_template('index.html')
 
     
@@ -163,11 +208,9 @@ def submission():
                                    ACCESS_KEY=MAP_KEY,
                                    lat=INIT_LAT,lng=INIT_LNG
                                   )
-                                  
+                                                 
         #validate text for embedded links
-        if "http" in request.form["title"]\
-         or "http" in request.form["description"]\
-         or "http" in request.form["suggestion"]:
+        if "http" in request.form["title"]:
             flash('A szöveg nem tartalmazhat linket!','danger')
             return render_template('submission.html',
                                    ACCESS_KEY=MAP_KEY,
@@ -185,8 +228,9 @@ def submission():
 		     lng=request.form["lng"],
 		     submitter_email=request.form["email"],
 		     owner_email="",
-		     #cover_image="",
 		     status="Bejelentve",
+		     status_changed_date=get_date(),
+		     status_changed_by = request.form["email"],
 		     created_date=get_date()
 		     )
 	
@@ -218,18 +262,17 @@ def submission():
               "Name":  "MKKP"
             }
               ],
-              "Subject":  "Sikeres várofmódosító bejelentés!",
-              "TextPart": "Sikeres várofmódosító bejelentés!",
+              "Subject":  "Sikeres városmódosító bejelentés!",
+              "TextPart": "Sikeres városmódosító bejelentés!",
               "HTMLPart": f"<h4>Gratulálunk!</h4><h5>Sikeres városmódosító bejelentést tettél!</h5>",
               "CustomID": "MKKP városmódosító bejelentés"
             }
           ]
         }
 
-        
         mailjet.send.create(data=submission_mail)
         flash("Sikeres bejelentés! Küldtünk egy levelet is!",'success')
-        return render_template('index.html')
+        return redirect(f'/single_submission/{submission.id}')
 
     if request.method == 'GET':
         return render_template('submission.html',
@@ -264,6 +307,39 @@ def single_submission(id):
             db.session.add(comment)                       
             db.session.commit()
             flash(f"Sikeresen hozzáadtál egy kommentet!","success")
+
+        if "closing_solution_submit" in request.form:
+            closing_solution = request.form["closing_solution"]
+            changed_by = request.form["current_user"]
+            submission = SubmissionModel.query.filter_by(id=submission_id).first()
+            submission.solution = closing_solution
+            submission.status = "Befejezve"
+            submission.status_changed_date =  get_date()
+            submission.status_changed_by = changed_by
+            db.session.commit()
+            flash(f"Sikeresen hozzáadtad a bejelentés zárószövegét! Az ügy innentől kezdve befejezettnek minősül.", "success")         
+            
+        if "new_address_submit" in request.form:
+            submission = SubmissionModel.query.filter_by(id=submission_id).first()
+            new_address = request.form["new_address"]
+            city = request.form["city"],
+            county = request.form["county"],
+            lat = request.form["lat"],
+            lng = request.form["lng"],
+            
+            city = city[0]
+            county = county[0]
+            lat = lat[0]
+            lng = lng[0]
+            
+            submission.address = new_address
+            submission.county = county
+            submission.city = city
+            submission.lat = lat
+            submission.lng = lng
+            
+            db.session.commit()
+            flash(f"Sikeresen módosítottad a címet!", "success")            
                                     
         if "comment-edit" in request.form:
             body_change = request.form["comment"]
@@ -273,6 +349,17 @@ def single_submission(id):
             comment.created_date = get_date()
             db.session.commit()
             flash(f"Komment szerkesztve","success")
+            
+        if "change_tumbnail" in request.form:
+            new_thumbnail = request.form["new_thumb"]
+            submission = SubmissionModel.query.filter_by(id=submission_id).first()
+            submission.cover_image = new_thumbnail
+            db.session.commit()
+            flash(f"""A borítókép cserélési eljárás 
+                      előkészítését elindítottuk.
+                      Ügyintézőnk egy héten belül jelentkezik.
+                      Kérjük, addig ne mozduljon a készüléke mellől!
+                      ""","success")            
 
         if "upload_before_images" in request.form:
             tag = "before"
@@ -306,56 +393,57 @@ def all_submission():
     post_list = SubmissionModel.query\
       .order_by(SubmissionModel.created_date.desc())\
       .paginate(page=page, per_page=ROWS_PER_PAGE)
-    img_list = ImageBeforeModel.query.all()
 
     if request.method == 'POST':
     
         county = request.form["county"]
+        problem_type = request.form["type"]
+        status = request.form["status"]
+
+        county_dict = {}
+        problem_type_dict = {}
+        status_dict = {}
         
-        if county == "Válassz a megyék közül!":
-            img_list = ImageBeforeModel.query.all()
-            post_list = SubmissionModel.query\
-            .order_by(SubmissionModel.created_date.desc())\
-            .paginate(page=page, per_page=ROWS_PER_PAGE)
-        else:              
-            post_list = SubmissionModel.query\
-            .filter_by(county=county)\
-            .order_by(SubmissionModel.created_date.desc())\
-            .paginate(page=page, per_page=ROWS_PER_PAGE)            
+        if county != "":
+            county_dict = {"county":county}
+            
+        if problem_type != "":
+            problem_type_dict = {"problem_type":problem_type}
+            
+        if status != "":
+            status_dict = {"status":status}
+        
+        #merge dicts      
+        query_dict = county_dict | problem_type_dict | status_dict
+        
+        filtered_list = SubmissionModel.query.filter_by(**query_dict)\
+        .order_by(SubmissionModel.created_date.desc())\
+        .paginate(page=page, per_page=ROWS_PER_PAGE)
         
         return render_template ("all_submission.html", 
-                                 post_list=post_list, 
-                                 img_list=img_list
+                                 post_list=filtered_list, 
                                )
 
     return render_template ("all_submission.html", 
                             post_list=post_list, 
-                            img_list=img_list
                            ) 
 
 
-#BEJELENTÉS ÖRÖKBEFOGADÁS                      
-@app.route('/adopt/<id>', methods = ['POST', 'GET'])
+#BEJELENTÉS RENDEZŐ HOZZÁADÁSA                      
+@app.route('/assign/<id>', methods = ['POST', 'GET'])
 @login_required
-def adopt(id):
+def assign(id):
+
+    user_list = UserModel.query.all()
+    submission = SubmissionModel.query.filter_by(id=id).first()
 
     if request.method == 'POST':
-        email = request.form["email"]
-        phone = request.form["phone"]
-        user = UserModel.query.filter_by(email=email).first()
-        user.phone = phone
-        try:
-            db.session.commit()
-        except Exception as err:
-            flash("Ez a telefonszám már használatban van!","danger")
-            return redirect(f'/adopt/{id}')
         
-        submission = SubmissionModel.query.filter_by(id=id).first()
-        submission.owner_email = email
-        submission.owner_user = user.username
+        submission.owner_email = request.form['email']
+        submission.owner_user = request.form['username']
         db.session.commit()
         
-        adoption_mail = {'Messages': [
+        organiser_mail = {'Messages': [
             {
             "From": {
             "Email": f"{FROM_MAIL}",
@@ -367,25 +455,24 @@ def adopt(id):
               "Name":  "MKKP"
             }
               ],
-              "Subject":  "Sikeres örökbefogadás!",
-              "TextPart": "Sikeres örökbefogadás!",
-              "HTMLPart": f"""<h3>Gratulálunk!</h3>
-                              <hr>
-                              <h5>Sikeresen örökbefogadtad az ügyet!</h5>
-                              <p>https://rendkivuliugyek.site/single_submission/{id}</p>
-                           """,
-              "CustomID": "MKKP Sikeres örökbefogadás!"
+              "Subject":  "MKKP rendező lettél!",
+              "TextPart": "MKKP rendező lettél!",
+              "HTMLPart": f"""<h2>Gratulálunk!</h2><h3>Rendezőként lettél beállítva 
+              a Rendkívüli Ügyek Minisztériumának következő bejelentésénél:</h3>
+              https://rendkivuliugyek.site/single_submission/{id}
+              """,
+              "CustomID": "MKKP rendező lettél!"
             }
           ]
         }
 
-        mailjet.send.create(data=adoption_mail)         
+        mailjet.send.create(data=organiser_mail)        
 
-        flash("Sikeresen örökbefogadva!","success")
+        flash("Szervező sikeresen hozzárendelve!","success")
         return redirect(f'/single_submission/{id}')
 
-    return render_template('adopt.html')   
-    
+    return render_template('assign.html', user_list=user_list, submission=submission) 
+
 
 #KOMMENT TÖRLÉS                      
 @app.route('/delete_comment/<id>')
@@ -398,7 +485,7 @@ def delete_comment(id):
     flash("A kommentet sikeresen töröltük!","success")
     return redirect(f'/single_submission/{submission_id}')
 
-    
+ 
 #KÉP TÖRLÉS
 @app.route('/delete_picture/<status_type>/<id>')
 @login_required
@@ -449,6 +536,27 @@ def delete_submission(id):
     flash("A bejegyzést sikeresen töröltük!","success")
     return redirect('/')
 
+
+#STATISZTIKA
+@app.route('/statistics', methods = ['POST', 'GET'])
+def statistics():
+    post_count = SubmissionModel.query.count()
+    user_count = UserModel.query.count()
+    submitted_count = SubmissionModel.query.filter_by(status="Bejelentve").count()
+    wip_count = SubmissionModel.query.filter_by(status="Folyamatban").count()
+    completed_count = SubmissionModel.query.filter_by(status="Befejezve").count()
+    #upload_stat = os.stat(UPLOAD_FOLDER)
+    #upload_size = os.stat(UPLOAD_FOLDER).st_size / 1000
+    
+    return render_template('statistics.html',
+                            post_count=post_count,
+                            user_count=user_count,
+                            submitted_count = submitted_count,
+                            wip_count=wip_count,
+                            completed_count=completed_count,
+                            #upload_size=upload_size
+                          )  
+ 
  
 #TÉRKÉP
 @app.route('/full_map', methods = ['POST', 'GET'])
@@ -462,207 +570,85 @@ def full_map():
                            lng=INIT_LNG,
                            post_list=post_list
                           )
-
-
-
-
+    
+#REGISZTRÁCIÓ
+@app.route('/register', methods=['POST', 'GET'])
+def register():
+    return redirect('https://passziv.mkkp.party/regisztracio', code=302)
+    
+ 
+   
 #FELHASZNÁLÓI FIÓK
 @app.route('/user_account', methods = ['POST', 'GET'])
 @login_required
 def user_account():
+
     if request.method == 'POST':
-        post_list = SubmissionModel.query.all()
-        return render_template("user_account.html",
-                               post_list=post_list
-                              )
+    
+        if "new_user_name" in request.form:
+            user_id = int(request.form["user_id"])
+            new_user_name = request.form["new_user_name"]
+            user = UserModel.query.filter_by(id=user_id).first()
+            user.user_name = new_user_name
+            db.session.commit()
+            flash("Mostantól így hívunk.","success")
+        
+        if "own_submissions" in request.form:
+        
+            user_id = int(request.form["user_id"])
+            user = UserModel.query.filter_by(id=user_id).first()
+            post_list = SubmissionModel.query.filter_by(submitter_email = user.email)
+            owner_list = SubmissionModel.query.filter_by(owner_email = user.email)
+            return render_template("user_account.html",
+                               post_list=post_list,
+                               owner_list=owner_list)
+                                 
     return render_template("user_account.html")
 
 
-#BEJELENTKEZÉS
-@app.route('/login', methods = ['POST', 'GET'])
-def login():
-    if current_user.is_authenticated:
-        flash("Már be vagy jelentkezve",'info')
-        return redirect('/')
+#FELHASZNÁLÓK ÁTTEKINTÉSE
+@app.route('/user_administration', methods = ['POST', 'GET'])
+@login_required
+def user_management():
+    if request.method == 'POST':
+        pass
+    user_list = UserModel.query.all()
+    return render_template("user_management.html", user_list=user_list)
+
+
+#FELHASZNÁLÓ KEZELÉSE
+@app.route('/user_manage/<id>', methods = ['POST', 'GET'])
+@login_required
+def user_manage(id):
+
+    user = UserModel.query.filter_by(id=id).first() 
 
     if request.method == 'POST':
-        email = request.form['email']
-        user = UserModel.query.filter_by(email = email).first()
-
-        if user is not None \
-           and user.check_password(request.form['password'])\
-           and user.verified == True:
-            login_user(user)
-            user.last_login = get_date()
-            db.session.commit()            
-            flash("Sikeres bejelentkezés!",'success')
-            return redirect('/')
-        else:
-            flash("Sikertelen bejelentkezés!",'danger')
-            render_template('login.html')
-
-    return render_template('login.html')
- 
+        user_role = request.form['role']
+        user.role = user_role
+        db.session.commit()
+        flash("Sikeres Módosítás",'success')
+        return render_template("single_user.html",user=user)
     
+    return render_template("single_user.html",user=user)
+
+#ADATVÉDELMI TÁJÉKOZTATÓ
+@app.route('/user_data_info', methods = ['GET'])
+def user_data_info():
+    return render_template("user_data_info.html")
+
 #KIJELENTKEZÉS
 @app.route('/logout')
 def logout():
     logout_user()
     flash("Sikeres kijelentkezés!",'success')
     return redirect('/')
-
-
-#REGISZTRÁCIÓ
-@app.route('/register', methods=['POST', 'GET'])
-def register():
-    if current_user.is_authenticated:
-        #if authenticated do not show register again
-        flash("Már regisztráltál.",'info')
-        return redirect('/')
-
-    if request.method == 'POST':
-        email = request.form['email']
-        username = request.form['username']
-        password = request.form['password']
-        
-        if UserModel.query.filter_by(email=email).first():
-            flash('Ez az email már használatban van.','warning')
-            return render_template('register.html')
-            
-        if UserModel.query.filter_by(username=username).first():
-            flash('Ez a felhasználónév már használatban van.','warning')
-            return render_template('register.html')
-            
-        v_code = str(random())[2:]
-        user = UserModel(email=email, 
-                         username=username,
-                         verified=False,
-                         verification_code=v_code,
-                         created_date=get_date()
-                         )
-        user.set_password(password)
-        db.session.add(user)
-        db.session.commit()
-        
-        registration_email = {
-	  'Messages': [
-	    {
-	      "From": {
-		"Email": f"{FROM_MAIL}",
-		"Name":  "Teszt Regisztráció"
-	      },
-	      "To": [
-		{
-		  "Email": f"{email}",
-		  "Name":  f"{username}"
-		}
-	      ],
-	      "Subject":  "Teszt regisztráció",
-	      "TextPart": "Regisztrációs email",
-	      "HTMLPart": f"<h3>{v_code}</h3>",
-	      "CustomID": "Regisztráció"
-	    }
-	  ]
-	}
-
-        result = mailjet.send.create(data=registration_email)
-        
-        return redirect('/confirm_registration')
-        
-    return render_template('register.html')
-
-
-#REGISZTRÁCIÓ MEGERŐSÍTÉSE
-@app.route('/confirm_registration', methods=['POST', 'GET'])
-def confirm_registration():
-    if current_user.is_authenticated:
-        return redirect('/')
-        
-    if request.method == 'POST':
-        email = request.form['email']
-        verification_code = request.form['verification_code']
-        user = UserModel.query.filter_by(email=email).first()
-        
-        if verification_code == user.verification_code:
-            user.verified = True
-            db.session.commit()
-            
-            sql = text("SELECT * from user")
-            result = db.session.execute(sql).fetchall()      
-            
-            flash("Sikeres regisztráció!",'success')
-            return redirect('/login')
-            
-        else:
-            flash("Sikertelen regisztráció!",'danger')
-            return redirect('/confirm_registration')
-
-    return render_template('confirm_registration.html')
-
-
-#ÚJ JELSZÓ
-@app.route('/reset_password', methods = ['POST', 'GET'])
-def reset_password():
-    if request.method == 'POST':
     
-        email = request.form['email']
-        password = request.form['password']
-        
-        user = UserModel.query.filter_by(email=email).first()
-        
-        v_code = str(random())[2:]
-        user_name = user.username
-        
-        registration_email = {
-	  'Messages': [
-	    {
-	      "From": {
-		"Email": f"{FROM_MAIL}",
-		"Name":  "Jelszó vissazállítása"
-	      },
-	      "To": [
-		{
-		  "Email": f"{email}",
-		  "Name":  f"{user_name}"
-		}
-	      ],
-	      "Subject":  "Jelszó vissazállítása",
-	      "TextPart": "Jelszó vissazállítása",
-	      "HTMLPart": f"<h3>{v_code}</h3>",
-	      "CustomID": "Jelszó vissazállítása"
-	    }
-	  ]
-	}
 
-        result = mailjet.send.create(data=registration_email)
-        
-        user.verification_code = v_code
-        user.verified = False
-        user.set_password(password)
-        db.session.commit()        
-        
-        return redirect('/confirm_registration')
-    return render_template('reset_password.html')
-
-
-#FELHASZNÁLÓ TÖRLÉSE
-@app.route('/delete_account', methods = ['POST', 'GET'])
-@login_required
-def delete_account():
-    if request.method == 'POST':
-        email = request.form['email']
-        user = UserModel.query.filter_by(email=email).first()
-        db.session.delete(user)
-        db.session.commit()
-        flash("Sikeres kijelentkezés",'success')
-        return redirect('/logout')
-        
-    return render_template('delete_account.html')
-    
 @app.errorhandler(404) 
 def page_not_found(e): 
     return render_template('404.html')
 
 #APP RUN
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='localhost', port=5000, debug=True)

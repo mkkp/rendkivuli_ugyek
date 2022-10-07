@@ -7,8 +7,14 @@ import uuid
 
 from datetime import datetime as dt
 from PIL import Image
+from PIL import ImageOps
 from pathlib import Path
+from random import randint
 
+from models import db
+from models import SubmissionModel
+from models import ImageBeforeModel
+from models import ImageAfterModel
 
 def valid_email(email: str) -> bool:
     """
@@ -30,7 +36,6 @@ def get_date():
 def save_picture(pictures, upload_folder, tag, submission_id):
     """
     """
-    from models import db
     from config import THUMBNAIL_SIZE
     img_count = 1
     
@@ -52,34 +57,35 @@ def save_picture(pictures, upload_folder, tag, submission_id):
         
         upload_path = os.path.join(picture_dir, new_filename)
         
-        #SAVE     
-        picture.save(upload_path)
+        #SAVE ORIGINAL
+        picture = Image.open(picture)
+        fixed_image = ImageOps.exif_transpose(picture)
+        fixed_image.save(upload_path)
 
-        #THUMBNAIL
+        #SAVE THUMBNAIL
         thumbnail_pic = resize(THUMBNAIL_SIZE, upload_path)
-        
         thumbnail_name = f"{submission_id}_{unique_id}_{tag}_thumbnail_{img_count}.{original_suffix}"
-        
         thumbnail_path = os.path.join(picture_dir, thumbnail_name)
-        thumbnail_pic.save(thumbnail_path)
+        fixed_thumbnail = ImageOps.exif_transpose(thumbnail_pic)
+        fixed_thumbnail.save(thumbnail_path)
 
         #UPDATE DB MODELS
         if tag == "before":
-            from models import ImageBeforeModel
+            
             image = ImageBeforeModel(parent_id = submission_id,
 		                     file_name = new_filename,
 		                     thumb_file_name = thumbnail_name,
 		                     created_date=get_date()
 		                    )
         if tag == "after":
-            from models import ImageAfterModel
+            
             image = ImageAfterModel(parent_id = submission_id,
 		                    file_name = new_filename,
 		                    thumb_file_name = thumbnail_name,
 		                    created_date=get_date()
 		                   )
 
-        from models import SubmissionModel	                   
+	#UPDATE SUBMISSION          
         submission = SubmissionModel.query.filter_by(id=submission_id).first()
         submission.cover_image = thumbnail_name
 	
@@ -108,3 +114,12 @@ def resize(size: tuple, file_path:str):
     resized = original.copy()
     resized.thumbnail(size)
     return resized
+    
+
+def get_random_name():
+    in_dir = Path(os.path.dirname(__file__))
+    file_name = "random_name_list.txt"
+    with open(in_dir/file_name, "r", encoding="UTF-8") as file:
+        name_list = [name.strip() for name in file.readlines()]
+    return name_list[randint(1, len(name_list))]
+

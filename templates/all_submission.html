@@ -22,7 +22,6 @@
 	  text-decoration: none;
 	}
 
-
 	/* selected link */
 	a:active {
 	  color: blue;
@@ -35,6 +34,12 @@
 	  object-position: 50% 50%; 
 	  border: 1px solid black;
 	}
+	
+	.content {
+	  display: none;
+	  overflow: hidden;
+	  }
+	  
 </style>
 
 </head>
@@ -46,16 +51,49 @@
   
   <h2>Összes bejelentés</h2>
   
+  <button type="button" class="collapsible btn btn-light form-control rounded-0">Részletes keresés</button>
+  
+  <div class="content">
+  
   <form action="" method="post" enctype="multipart/form-data">
   
    <div class="form-group">
    
+    <label for="type">Státusz</label>
+    <select class="form-select form-control" 
+            aria-label="Státusz kiválasztása" 
+            name="status">
+    <option selected value="">Válassz a státuszok közül!</option>
+    <option>Bejelentve</option>
+    <option>Folyamatban</option>
+    <option>Készül</option>
+    <option>Befejezve</option>
+    </select>
+   
     <label for="type">Típus</label>
-    
-    <select class="form-select form-control rounded-0" 
-            aria-label="Select Problem Type" 
+    <select class="form-select form-control" 
+            aria-label="Típus kiválasztása" 
+            name="type">
+    <option selected value="">Válassz a típusok közül!</option>
+    <option>Utca</option>
+    <option>Szemét</option>
+    <option>Közmű</option>
+    <option>Út</option>
+    <option>Járda</option>
+    <option>Akadálymentesítés</option>
+    <option>Növény</option>
+    <option>Épület</option>
+    <option>Közlekedés</option>
+    <option>Tájékoztatás</option>
+    <option>Műemlék</option>   
+   </select>
+   
+    <label for="type">Megye</label>
+    <select class="form-select form-control" 
+            aria-label="Megye kiválasztása" 
             name="county">
-     <option selected>Válassz a megyék közül!</option>
+     <option selected value="">Válassz a megyék közül!</option>
+     <option>Budapest</option>
      <option>Pest</option>
      <option>Bács-Kiskun</option>
      <option>Baranya</option>
@@ -74,14 +112,15 @@
      <option>Vas</option>
      <option>Veszprém</option>
      <option>Zala</option>
-     <!--TODO az összes opciót hozzáadni!-->
     </select>
     
-   </div> 
+   </div> <!--detailed_search-->
    
-    <button type="submit" class="btn btn-light form-control rounded-0">Mutasd!</button>
+    <button type="submit" class="btn btn-dark form-control rounded-0">Mutasd!</button>
     
    </form>
+   
+   </div>
    
    <hr>
    
@@ -95,7 +134,7 @@
       
        <img class="cropped" src="/static/upload/{{ row.id }}/{{row.cover_image}}" alt={{ row.title }}/>
            
-       <a href="/single_submission/{{ row.id }}" target="_blank" rel="noopener noreferrer">
+       <a href="/single_submission/{{ row.id }}" rel="noopener noreferrer">
            
        <table class="table table-light">
            
@@ -172,6 +211,20 @@
     </a>
    </div>
   </div>
+  
+<script>
+  var coll = document.getElementsByClassName("collapsible");
+  coll[0].addEventListener("click", function() {
+    this.classList.toggle("active");
+    var content = this.nextElementSibling;
+    if (content.style.display === "block") {
+      content.style.display = "none";
+    } else {
+      content.style.display = "block";
+    }
+  });
+
+</script>
 
  </body>
  

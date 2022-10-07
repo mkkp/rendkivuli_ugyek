@@ -1,0 +1,2 @@
+id,create,read,update,delete,active,role,created_date,email,inactive_date,last_login,phone,user_name,verified
+1,,,,,1,admin,2022-10-06,feher.aron@gmail.com,,2022-10-06,,"Pocok Lipót 887",

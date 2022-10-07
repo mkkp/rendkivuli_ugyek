@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+
+<html>
+    <head></head>
+    <body>
+    <div class="container">
+	<h3>Bejelentkezés az MKKP városfelújítós honlapra</h3>
+	<form action="" method = "POST">
+	
+	    <div class="form-group">
+	      <label for="email">Email</label>
+	      <input type = "email" 
+	             inputmode="email" 
+	             class = "form-control" 
+	             name = "email" 
+	             autofocus/></p>
+	    </div>
+	    
+	    <div class="form-group">
+	      <label for="password">Jelszó</label>
+	      <input type = "password" 
+	             class = "form-control" 
+	             name = "password" />
+	    </div> 
+	    <a href="/reset_password"><small><p>Elfelejtett jelszó</p></small></a>
+	    
+	    <div class="form-group"> 
+	      <input type = "submit" 
+	             class="btn btn-success" 
+	             value = "Bejelentkezés" />
+	    </div>
+	    
+	</form>
+
+        <hr>
+
+	<h5>Még nem regisztráltál?</h5>
+	<a href = "{{url_for('register') }}">
+	<input class="btn btn-primary" 
+	       value = "Regisztráció" />
+	</a>
+    </div>
+    </body>
+</html>
+{% endblock %}

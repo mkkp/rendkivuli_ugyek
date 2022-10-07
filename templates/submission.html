@@ -1,50 +1,28 @@
 {% extends "base.html" %}
 
 {% block content %}
-
-<!--TODO az összes opciót hozzáadni!-->
-<!--TODO kód formázást szebbre-->
-
 <html>
 
 <head>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <link href='https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.css' rel='stylesheet' />
-    <style>
-        .cabinet {
-        	  color: white;
-        	  background-color: blue;
-        	  cursor: pointer;
-        	  }	  
-        	  
-        	  .cabinet:hover {
-        	  color: white;
-        	  background-color: coral;
-        	  cursor: pointer;
-        	  }
-    </style>
+    <link rel="stylesheet" href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.1/mapbox-gl.css" type="text/css" />
 </head>
 
 <body>
     <div class="container">
-
         <h2>Probléma bejelentése</h2>
-        
         <hr>
-        
         <form action="" method="post" enctype="multipart/form-data">
-
             <div class="form-group">
                 <strong><label for="megnevezes">Probléma megnevezése</label></strong>
-                <input value="" type="text" class="form-control" id="megnevezes" placeholder="" name="title" autofocus>
+                <input value="" type="text" class="form-control" id="megnevezes" placeholder="" name="title" autofocus required>
             </div>
-
             <br>
-
             <div class="form-group">
                 <strong><label for="tipus">Típus</label></strong>
                 <select class="form-select form-control rounded-0" aria-label="Select Problem Type" name="type" required>
-	         <option selected>Válassz a típusok közül!</option>
+	         <option value="" selected>Válassz a típusok közül!</option>
 	         <option value="Utca">Utca</option>
 	         <option value="Szemét">Szemét</option>
 	         <option value="Közmű">Közmű</option>
@@ -58,23 +36,17 @@
                  <option value="Műemlék">Műemlék</option>
 	  </select>
             </div>
-
             <br>
-
             <div class="form-group">
                 <strong><label for="reszletes_leiras">Részletes leírás</label></strong>
                 <textarea class="form-control rounded-0" id="reszletes" rows="3" name="description" required></textarea>
             </div>
-
             <br>
-
             <div class="form-group">
                 <strong><label for="megoldas">Megoldási javaslat</label></strong>
-                <textarea class="form-control rounded-0" id="megoldas" rows="3" name="suggestion" required></textarea>
+                <textarea class="form-control rounded-0" id="megoldas" rows="3" name="suggestion"></textarea>
             </div>
-
             <br>
-
             <div class="form-group">
                 <strong><label for="files" class="" style=>Képek feltöltése</label></strong>
                 <input type="file" 
@@ -86,9 +58,7 @@
                        required
                        accept="image/x-png, image/jpeg"/>
             </div>
-
             <br>
-
             <div class="form-group">
                 <strong><label for="email">Email cím</label></strong>
                 <input type="text" 
@@ -102,69 +72,236 @@
                        {% endif %}
                        required>
             </div>
-
+            <div class="checkbox">
+              <label><input type="checkbox" required> <a href="/user_data_info" target="_blank">Adatvédelmi nyilatkozat elfogadása </a></label>
+            </div>
             <div class="form-group">
                 <strong><label for="address">Cím</label></strong> 
                 <br> 
-                <small> Minta: <i>16 Petőfi utca </i></small>
-                <input type="text" class="form-control" id="address" name="address" placeholder="Klikk a térképre!" autocomplete="street-address">
-                <input hidden type="text" id="lng" name="lng"></p>
-                <input hidden type="text" id="lat" name="lat"></p>
-                <input hidden type="text" id="city" name="city"></p>
-                <input hidden type="text" id="county" name="county"></p>
+                <input type="text" 
+                       class="form-control" 
+                       id="address" 
+                       name="address" 
+                       placeholder="Klikk a térképre!"
+                       onkeyup="getLocation()"/>
+                <input hidden type="text" id="lng" name="lng" value=0></p> <!--Ide lehetne valami vicces default értéket adni, pl parlament-->
+                <input hidden type="text" id="lat" name="lat" value=0></p> <!--Ide lehetne valami vicces default értéket adni, pl parlament-->
+                <input hidden type="text" id="city" name="city" value="nem meghatározott"></p>
+                <input hidden type="text" id="county" name="county" value="nem meghatározott"></p>
+                <button type="button" class="btn btn-light form-control rounded-0 border border-dark" onclick="complete_address()">Cím kiegészítése</button>
             </div>
             <br>
             <div id='map' style='width: auto; height: 30em;'></div>
             <hr>
-            <button type="submit" class="btn btn-success form-control rounded-0 border border-dark">Bejelent</button>
+            <button type="submit" class="btn btn-success form-control rounded-0 border border-dark"><h3>Bejelent</h3></button>
             <hr>
         </form>
         <br>
         <br>
-
     </div>
-
 </body>
-	
+
 <script>
-    //MAPBOX autofill address
-    const script = document.getElementById("search-js");
-    script.onload = function () {
-        mapboxsearch.autofill({
-            accessToken: "{{ACCESS_KEY}}",
-            options: { country: "hu" },
-        });
-    };
+//getCurrentPosition
+window.onload = function getGPSLocation() {
+  
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(showPosition, showError);
+  }
+
+  function showPosition(position) {
+    var lat = position.coords.latitude
+    var lng = position.coords.longitude 
+    const url = "https://api.mapbox.com/geocoding/v5/mapbox.places/" +
+    lng +
+    "," +
+    lat +
+    ".json?access_token=" + mapboxgl.accessToken +
+    "&language=hu" +
+    "&types=address"
+    
+    //FORWARD GEOCODING 1
+    $.get(url, function (data) {
+      var address = data.features[0].place_name;
+      var city = address.split(",")[0].trim()
+      var street = address.split(",")[1].trim()
+      var postal_code = address.split(",")[2].trim()
+      var lng = position.coords.longitude
+      var lat = position.coords.latitude
+      
+      if (city == "Budapest"){
+        var county = "Budapest"
+      } else {
+        var county = address.split(",")[3].trim()
+      }
+    
+      var county = county.replace("County", "").trim()
+
+      document.getElementById("city").value = city
+      document.getElementById("county").value = county
+      document.getElementById("address").value = address
+      document.getElementById("lng").value = lng
+      document.getElementById("lat").value = lat
+      
+      map.flyTo({center: [lng, lat]});
+      deletePopup();
+      addPopup(lng, lat, address);
+      deleteLayer();
+      deleteSource();
+      addSource(lng,lat);
+      addLayer();
+      });//get
+  }//showPosition onLoad
+}//onload
 </script>
 
 <script>
+//CREATE MAP
     mapboxgl.accessToken = '{{ACCESS_KEY}}';
     var map = new mapboxgl.Map({
-    container: 'map',
-    center: [{{lat}}, {{lng}}],
-    zoom: 13,
-    style: 'mapbox://styles/mapbox/streets-v11'
+      container: 'map',
+      center: [{{lat}}, {{lng}}],
+      zoom: 14,
+      style: 'mapbox://styles/mapbox/streets-v11'
     });
-
+    
+//ON CLICK
     map.on("click", (e) => {
     coordinates = e.lngLat;
-    const url =
-    "https://api.mapbox.com/geocoding/v5/mapbox.places/" +
-    coordinates.lng +
-    "," +
-    coordinates.lat +
-    ".json?access_token=" +
-    '{{ACCESS_KEY}}' +
+    
+    var lng = coordinates.lng
+    var lat = coordinates.lat
+    
+    const url = "https://api.mapbox.com/geocoding/v5/mapbox.places/" +
+    lng + "," + lat +
+    ".json?access_token=" + mapboxgl.accessToken +
+    "&language=hu" +
     "&types=address";
-    map.flyTo({center: coordinates});
+    
+    //FORWARD GEOCODING 2
+    $.get(url, function (data) {
+      var address = data.features[0].place_name;
+      var city = address.split(",")[0].trim()
+      var street = address.split(",")[1].trim()
+      var postal_code = address.split(",")[2].trim()
+    
+      if (city == "Budapest"){
+        var county = "Budapest"
+      } else {
+        var county = address.split(",")[3].trim()
+      };
+    
+      var county = county.replace("County", "").trim()
+    
+      document.getElementById("city").value = city
+      document.getElementById("county").value = county
+      document.getElementById("address").value = address
+      document.getElementById("lng").value = lng
+      document.getElementById("lat").value = lat
+    
+      map.flyTo({center: [lng,lat]});
+      deletePopup();
+      addPopup(lng, lat, address);
+      deleteLayer();
+      deleteSource();
+      addSource(lng,lat);
+      addLayer();
+    });
+  });// map onClick
+</script>
 
-    if (map.getLayer('circle')) {
-      map.removeLayer('circle');
-    }
+<script>
+//CÍM KIEGÉSZÍTÉSE
+function complete_address(){
+  //FW GEOCODING COMPLETION
+  var address_input = document.getElementById("address").value;
+  url = "https://api.mapbox.com/geocoding/v5/mapbox.places/" + 
+  address_input +
+  ".json?country=hu" +
+  "&proximity=-73.990593%2C40.740121" +
+  "&types=place%2Cpostcode%2Caddress" +
+  "&language=hu" +
+  "&access_token={{ACCESS_KEY}}"
+  $.get(url, function (data) {
+    var location_center = data.features[0].center;
+    var lat = data.features[0].center[1]
+    var lng = data.features[0].center[0]
+    var address = data.features[0]['place_name']
+    var city = address.split(",")[0].trim()
+  
+    if (city == "Budapest"){ 
+      var county = "Budapest"
+    } else {
+      var county = address.split(",")[3].trim()
+    };
+  
+    var county = county.replace("megye", "")
+
+    document.getElementById("address").value = address
+    document.getElementById("city").value = city
+    document.getElementById("county").value = county
+    document.getElementById("lng").value = lat
+    document.getElementById("lat").value = lng
+  
+    deletePopup();
+    addPopup(lng, lat, address);
+    deleteLayer();
+    deleteSource();
+    addSource(lng,lat);
+    addLayer();
+    map.flyTo({center: [lng,lat]});
+  
+})};
+</script>
+
+
+
+<script>
+//FOWRARD GEOCODING 
+//when SPACE hit on address
+function getLocation(){
+    if (event.keyCode == 32) { //32 = space
+      var address_input = document.getElementById("address").value;
+      url = "https://api.mapbox.com/geocoding/v5/mapbox.places/" + 
+      address_input +
+      ".json?country=hu" +
+      "&proximity=-73.990593%2C40.740121" +
+      "&types=place%2Cpostcode%2Caddress" +
+      "&language=hu" +
+      //"&access_token={{ACCESS_KEY}}"
+      "&access_token=" + mapboxgl.accessToken;
+      
+      $.get(url, function (data) {
+        const location_center = data.features[0].center;
+        const place_name = data.features[0].place_name;
+        var lat = location_center[0]
+        var lng = location_center[1]
+        
+        map.flyTo({center: [lat,lng]});
+        deleteLayer();
+        deleteSource();     
+        addSource(lng,lat);
+        addLayer();
+	});
+}
+};//getLocation
+</script>
+
+<script>
+//UTILS
+function deleteSource(){
     if (map.getSource('points')) {
-      map.removeSource('points');
+      map.removeSource('points')
     }
+};
 
+function deleteLayer(){
+    if (map.getLayer('circle')) {
+      map.removeLayer('circle')
+    }
+};
+
+function addSource(lng,lat){
     map.addSource('points', {
     'type': 'geojson',
     'data': {
@@ -175,59 +312,63 @@
         'properties': {},
         'geometry': {
           'type': 'Point',
-          'coordinates': [coordinates.lng,coordinates.lat]
+          'coordinates': [lng,lat]
           }
         }
       ]
     }
     });
+};
 
-    map.addLayer({
-    'id': 'circle',
-    'type': 'circle',
-    'source': 'points', //refers to first parameter of addSource
-    'paint': {
-      'circle-color': '#ff0000',
-      'circle-radius': 10,
-      'circle-stroke-width': 2,
-      'circle-stroke-color': '#000000',
-      'circle-opacity' : 0.5
-    }});
+function addLayer(){
+	map.addLayer({
+	    'id': 'circle',
+	    'type': 'circle',
+	    'source': 'points', //refers to first parameter of addSource
+	    'paint': {
+	      'circle-color': '#ff0000',
+	      'circle-radius': 10,
+	      'circle-stroke-width': 2,
+	      'circle-stroke-color': '#000000',
+	      'circle-opacity' : 0.5
+	    }})    
+};
 
-    $.get(url, function (data) {
-    var address = data.features[0].place_name;
-    var city = address.split(",")[0].trim()
-    var street = address.split(",")[1].trim()
-    var postal_code = address.split(",")[2].trim()
-    
-    if (city == "Budapest"){
-      var county = "Pest"
-    } else {
-      var county = address.split(",")[3].trim()
-    };
-    
-    var county = county.replace("County", "").trim()
-
-    const popups = document.getElementsByClassName("mapboxgl-popup");
-    if (popups.length) {
-    popups[0].remove();
+//DELETE POPUP
+function deletePopup(){
+  const popups = document.getElementsByClassName("mapboxgl-popup");
+  if (popups.length) { 
+    popups[0].remove() 
     }
+};
 
+//ADD POPUP
+function addPopup(lng, lat, address){
     const popup = new mapboxgl.Popup({ closeOnClick: false })
-    .setLngLat([coordinates.lng,coordinates.lat])
+    .setLngLat([lng,lat])
     .setHTML(`<p>${address}</p>`)
     .addTo(map);
+}
 
-    document.getElementById("city").value = city
-    document.getElementById("county").value = county
-    console.log(county)
-    document.getElementById("address").value = address
-    document.getElementById("lng").value = coordinates.lng
-    document.getElementById("lat").value = coordinates.lat
-    });
-     });
+function showError(error) {
+    switch(error.code) {
+      case error.PERMISSION_DENIED:
+        alert("Ajjaj... A helyhozzáférés nincsen engedélyezve. Ha szeretnéd, hogy robokutyi töltse ki helyetted a címet, akkor kérlek engedélyezd.")
+        break;
+      case error.POSITION_UNAVAILABLE:
+        alert("Nem meghatározható koordináták.")
+        break;
+      case error.TIMEOUT:
+        alert("Időkeret túllépés")
+        break;
+      case error.UNKNOWN_ERROR:
+        alert("Ismeretlen hiba.")
+        break;
+    }
+  };//showError
+
+//<--UTILS
 </script>
-
 
 </html>
 
