@@ -7,8 +7,13 @@
     <title>{{ submission[0].title }}</title>
     <meta property="og:site_name"      content="Rendkívüli Ügyek Minisztériuma" />  
     <meta property="og:title"          content="{{ submission[0].title }}" />
-    <meta property="description"       content="{{ submission[0].description }}" />
+    
+    {% if submission[0].solution  %}
+    <meta property="og:description"       content="{{ submission[0].solution }}" />
+    {% else %}
     <meta property="og:description"    content="{{ submission[0].description }}" />
+    {% endif %}
+    
     <meta property="og:type"           content="article" />
     <meta property="og:url"            content="https://rendkivuliugyek.site/single_submission/{{  submission[0].id  }}" />
     <meta property="og:image"          content="{{ img_url }}" />
@@ -30,66 +35,14 @@
         <h3><b>{{ submission[0].title }}</b></h3>
         <hr>
         <p><strong>Leírás:</strong> {{ submission[0].description }}</p>
-
         <p><strong>Megoldási javaslat:</strong> {{ submission[0].suggestion }}</p>
-        
-        {% if current_user.email == submission[0].owner_email
-           or role == 'coordinator' 
-           or role == 'admin'
-        %}
-
-        <form action="" method="post">
-            <input hidden type=text, value={{current_user.user_name}} name="current_user" />
-            <label for="status"><strong>Státusz</strong></label>
-            <select class="form-select" id="status" aria-label="Select status" name="status" onchange="detectChange(this)">
-	     <option selected>{{ submission[0].status }}</option>
-	     <option value="Folyamatban">Folyamatban</option>
-	     <option value="Készül">Készül</option>
-	     <option value="Hivatal megoldotta">Hivatal megoldotta</option>	     
-	     <option value="Inaktív">Inaktív</option>
-	     <option value="Duplika">Duplika</option>
-	     <option value="Befejezve">Befejezve</option>
-	    </select>
-            <button type="submit" id="change_status" name="change_status" class="btn btn-primary rounded-0">Módosít</button>
-        </form>
-
-        {% else %}
-
         <p><strong>Státusz:</strong> {{ submission[0].status }}</p>
-
-        {% endif %}
-        
         <p><strong>Ebben a státuszban:</strong> {{ submission[0].status_changed_date }}</p>
         <p><strong>Típus:</strong> {{ submission[0].problem_type }}</p>
         <p><strong>Bejelentve:</strong> {{ submission[0].created_date }}</p>
         <p><strong>Megye:</strong> {{ submission[0].county }}</p>
-        
-        {% if current_user.email == submission[0].submitter_email
-           or current_user.email == submission[0].owner_email
-           or role == 'coordinator' 
-           or role == 'admin'
-        %}
         <p><strong>Cím:</strong> {{ submission[0].address }}</p>
-        
-          <form action="" method="post">
-          <label><strong>Cím módosítása:</strong></label>
-          <input type="text" class="form-control rounded-0" id="new_address" autocomplete="on" name="new_address">
-          <input hidden type="text" id="lng" name="lng" value=0></p> <!--Ide lehetne valami vicces default értéket adni, pl parlament-->
-          <input hidden type="text" id="lat" name="lat" value=0></p> <!--Ide lehetne valami vicces default értéket adni, pl parlament-->
-          <input hidden type="text" id="city" name="city" value="nem meghatározott"></p>
-          <input hidden type="text" id="county" name="county" value="nem meghatározott"></p>          
-          <button type ="button" 
-                  class="btn btn-warning rounded-0" 
-                  id="complete_addr" 
-                  name="complete_addr" 
-                  onclick="complete_address()">Cím kiegészítése</button>
-          <button class="btn btn-warning rounded-0" id="new_address_submit" name="new_address_submit">Új Cím mentése</button>
-          </form>
-          
-        {% else %}
-        <p><strong>Cím:</strong> {{ submission[0].address }}</p>
-        {% endif %}
-        
+
         {%if submission[0].owner_email %}
          <p><strong>Rendező:</strong> {{ submission[0].owner_email }}</p>
         {% endif %}
@@ -99,23 +52,23 @@
          </strong>{{ submission[0].solution }}</p>
         {% endif %}
         
-        <!--ÜGY BEFEJEZVE SZÖVEG-->
-        <div class = "submission_solution" id = "solution_div">
-        <form action="" method="post" enctype="multipart/form-data">
-          <label><strong>Megoldás</strong></label>
-          <input hidden type=text, value={{current_user.user_name}} name="current_user" />
-          <textarea class="form-control rounded-0" id="solution" rows="3" name="closing_solution"></textarea>
-          <button class="btn btn-warning rounded-0" name="closing_solution_submit" id="closing_solution_submit">Megoldás hozzáadása</button>
-        </form>
-        </div>
-        <!--ÜGY BEFEJEZVE SZÖVEG--> 
-
+        {% if current_user.email == submission[0].owner_email
+           or role == 'coordinator' 
+           or role == 'admin'
+        %}
+        <a href="/change_submission_data/{{submission[0].id}}">
+            <button class="btn btn-light form-control rounded-0">Adatok módosítása</button>
+        </a>
+        <br>
+        <br>
+        {% endif %}      
         <div id="fb-root"></div>
 	<div class="fb-share-button" 
 	  data-href="https://rendkivuliugyek.site/single_submission/{{  submission[0].id  }}" 
 	  data-layout="button_count">
 	</div>
         <hr> 
+        
         <!--ELŐTTE KÉPEK FELTÖLTÉSE-->
         {% if current_user.email == submission[0].submitter_email
            or current_user.email == submission[0].owner_email
@@ -319,68 +272,7 @@
 	}(document, 'script', 'facebook-jssdk'));
     </script>
 
-   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-
-
-<script>
-function detectChange(status) {
-  var content = document.getElementById("solution_div");
-  if (status.value === "Befejezve") {
-    if (content.style.display === "block") {
-        content.style.display = "none";
-       } else {
-        content.style.display = "block";
-       }       
-     }
-  };
-
-</script>
-
-<script>
-  //CÍM KIEGÉSZÍTÉSE
-  function complete_address(){
-  //FW GEOCODING COMPLETION
-  var address_input = document.getElementById("new_address").value;
-  console.log(address_input)
-  url = "https://api.mapbox.com/geocoding/v5/mapbox.places/" + 
-  address_input +
-  ".json?country=hu" +
-  "&proximity=-73.990593%2C40.740121" +
-  "&types=place%2Cpostcode%2Caddress" +
-  "&language=hu" +
-  "&access_token={{ACCESS_KEY}}"
-  $.get(url, function (data) {
-    var location_center = data.features[0].center;
-    var lat = data.features[0].center[1]
-    var lng = data.features[0].center[0]
-    var address = data.features[0]['place_name']
-    var city = address.split(",")[0].trim()
-  
-    if (city == "Budapest"){ 
-      var county = "Budapest"
-    } else {
-      var county = address.split(",")[3].trim()
-    };
-  
-    var county = county.replace("megye", "")
-    
-    document.getElementById("new_address").value = address
-    document.getElementById("city").value = city
-    document.getElementById("county").value = county
-    document.getElementById("lng").value = lng
-    document.getElementById("lat").value = lat
-  
-    deletePopup();
-    addPopup(lng, lat, address);
-    deleteLayer();
-    deleteSource();
-    addSource(lng,lat);
-    addLayer();
-    map.flyTo({center: [lng,lat]});
-  
-})};
-</script>
-
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script>
 //UTILS
 function deleteSource(){

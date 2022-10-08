@@ -2,6 +2,7 @@
 {% block content %}
 <body>
 <div class="container">
+<br>
 <h3>Felhasználó kezelése</h3>
 <hr>
 {% if role == 'admin' %}
@@ -22,7 +23,7 @@
     {% endif %}
     <p><strong>Felhasználó létrehozva: </strong>{{ user.created_date }}</p>
     <p><strong>Utolsó bejelentkezés: </strong>{{ user.last_login }}</p>
-    <button type="submit" id="change_role" name="change_role" class="btn btn-warning rounded-0">Módosít</button>
+    <button type="submit" id="change_role" name="change_role" class="btn btn-success rounded-0">Ment</button>
     </form>
 {% endif %}
 </div>

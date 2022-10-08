@@ -279,7 +279,80 @@ def submission():
                                ACCESS_KEY=MAP_KEY,
                                lat=INIT_LAT,lng=INIT_LNG
                               )
+                              
+                              
+#ÜGY ADATAINAK MÓDOSÍTÁSA
+@app.route('/change_submission_data/<submission_id>', methods = ['POST', 'GET'])
+def change_submission_data(submission_id):
+    
+    submission = SubmissionModel.query.filter_by(id=submission_id).first()
+    
+    if request.method == 'POST':
+    
+        if request.form["new_title"] != "":
+            new_title = request.form["new_title"]
+            submission.title = new_title
+            db.session.commit()
+            flash(f"Sikeresen módosítottad az ügy megnevezését!", "success")
+            
+        if request.form["new_description"] != "":
+            new_description = request.form["new_description"]
+            submission.description = new_description
+            db.session.commit()
+            flash(f"Sikeresen módosítottad az ügy leírását!", "success")
 
+        if request.form["new_suggestion"] != "":
+            new_suggestion = request.form["new_suggestion"]
+            submission.suggestion = new_suggestion
+            db.session.commit()
+            flash(f"Sikeresen módosítottad az ügy megoldási javaslatát!", "success")                      
+    
+        if request.form["status"] != submission.status:
+            new_status = request.form["status"]
+            changed_by = request.form["current_user"]
+
+            submission.status = new_status
+            submission.status_changed_date = get_date()
+            submission.status_changed_by = changed_by
+            db.session.commit()
+            flash(f"Sikeresen módosítottad az ügy státuszát erre: {new_status}", "success")
+            
+        if request.form["closing_solution"] != "":
+            closing_solution = request.form["closing_solution"]
+            changed_by = request.form["current_user"]
+
+            submission.solution = closing_solution
+            submission.status = "Befejezve"
+            submission.status_changed_date =  get_date()
+            submission.status_changed_by = changed_by
+            db.session.commit()
+            flash(f"Sikeresen hozzáadtad a bejelentés zárószövegét! Az ügy innentől kezdve befejezettnek minősül.", "success") 
+            
+        if request.form["new_address"] != "":
+            new_address = request.form["new_address"]
+            city = request.form["city"],
+            county = request.form["county"],
+            lat = request.form["lat"],
+            lng = request.form["lng"],
+            
+            #itt rá kéne jönni hogy miért tuple-t ad vissza a from..
+            # idális megoldás lenne: submission.city = city
+
+            submission.address = new_address
+            submission.county = county[0]
+            submission.city = city[0]
+            submission.lat = lat[0]
+            submission.lng = lng[0]
+            
+            db.session.commit()
+            flash(f"Sikeresen módosítottad a címet!", "success")                        
+            
+        return redirect(f'/single_submission/{submission_id}')
+    
+    return render_template ("change_submission_data.html", 
+                            submission=submission,
+                            ACCESS_KEY=MAP_KEY
+                            ) 
 
 #EGY BEJELENTÉS
 @app.route('/single_submission/<id>', methods = ['POST', 'GET'])
@@ -289,16 +362,7 @@ def single_submission(id):
     
     if request.method == 'POST':
 
-        if "change_status" in request.form:
-            new_status = request.form["status"]
-            changed_by = request.form["current_user"]
-            submission = SubmissionModel.query.filter_by(id=submission_id).first()
-            submission.status = new_status
-            submission.status_changed_date = get_date()
-            submission.status_changed_by = changed_by
-            db.session.commit()
-            flash(f"Sikeresen módosítottad a státuszt '{new_status}' státuszra!","success")
-                                    
+                   
         if "comment-submit" in request.form:
             comment = CommentModel(commenter=request.form["current_user"],
                                    created_date=get_date(),
@@ -307,40 +371,7 @@ def single_submission(id):
             db.session.add(comment)                       
             db.session.commit()
             flash(f"Sikeresen hozzáadtál egy kommentet!","success")
-
-        if "closing_solution_submit" in request.form:
-            closing_solution = request.form["closing_solution"]
-            changed_by = request.form["current_user"]
-            submission = SubmissionModel.query.filter_by(id=submission_id).first()
-            submission.solution = closing_solution
-            submission.status = "Befejezve"
-            submission.status_changed_date =  get_date()
-            submission.status_changed_by = changed_by
-            db.session.commit()
-            flash(f"Sikeresen hozzáadtad a bejelentés zárószövegét! Az ügy innentől kezdve befejezettnek minősül.", "success")         
-            
-        if "new_address_submit" in request.form:
-            submission = SubmissionModel.query.filter_by(id=submission_id).first()
-            new_address = request.form["new_address"]
-            city = request.form["city"],
-            county = request.form["county"],
-            lat = request.form["lat"],
-            lng = request.form["lng"],
-            
-            city = city[0]
-            county = county[0]
-            lat = lat[0]
-            lng = lng[0]
-            
-            submission.address = new_address
-            submission.county = county
-            submission.city = city
-            submission.lat = lat
-            submission.lng = lng
-            
-            db.session.commit()
-            flash(f"Sikeresen módosítottad a címet!", "success")            
-                                    
+                          
         if "comment-edit" in request.form:
             body_change = request.form["comment"]
             comment_id = request.form["comment_id"]
@@ -404,6 +435,7 @@ def all_submission():
         problem_type_dict = {}
         status_dict = {}
         
+        
         if county != "":
             county_dict = {"county":county}
             
@@ -415,6 +447,8 @@ def all_submission():
         
         #merge dicts      
         query_dict = county_dict | problem_type_dict | status_dict
+        
+        print(query_dict)
         
         filtered_list = SubmissionModel.query.filter_by(**query_dict)\
         .order_by(SubmissionModel.created_date.desc())\
@@ -606,7 +640,37 @@ def user_account():
     return render_template("user_account.html")
 
 
-#FELHASZNÁLÓK ÁTTEKINTÉSE
+#FELHASZNÁLÓ ADATOK MÓDOSÍTÁSA
+@app.route('/change_user_data/<user_id>', methods = ['POST', 'GET'])
+def change_user_data(user_id):
+
+    user = UserModel.query.filter_by(id=user_id).first()
+    
+    if request.method == 'POST':
+        
+        if request.form["new_user_name"] != "":
+            new_user_name = request.form["new_user_name"]
+            user.user_name = new_user_name
+            db.session.commit()
+            flash(f"Sikeresen módosítottad a felhasználónevedet!", "success")
+            
+        if request.form["new_email"] != "":
+            new_email = request.form["new_email"]
+            user.email = new_email
+            db.session.commit()
+            flash(f"Sikeresen módosítottad az email címedet!", "success")
+            
+        if request.form["new_phone"] != "":
+            new_phone = request.form["new_phone"]
+            user.phone = new_phone
+            db.session.commit()
+            flash(f"Sikeresen módosítottad a telefonszámodat!", "success")                      
+        
+    return render_template ("change_user_data.html", 
+    user = user)
+
+
+#FELHASZNÁLÓK ÁTTEKINTÉSE (ADMIN FELÜLET)
 @app.route('/user_administration', methods = ['POST', 'GET'])
 @login_required
 def user_management():

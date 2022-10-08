@@ -4,21 +4,20 @@
 
 <div class="container">
 <div class="panel panel-default">
+<br>
 <h3>Felhasználói fiók beállítások</h3>
 </div>
 <hr>
+<br>
 <p><strong>Felhasználónév: </strong>{{current_user.user_name}}
-<form action="" method="post">
-<label><strong>Felhasználónév módosítása:</label>
-<input hidden id="user_id" name="user_id" type="text" value={{current_user.id}}>
-<input type="text" class="form-control rounded-0" id="new_user_name" name="new_user_name">
-<button class="btn btn-warning rounded-0" name="new_user_name">Új felhasználónév mentése</button>
-</form>
-<br>
-<br>
 <p><strong>Email cím: </strong>{{current_user.email}}</p>
+<p><strong>Telefon szám: </strong>{{current_user.phone}}</p>
 <p><strong>Létrehozva: </strong>{{current_user.created_date}}</p>
-<p><strong>Szint: </strong> {{ role }}</p>
+<p><strong>Felhasználói szint: </strong> {{ role }}</p>
+<hr>
+<a href="/change_user_data/{{current_user.id}}">
+    <button class="btn btn-light form-control rounded-0">Adatok módosítása</button>
+</a>
 <hr>
 <form action = "" method = "post">
 <input hidden id="user_id" name="user_id" type="text" value={{current_user.id}}>

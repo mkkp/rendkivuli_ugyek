@@ -34,7 +34,7 @@ class UserModel(UserMixin, db.Model):
     email = db.Column(db.String(80), unique=True) #GDPR
     inactive_date = db.Column(db.String(10)) #2022-09-01
     last_login = db.Column(db.String(10)) #2022-09-01
-    phone = db.Column(db.String(20), unique=True) #GDPR
+    phone = db.Column(db.String(20)) #GDPR
     user_name = db.Column(db.String(100), unique=True)
     verified = db.Column(db.Boolean())
          

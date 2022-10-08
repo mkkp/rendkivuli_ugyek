@@ -11,7 +11,9 @@
 
 <body>
     <div class="container">
+        <br>
         <h2>Probléma bejelentése</h2>
+        <p>[folyamat ismertetése szöveg vagy piktogram]</p>
         <hr>
         <form action="" method="post" enctype="multipart/form-data">
             <div class="form-group">
@@ -104,10 +106,15 @@
 <script>
 //getCurrentPosition
 window.onload = function getGPSLocation() {
-  
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(showPosition, showError);
-  }
+
+  let details = navigator.userAgent;
+  let regexp = /android|iphone|kindle|ipad/i;
+  let isMobileDevice = regexp.test(details);
+
+  if (isMobileDevice){
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition, showError);
+      }
 
   function showPosition(position) {
     var lat = position.coords.latitude
@@ -152,6 +159,7 @@ window.onload = function getGPSLocation() {
       addLayer();
       });//get
   }//showPosition onLoad
+  }
 }//onload
 </script>
 
@@ -191,7 +199,7 @@ window.onload = function getGPSLocation() {
         var county = address.split(",")[3].trim()
       };
     
-      var county = county.replace("County", "").trim()
+      var county = county.replace("megye", "").trim()
     
       document.getElementById("city").value = city
       document.getElementById("county").value = county

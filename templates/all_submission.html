@@ -13,32 +13,41 @@
 
 	/* visited link */
 	a:visited {
-	  color: grey;
+	  color: black;
 	}
 
 	/* mouse over link */
 	a:hover {
-	  color: red;
 	  text-decoration: none;
-	}
-
-	/* selected link */
-	a:active {
-	  color: blue;
+	  font-weight: lighter;
+	  transition: 0.5s;
 	}
 
 	.cropped {
 	  width: auto; 
 	  height: 10em; 
 	  object-fit: cover;
-	  object-position: 50% 50%; 
-	  border: 1px solid black;
+	  object-position: 50% 50%;
+	}
+	
+	.cropped:hover{
+	 transform: scale(1.07);
+	 transition: transform 0.6s;
+	 overflow: hidden;
 	}
 	
 	.content {
 	  display: none;
 	  overflow: hidden;
 	  }
+	  
+	.card {
+	 border-style: solid;
+	 border-width: 0.1em;
+	 border-color: grey;
+	 padding:0.5em;
+	 border-radius: 0.7em;
+	}
 	  
 </style>
 
@@ -129,47 +138,35 @@
     {% for row in post_list.items %}
     
      <div class="col-sm-3">
-     
+     <a href="/single_submission/{{ row.id }}" rel="noopener noreferrer">
       <div class="card">
-      
+       {% set status = row.status %}
+       {% if status == 'Bejelentve' %}
+         <div style="background-color:blue; color:white;">IKON {{ row.problem_type }}</div>
+       {% elif status == 'Folyamatban' %}
+         <div style="background-color:coral; color:white;">IKON {{ row.problem_type }}</div>
+       {% elif status == 'Készül' %}
+         <div style="background-color:red; color:white;">IKON {{ row.problem_type }}</div>
+       {% elif status == 'Hivatal megoldotta' %}
+         <div style="background-color:pink; color:white;">IKON {{ row.problem_type }}</div>
+       {% elif status == 'Inaktív' %}
+         <div style="background-color:grey; color:white;">IKON {{ row.problem_type }}</div>
+       {% elif status == 'Duplika' %}
+         <div style="background-color:purple; color:white;">IKON {{ row.problem_type }}</div> 
+       {% elif status == 'Befejezve' %}
+         <div style="background-color:green; color:white;">IKON {{ row.problem_type }}</div>                                               
+       {% endif%}
+       
        <img class="cropped" src="/static/upload/{{ row.id }}/{{row.cover_image}}" alt={{ row.title }}/>
-           
-       <a href="/single_submission/{{ row.id }}" rel="noopener noreferrer">
-           
-       <table class="table table-light">
-           
-        <tr>
-         <thead class="thead">
-          <th>
-           {{ row.title }}
-          </th>
-         </thead>
-        </tr>
-           
-        <tr>
-         <td>{{ row.status }}</td>
-        </tr>
-                      
-        <tr>
-         <td>{{ row.created_date }}</td>
-        </tr>
-           
-        <tr>
-         <td>{{ row.problem_type }}</td>
-        </tr>
-           
-        <tr>
-         <td>{{ row.address }}</td>
-        </tr>
-
-       </table>
+         <br>
+         <p>{{ row.title }}</p>
+         <p>{{ row.city }}</p>
+         {% set desc_1 = row.description.split('.') %}
+         <p>{{ desc_1[0] }}.</p>
+       </div>
        
        </a>
-       
-       </div>
-
        <nav aria-label="Page navigation example">
-
      </div>
 
     {% endfor %}
