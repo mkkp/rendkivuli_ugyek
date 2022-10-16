@@ -3,7 +3,8 @@
  {% block head %}
   {% set img_url = 'https://rendkivuliugyek.site/static/upload/' + submission[0].id | string + '/' + before_img_list[0].file_name%}
   <head>
-    <link href='https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.css' rel='stylesheet' />    
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.css' rel='stylesheet' /> 
+    <link href="../static/css/lightbox.css" rel="stylesheet">   
     <title>{{ submission[0].title }}</title>
     <meta property="og:site_name"      content="Rendkívüli Ügyek Minisztériuma" />  
     <meta property="og:title"          content="{{ submission[0].title }}" />
@@ -96,9 +97,10 @@
         <form action="" method="post">
         <!--ELŐTTE KÉPEK MUTATÁSA-->
         <h4>Előtte képek:</h4>
-        <br> {% for img in before_img_list %}
+        <br> 
+        {% for img in before_img_list %}
         <figure class="figure">
-            <a href={{url_for( 'static',filename='upload/' + submission[0].id | string + '/' + img.file_name)}}>
+            <a href={{url_for( 'static',filename='upload/' + submission[0].id | string + '/' + img.file_name)}} data-lightbox="roadtrip">
                 <img src={{url_for( 'static',filename='upload/' + submission[0].id | string + "/" + img.thumb_file_name)}}/>
             </a>
              {% if current_user.email == submission[0].submitter_email
@@ -106,6 +108,7 @@
                 or role == 'coordinator' 
                 or role == 'admin'
               %}
+              
              {% if submission[0].cover_image == img.thumb_file_name%}
                <figcaption>☝Jelenlegi borítókép</figcaption>
              {% else %}
@@ -117,18 +120,21 @@
                </figcaption>
                </figure>
              {% endif %}
-            {% endif %}
+             {% endif %} <!--End of role check -->
         </figure>
         {% endfor %}
 
-        <br>
-        <!--UTÁNA KÉPEK-->
-        <h4>Utána képek:</h4>
         
+        <!--UTÁNA KÉPEK-->
+        {% if after_img_list[0] %}
+        <br>
+        <h4>Utána képek:</h4>
         <br> 
+        {% endif %}
+        
         {% for img in after_img_list %}
          <figure class="figure">
-            <a href={{url_for( 'static',filename='upload/' + submission[0].id | string + "/" + img.file_name)}}>
+            <a href={{url_for( 'static',filename='upload/' + submission[0].id | string + "/" + img.file_name)}} data-lightbox="roadtrip">
                 <img src={{url_for( 'static',filename='upload/' + submission[0].id | string + "/" + img.thumb_file_name)}}/>
             </a>
              {% if current_user.email == submission[0].submitter_email
@@ -146,19 +152,29 @@
                  <a href="/delete_picture/before/{{img.id}}">🗑</a>
                  </figcaption>
                {% endif %}
+             
             {% endif %}
          </figure>
         {% endfor %}
-        <br>
-        <button type="submit" id="change_tumbnail" name="change_tumbnail" class="btn rounded-0">Borítókép módosítása</button>
         
-        </form>        
+        {% if current_user.email == submission[0].submitter_email
+           or current_user.email == submission[0].owner_email
+           or role == 'coordinator' 
+           or role == 'admin'
+        %}
+        <br>      
+        <button type="submit" id="change_tumbnail" name="change_tumbnail" class="btn rounded-0">Borítókép módosítása</button> 
         <br>
-        <hr>
-        {% if comment_list[0] %}
-        <label for="comment">Korábbi hozzászólások</label>
+        <br>
         {% endif %}
-        <br> {% for comment in comment_list %} 
+        </form>        
+ 
+        {% if comment_list[0] %}
+        <hr>
+        <label for="comment">Korábbi hozzászólások</label>
+        <br>
+        {% endif %}
+        {% for comment in comment_list %} 
         {% if comment.commenter == current_user.user_name or role == 'admin' %}
         <a href="/delete_comment/{{comment.id}}">
             <button class="btn btn-danger rounded-0" id="comment-delete" name="comment-delete">törlés</button>
@@ -233,33 +249,49 @@
         style: 'mapbox://styles/mapbox/streets-v11' //'mapbox://styles/mapbox/navigation-night-v1'
         });
     
-        map.on('load', () => {
-        map.addSource('points', {
-         'type': 'geojson',
-         'data': {
-         'type': 'FeatureCollection',
-         'features': [
-         {
-         'type': 'Feature',
-         'properties': {},
-         'geometry': {
-         'type': 'Point',
-         'coordinates': [{{submission[0].lng}}, {{submission[0].lat}}]
-         }}]}
-        });
-    
-        // Add a circle layer
-        map.addLayer({
-         'id': 'circle',
-         'type': 'circle',
-         'source': 'points', //refers to first parameter of addSource
-         'paint': {
-         'circle-color': '#ff0000',
-         'circle-radius': 10,
-         'circle-stroke-width': 2,
-         'circle-stroke-color': '#000000'
-         }})
-        });
+	map.on('load', () => {
+	// Add an image to use as a custom marker
+	map.loadImage('/static/marker/kutyafejek/marker_red.png',
+	(error, image) => {
+	if (error) throw error;
+	map.addImage('custom-marker', image);
+	// Add a GeoJSON source with 2 points
+	
+	map.addSource('points', {
+		 'type': 'geojson',
+		 'data': {
+		 'type': 'FeatureCollection',
+		 'features': [
+		 {
+		 'type': 'Feature',
+		 'properties': {},
+		 'geometry': {
+		 'type': 'Point',
+		 'coordinates': [{{submission[0].lng}}, {{submission[0].lat}}]
+		 }}]}
+		})
+
+
+	// Add a symbol layer
+	map.addLayer({
+	'id': 'points',
+	'type': 'symbol',
+	'source': 'points',
+	'layout': {
+	'icon-image': 'custom-marker',
+	// get the title name from the source's "title" property
+	'text-field': ['get', 'title'],
+	'text-font': [
+	'Open Sans Semibold',
+	'Arial Unicode MS Bold'
+	],
+	'text-offset': [0, 1.25],
+	'text-anchor': 'top'
+	}
+	});
+	}
+	);
+	});
     </script>
     
     <script>
@@ -306,6 +338,7 @@ function addSource(lng,lat){
     });
 };
 
+
 function addLayer(){
 	map.addLayer({
 	    'id': 'circle',
@@ -337,6 +370,16 @@ function addPopup(lng, lat, address){
 }
 
 //<--UTILS
+</script>
+
+<script src="../static/js/lightbox.js"></script>
+<script>
+    lightbox.option({
+      'resizeDuration': 100,
+      'wrapAround': true,
+      'alwaysShowNavOnTouchDevices':false,
+      'albumLabel':"%1 / %2"
+    })
 </script>
 
 </body>

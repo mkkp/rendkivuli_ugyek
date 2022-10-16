@@ -6,6 +6,7 @@
 
 <head>
  <style>
+
 	/* unvisited link */
 	a:link {
 	  color: black;
@@ -13,7 +14,7 @@
 
 	/* visited link */
 	a:visited {
-	  color: black;
+	  color: grey;
 	}
 
 	/* mouse over link */
@@ -30,27 +31,55 @@
 	  object-position: 50% 50%;
 	}
 	
-	.cropped:hover{
-	 transform: scale(1.07);
-	 transition: transform 0.6s;
-	 overflow: hidden;
-	}
-	
 	.content {
 	  display: none;
 	  overflow: hidden;
 	  }
-	  
+	  	
 	.card {
-	 border-style: solid;
-	 border-width: 0.1em;
-	 border-color: grey;
-	 padding:0.5em;
-	 border-radius: 0.7em;
-	}
+	  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+	  transition: 0.3s;
+	  border-radius: 30px;
+	  margin:0.5em;
+	  display: flex;
 	  
-</style>
+	}
 
+	.card:hover {
+	  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+	  font-weight:bold;
+	}
+
+	.card_hr {
+	    width:100%;
+	    margin:0 auto;
+	    border-top: 1px solid #000000;
+	}
+
+	.card_container {
+	  padding: 2px 8px;
+	}
+
+	.card_head{
+	padding:5px;
+	text-align: left;
+	background-color:#008000;
+	border-top-left-radius: 25px;
+	border-top-right-radius: 25px;
+	color:white;
+	font-weight:bold;
+	
+	}
+	
+	.card_label{
+	padding:5px;
+	}
+	
+	.col-sm-3{
+	padding:0.2em;
+	}
+
+</style>
 </head>
  <body>
  
@@ -58,11 +87,11 @@
   
   <br>
   
-  <h2>Összes bejelentés</h2>
+  <h2><i><b>ÖSSZES BEJELENTÉS</b></i></h2>
   
   <button type="button" class="collapsible btn btn-light form-control rounded-0">Részletes keresés</button>
   
-  <div class="content">
+  <div class="content" id="content">
   
   <form action="" method="post" enctype="multipart/form-data">
   
@@ -142,36 +171,75 @@
       <div class="card">
        {% set status = row.status %}
        {% if status == 'Bejelentve' %}
-         <div style="background-color:blue; color:white;">IKON {{ row.problem_type }}</div>
+         <div class='card_head' style="background-color:blue; color:white;">
+          <div class='card_label'>
+           <img src="/static/category/{{row.problem_type}}.png">
+           <label>&nbsp;&nbsp;{{row.problem_type}}</label>
+          </div>
+         </div>
        {% elif status == 'Folyamatban' %}
-         <div style="background-color:coral; color:white;">IKON {{ row.problem_type }}</div>
+         <div class='card_head' style="background-color:coral; color:white;">
+          <div class='card_label'>
+           <img src="/static/category/{{row.problem_type}}.png">
+           <label>&nbsp;&nbsp;{{row.problem_type}}</label>
+          </div>
+         </div>
        {% elif status == 'Készül' %}
-         <div style="background-color:red; color:white;">IKON {{ row.problem_type }}</div>
+         <div class='card_head' style="background-color:red; color:white;">
+          <div class='card_label'>
+           <img src="/static/category/{{row.problem_type}}.png">
+           <label>&nbsp;&nbsp;{{row.problem_type}}</label>
+          </div>
+         </div>
        {% elif status == 'Hivatal megoldotta' %}
-         <div style="background-color:pink; color:white;">IKON {{ row.problem_type }}</div>
+         <div class='card_head' style="background-color:pink; color:white;">
+          <div class='card_label'>
+           <img src="/static/category/{{row.problem_type}}.png">
+           <label>&nbsp;&nbsp;{{row.problem_type}}</label>
+          </div>
+         </div>
        {% elif status == 'Inaktív' %}
-         <div style="background-color:grey; color:white;">IKON {{ row.problem_type }}</div>
+         <div class='card_head' style="background-color:grey; color:white;">
+          <div class='card_label'>
+           <img src="/static/category/{{row.problem_type}}.png">
+           <label>&nbsp;&nbsp;{{row.problem_type}}</label>
+          </div>
+         </div>
        {% elif status == 'Duplika' %}
-         <div style="background-color:purple; color:white;">IKON {{ row.problem_type }}</div> 
+         <div class='card_head' style="background-color:purple; color:white;">
+          <div class='card_label'>
+           <img src="/static/category/{{row.problem_type}}.png">
+           <label>&nbsp;&nbsp;{{row.problem_type}}</label>
+          </div>
+         </div>
        {% elif status == 'Befejezve' %}
-         <div style="background-color:green; color:white;">IKON {{ row.problem_type }}</div>                                               
+         <div class='card_head' style="background-color:green; color:white;">
+          <div class='card_label'>
+           <img src="/static/category/{{row.problem_type}}.png">
+           <label>&nbsp;&nbsp;{{row.problem_type}}</label>
+          </div>
+         </div>                                         
        {% endif%}
        
        <img class="cropped" src="/static/upload/{{ row.id }}/{{row.cover_image}}" alt={{ row.title }}/>
+         <div class="card_container">
          <br>
-         <p>{{ row.title }}</p>
-         <p>{{ row.city }}</p>
-         {% set desc_1 = row.description.split('.') %}
-         <p>{{ desc_1[0] }}.</p>
-       </div>
-       
+         <h6><b>{{ row.title | upper}}</b></h6>
+         <i>{{ row.city | upper}}</i>
+         <hr class='card_hr'>
+         <br>
+         {% if row.description %}
+          {% set desc_1 = row.description.split('.') %}
+          <p><i>{{ desc_1[0] }}.</i></p>
+         {% endif %}
+         </div> <!--card_container-->
+       </div> <!--card-->
        </a>
-       <nav aria-label="Page navigation example">
-     </div>
+     </div> <!--col-sm-3-->
 
     {% endfor %}
     
-   </div>
+   </div> <!-- row -->
    <hr>
    
 

@@ -12,7 +12,7 @@
 <body>
     <div class="container">
         <br>
-        <h2>Probléma bejelentése</h2>
+        <h2><b><i>PROBLÉMA BEJELENTÉSE</i></b></h2>
         <p>[folyamat ismertetése szöveg vagy piktogram]</p>
         <hr>
         <form action="" method="post" enctype="multipart/form-data">
@@ -32,6 +32,7 @@
 	         <option value="Járda">Járda</option>
 	         <option value="Akadálymentesítés">Akadálymentesítés</option>
 	         <option value="Növény">Növény</option>
+	         <option value="Állat">Állat</option>
 	         <option value="Épület">Épület</option>
 	         <option value="Közlekedés">Közlekedés</option>
                  <option value="Tájékoztatás">Tájékoztatás</option>
@@ -243,13 +244,13 @@ function complete_address(){
       var county = address.split(",")[3].trim()
     };
   
-    var county = county.replace("megye", "")
+    var county = county.replace("megye", "").trim()
 
     document.getElementById("address").value = address
     document.getElementById("city").value = city
     document.getElementById("county").value = county
-    document.getElementById("lng").value = lat
-    document.getElementById("lat").value = lng
+    document.getElementById("lng").value = lng
+    document.getElementById("lat").value = lat
   
     deletePopup();
     addPopup(lng, lat, address);
