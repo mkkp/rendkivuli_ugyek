@@ -27,6 +27,9 @@ from flask import request
 from flask import session
 from flask import url_for
 
+#Flask-Migrate
+from flask_migrate import Migrate
+
 #Flask Login
 #from flask_login import current_user
 from flask_login import login_required
@@ -80,6 +83,7 @@ from config import AUTH0_DOMAIN
 
 ##APP
 app = Flask(__name__)
+migrate = Migrate(app, db)
 
 ##OAUTH
 oauth = OAuth(app)
@@ -251,20 +255,28 @@ def add_submission():
 		     status_changed_by = request.form["email"],
 		     created_date=get_date()
 		     )
-
+		     
         db.session.add(submission)
         db.session.commit()
-
+		     
         #SAVE PICTURES
         pictures = request.files.getlist('files')
+        additional_pictures = request.files.getlist('additional_files')
+        
+        if additional_pictures[0].filename != "":
+            pictures = pictures + additional_pictures
+            
+        for p in pictures:
+            print(type(p))
+            
         tag = "before"
-
+        
         result = save_picture(pictures=pictures,
                               upload_folder=UPLOAD_FOLDER,
                               tag=tag,
                               submission_id=str(submission.id)
                              )
-
+                             
         if result == "not allowed extension":
             flash("Nem megengedett file kiterjesztés.","danger")
             return render_template('submission.html',
@@ -288,6 +300,7 @@ def add_submission():
               "TextPart": "Sikeres városmódosító bejelentés!",
               "HTMLPart": f"""<h3>Gratulálunk!</h3>
                               <h4>Sikeres városmódosító bejelentést tettél!</h4>
+                              <p>{submission.title}</p>
                               <p>Az ügy adatlapját itt találod:</p>
                               <p>https://rendkivuliugyek.site/single_submission/{submission.id}</p>
                               """,
@@ -299,7 +312,7 @@ def add_submission():
         mailjet.send.create(data=submission_mail)
         flash("Sikeres bejelentés! Küldtünk egy levelet is!",'success')
         return redirect(f'/single_submission/{submission.id}')
-
+        
     if request.method == 'GET':
         return render_template('submission.html',
                                ACCESS_KEY=MAP_KEY,
@@ -457,14 +470,18 @@ def all_submission():
       .paginate(page=page, per_page=ROWS_PER_PAGE)
 
     if request.method == 'POST':
-
+    
         county = request.form["county"]
         problem_type = request.form["type"]
         status = request.form["status"]
+        search_text = request.form["full_text_search"]
+        #result = SubmissionModel.query.filter(SubmissionModel.description.like(f"%{search_text}%")).all()
+        #result = SubmissionModel.query.filter_by(description = f"%{search_text}%").all()
 
         county_dict = {}
         problem_type_dict = {}
         status_dict = {}
+        text_dict = {}
 
         if county != "":
             county_dict = {"county":county}
@@ -474,16 +491,24 @@ def all_submission():
 
         if status != "":
             status_dict = {"status":status}
+            
+        if search_text != "":
+            search_text = search_text.lower()
+            filtered_list = SubmissionModel.query.filter(SubmissionModel.description.ilike(f"%{search_text}%"))\
+            .order_by(SubmissionModel.created_date.desc())\
+            .paginate(page=page, per_page=ROWS_PER_PAGE)
+            return render_template ("all_submission.html",
+                                     post_list=filtered_list
+                                   )
 
         #merge dicts
         query_dict = county_dict | problem_type_dict | status_dict
 
-        print(query_dict)
 
         filtered_list = SubmissionModel.query.filter_by(**query_dict)\
         .order_by(SubmissionModel.created_date.desc())\
         .paginate(page=page, per_page=ROWS_PER_PAGE)
-
+ 
         return render_template ("all_submission.html",
                                  post_list=filtered_list,
                                )

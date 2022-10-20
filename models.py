@@ -1,5 +1,12 @@
 """
 SQLAlchemy schema model definitons
+
+Migration steps:
+1. pip install Flask-migrate
+2. cd to Flask project library
+3. flask db init
+4. flask db migrate -m "-some commit text-"
+5. flask db upgrade
 """
 from flask_login import UserMixin
 from flask_login import LoginManager

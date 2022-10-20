@@ -5,6 +5,13 @@
  <link href='https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.css' rel='stylesheet' />
  <link rel="stylesheet" href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.1/mapbox-gl.css" type="text/css" />
  <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" type="text/css">
+ 
+ <style>
+ img {
+    width: 100%;
+    height: auto;
+}
+ </style>
 </head>
 
 <body>
@@ -13,9 +20,10 @@
   <h3><b><i>MINDEN ÜGY EGY TÉRKÉPEN</i></b></h3>
   <hr>
   <div id='map' style='width: auto; height: 50em;'></div>
+  <img src={{url_for('static',filename='site_img/jelmagyarazat.png')}}/>
   <hr>
+</div>
   
-
 <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
 
 <script>
@@ -155,8 +163,15 @@
 	map.getCanvas().style.cursor = 'pointer';
 	});
 	map.on('mouseleave', 'clusters', () => {
-	map.getCanvas().style.cursor = '';
+	map.getCanvas().style.cursor = 'zoom-in';
 	});
+	
+	map.on('mouseenter', 'unclustered-point', () => {
+	map.getCanvas().style.cursor = 'pointer';
+	});
+	map.on('mouseleave', 'unclustered-point', () => {
+	map.getCanvas().style.cursor = 'zoom-in';
+	});	
 	
 	map.addControl(
 	new MapboxGeocoder({
@@ -166,9 +181,12 @@
 	mapboxgl: mapboxgl
 	})
 	);
+
+	map.addControl(new mapboxgl.NavigationControl());
+	map.addControl(new mapboxgl.FullscreenControl());	
 	     
 </script>
-</div>
+
 </body>
 
 {% endblock %}

@@ -152,6 +152,9 @@
      <option>Zala</option>
     </select>
     
+    <label for="type">Szöveges keresés a leírásban</label>
+    <input value="" type="text" class="form-control" id="full_text_search" placeholder="" name="full_text_search">
+    
    </div> <!--detailed_search-->
    
     <button type="submit" class="btn btn-dark form-control rounded-0">Mutasd!</button>
@@ -223,11 +226,9 @@
        
        <img class="cropped" src="/static/upload/{{ row.id }}/{{row.cover_image}}" alt={{ row.title }}/>
          <div class="card_container">
-         <br>
          <h6><b>{{ row.title | upper}}</b></h6>
          <i>{{ row.city | upper}}</i>
          <hr class='card_hr'>
-         <br>
          {% if row.description %}
           {% set desc_1 = row.description.split('.') %}
           <p><i>{{ desc_1[0] }}.</i></p>

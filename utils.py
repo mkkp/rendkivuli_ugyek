@@ -14,6 +14,7 @@ from PIL import ImageOps
 from PIL import UnidentifiedImageError
 
 from config import THUMBNAIL_SIZE
+from config import FULL_SIZE
 
 from models import db
 from models import SubmissionModel
@@ -40,22 +41,38 @@ def save_picture(pictures, upload_folder, tag, submission_id):
     #
     """
     img_count = 1
-
     picture_dir = os.path.join(upload_folder, submission_id)
 
     for picture in pictures:
-
+        
+        """ Az adatlapon keresztül utólagosan feltöltött képek is a save_picture API-t használják,
+            ami nem veszi figyelembe hogy eddig hány kép lett elmentve milyen sorszámmal.
+            Ez azt eredményezi, hogy lehet két ugyanolyan nevű de más tartalmú képünk is.
+            Tehát img 1_1.jpg ami az első bejelentés első képének a neve 
+            és a 1_1.jpg ami egy az adatlapról utólagosan hozzáadott másik kép.
+            A keveredés elkerülésére egy 8 számjegyű random szám is beleíródik a kép címébe.
+            A unique_id-ra való támaszkodás megszűntethető lenne, ha a save_picture API 
+            figyelembe venné a legnagyobb kiosztott kép sorszámot és onnan folytaná a sorszám kiosztást (img_count).
+        """
         unique_id = str(uuid.uuid4()).split("-")[:1][0]
 
         #CREATE FOLDER
         if not os.path.exists(picture_dir):
             os.mkdir(picture_dir)
-
+            
+        """
+        else:
+            for p in os.listdir(picture_dir):
+                biggest_id = max([picture for picture in last_id = p.split("_")[-1:][0].split(".")[0]])
+                print(biggest_id)
+                #.split(".")[0]
+        """
+            
         #GET ORIGINAL EXTENSION
         original_suffix = picture.filename.split(".")[-1:][0]
 
         #CREATE FILE NAME
-        new_filename = f"{submission_id}_{unique_id}_{tag}__{img_count}.{original_suffix}"
+        new_filename = f"{submission_id}_{unique_id}_{tag}_{img_count}.{original_suffix}"
 
         upload_path = os.path.join(picture_dir, new_filename)
 

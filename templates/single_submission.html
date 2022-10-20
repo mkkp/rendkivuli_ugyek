@@ -4,6 +4,7 @@
   {% set img_url = 'https://rendkivuliugyek.site/static/upload/' + submission[0].id | string + '/' + before_img_list[0].file_name%}
   <head>
     <link href='https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.css' rel='stylesheet' /> 
+    <link rel="stylesheet" href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.1/mapbox-gl.css" type="text/css" />
     <link href="../static/css/lightbox.css" rel="stylesheet">   
     <title>{{ submission[0].title }}</title>
     <meta property="og:site_name"      content="Rendkívüli Ügyek Minisztériuma" />  
@@ -101,7 +102,7 @@
         {% for img in before_img_list %}
         <figure class="figure">
             <a href={{url_for( 'static',filename='upload/' + submission[0].id | string + '/' + img.file_name)}} data-lightbox="roadtrip">
-                <img src={{url_for( 'static',filename='upload/' + submission[0].id | string + "/" + img.thumb_file_name)}}/>
+                <img height="200" src={{url_for( 'static',filename='upload/' + submission[0].id | string + "/" + img.thumb_file_name)}}/>
             </a>
              {% if current_user.email == submission[0].submitter_email
                 or current_user.email == submission[0].owner_email
@@ -135,7 +136,7 @@
         {% for img in after_img_list %}
          <figure class="figure">
             <a href={{url_for( 'static',filename='upload/' + submission[0].id | string + "/" + img.file_name)}} data-lightbox="roadtrip">
-                <img src={{url_for( 'static',filename='upload/' + submission[0].id | string + "/" + img.thumb_file_name)}}/>
+                <img height="200" src={{url_for( 'static',filename='upload/' + submission[0].id | string + "/" + img.thumb_file_name)}}/>
             </a>
              {% if current_user.email == submission[0].submitter_email
                 or current_user.email == submission[0].owner_email
@@ -187,9 +188,9 @@
         
         {% if comment.commenter == current_user.user_name or role == 'admin' %}
         <form action="" method="post">
-            <textarea class="form-control rounded-0" id="comment" rows="1" name="comment" style="padding:0.2em; word-wrap: break-word;">
-              {{ comment.body }}
-             </textarea>
+            <input class="form-control rounded-0" id="comment" rows="1" name="comment" style="padding:0.2em; word-wrap: break-word;"
+              value={{ comment.body }}/>
+
             <button class="btn btn-warning rounded-0" id="comment-edit" name="comment-edit">szerkesztés mentése</button>
             <input hidden type=text, value={{comment.id}} name="comment_id" />
         </form>
@@ -205,7 +206,7 @@
             <input hidden type=text, value='{{current_user.user_name}}' name="current_user" />
             <label for="comment">Na ehhez hozzászólok én is!</label>
 
-            <textarea class="form-control rounded-0" id="comment" rows="1" name="comment"></textarea>
+            <input type=text class="form-control rounded-0" id="comment" rows="1" name="comment"/>
             <br>
             <button type="submit" id="comment-submit" name="comment-submit" class="btn btn-primary rounded-0">Hozzáaszólás beküldése
             </button>
@@ -292,6 +293,10 @@
 	}
 	);
 	});
+	
+	map.addControl(new mapboxgl.NavigationControl());
+	map.addControl(new mapboxgl.FullscreenControl());
+	
     </script>
     
     <script>

@@ -2,6 +2,7 @@ app.db
 config.py
 static/upload
 archive
+migrations
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

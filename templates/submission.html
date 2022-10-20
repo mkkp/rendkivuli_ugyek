@@ -7,6 +7,15 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <link href='https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.css' rel='stylesheet' />
     <link rel="stylesheet" href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.1/mapbox-gl.css" type="text/css" />
+    <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" type="text/css">
+
+  <style>
+  .hidden_file_upload {
+    display: none; //block 
+    overflow: hidden;
+    }
+  </style>    
+    
 </head>
 
 <body>
@@ -51,15 +60,26 @@
             </div>
             <br>
             <div class="form-group">
-                <strong><label for="files" class="" style=>Képek feltöltése</label></strong>
+                <strong><label for="files" style=>Képek feltöltése</label></strong>
                 <input type="file" 
                        id="files" 
                        name="files" 
                        class="btn btn-secondary form-control rounded-0 border border-dark" 
                        multiple="true" 
-                       autocomplete="off" 
                        required
-                       accept="image/x-png, image/jpeg"/>
+                       accept="image/x-png, image/jpeg"
+                       onchange="show_additional_file_input()"
+                       />
+            </div>
+            <div class="hidden_file_upload" id="hidden_file_upload">
+            <strong><label for="additional_files" style=>További képek feltöltése</label></strong>
+                <input type="file" 
+                       id="additional_files" 
+                       name="additional_files" 
+                       class="btn btn-secondary form-control rounded-0 border border-dark" 
+                       multiple="true"
+                       accept="image/x-png, image/jpeg"
+                       />
             </div>
             <br>
             <div class="form-group">
@@ -103,6 +123,19 @@
         <br>
     </div>
 </body>
+
+<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
+
+<script>
+function show_additional_file_input(){
+    var content = document.getElementById("hidden_file_upload");
+    if (content.style.display === "block") {
+        content.style.display = "none";
+       } else {
+        content.style.display = "block";
+       }       
+     }
+</script>
 
 <script>
 //getCurrentPosition
@@ -173,6 +206,18 @@ window.onload = function getGPSLocation() {
       zoom: 14,
       style: 'mapbox://styles/mapbox/streets-v11'
     });
+    
+    map.addControl(
+      new MapboxGeocoder({
+      accessToken: mapboxgl.accessToken,
+      country:'HUN',
+      language:'hu',
+      mapboxgl: mapboxgl
+      })
+      );
+      
+    map.addControl(new mapboxgl.NavigationControl());
+    map.addControl(new mapboxgl.FullscreenControl());      
     
 //ON CLICK
     map.on("click", (e) => {
