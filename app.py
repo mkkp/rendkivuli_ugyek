@@ -17,6 +17,7 @@ from geojson import Feature
 from geojson import Point
 from geojson import FeatureCollection
 from geojson import dumps as gj_dump
+import flask_excel as excel
 
 #Flask
 from flask import Flask
@@ -309,7 +310,7 @@ def add_submission():
           ]
         }
 
-        mailjet.send.create(data=submission_mail)
+        result = mailjet.send.create(data=submission_mail)
         flash("Sikeres bejelentés! Küldtünk egy levelet is!",'success')
         return redirect(f'/single_submission/{submission.id}')
         
@@ -321,6 +322,7 @@ def add_submission():
 
 #ÜGY ADATAINAK MÓDOSÍTÁSA
 @app.route('/change_submission_data/<submission_id>', methods = ['POST', 'GET'])
+@login_required
 def change_submission_data(submission_id):
     """
     Pylint R0915: Too many statements (53/50) (too-many-statements)
@@ -362,7 +364,38 @@ def change_submission_data(submission_id):
             submission.status_changed_date = get_date()
             submission.status_changed_by = changed_by
             db.session.commit()
-            flash(f"Sikeresen módosítottad az ügy státuszát erre: {new_status}", "success")
+            
+            if submission.owner_email != "":
+                status_change_mail = {'Messages': [
+		    {
+		    "From": {
+		    "Email": f"{FROM_MAIL}",
+		    "Name":  "MKKP"
+		      },
+		      "To": [
+		    {
+		      "Email": f"{submission.owner_email}",
+		      "Name":  "MKKP"
+		    }
+		      ],
+		      "Subject":  f"Státusz változás: {submission.title}",
+		      "TextPart": "Városfelújítós ügy státusz változás",
+		      "HTMLPart": f"""<h3>Kedves {submission.owner_user}!</h3>
+		                      <p>A {submission.title} ügy státusza megváltozott a következőre: {submission.status}
+		                      </p>
+		                      <p>Az ügy adatlapját itt találod:</p>
+		                      <p>https://rendkivuliugyek.site/single_submission/{submission.id}</p>
+		                      """,
+		      "CustomID": "MKKP városmódosító bejelentés"
+		    }
+		  ]
+		}
+
+                mailjet.send.create(data=status_change_mail)
+                flash(f"Sikeresen módosítottad az ügy státuszát erre: {new_status}, a rendezőnek ment levél.", "success")          
+            
+            else:
+                flash(f"Sikeresen módosítottad az ügy státuszát erre: {new_status}", "success")
 
         if request.form["closing_solution"] != "":
             closing_solution = request.form["closing_solution"]
@@ -685,6 +718,7 @@ def user_account():
 
 #FELHASZNÁLÓ ADATOK MÓDOSÍTÁSA
 @app.route('/change_user_data/<user_id>', methods = ['POST', 'GET'])
+@login_required
 def change_user_data(user_id):
     "#"
     user = UserModel.query.filter_by(id=user_id).first()
@@ -738,6 +772,57 @@ def user_manage(id):
         return render_template("single_user.html",user=user)
 
     return render_template("single_user.html",user=user)
+
+#ÜGYEK TÁBLÁZATOS LETÖLTÉSE
+@login_required
+@app.route('/download', methods=['GET'])
+def download_data():
+    submissions = SubmissionModel.query.all()
+    
+    title = [submission.title for submission in submissions]
+    problem_type = [submission.problem_type for submission in submissions]
+    problem_type = [submission.problem_type for submission in submissions]
+    description = [submission.description for submission in submissions]
+    suggestion = [submission.suggestion for submission in submissions]
+    solution = [submission.solution for submission in submissions]
+    address = [submission.address for submission in submissions]
+    city = [submission.city for submission in submissions]
+    county = [submission.county for submission in submissions]
+    lat = [submission.lat for submission in submissions]
+    lng = [submission.lng for submission in submissions]
+    submitter_email = [submission.submitter_email for submission in submissions]
+    owner_email = [submission.owner_email for submission in submissions]
+    owner_user = [submission.owner_user for submission in submissions]
+    created_date = [submission.created_date for submission in submissions]
+    status = [submission.status for submission in submissions]
+    status_changed_date = [submission.status_changed_date for submission in submissions]
+    status_changed_by = [submission.status_changed_by for submission in submissions]
+    
+    excel.init_excel(app)
+    extension_type = "csv"
+    filename = "RÜM_összes_bejelentés_" + str(get_date()) + "." + extension_type
+    data = {'Elnevezés': title,
+    	    'Típus': problem_type,
+    	    'Leírás': description,
+    	    'Megoldási javaslat': suggestion,
+    	    'Megoldás': solution,
+    	    'Cím': address,
+    	    'Város': city,
+    	    'Megye': county,
+    	    'Szélességi fok': lat,
+    	    'Hosszúsági fok': lng,
+    	    'Bejelentő email': submitter_email,
+    	    'Rendező email': owner_email,
+    	    'Rendező felhasználó': owner_user,
+    	    'Létrehozva': created_date,
+    	    'Státusz': status,
+    	    'Státusz változás dátuma': status_changed_date,
+    	    'Státuszt változtató felhasználó': status_changed_by
+    }
+    return excel.make_response_from_dict(data, 
+                                         file_type=extension_type, 
+                                         file_name=filename
+                                        )
 
 #ADATVÉDELMI TÁJÉKOZTATÓ
 @app.route('/user_data_info', methods = ['GET'])

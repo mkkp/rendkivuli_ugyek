@@ -51,6 +51,16 @@
 
 </form>
 
+{% if role == 'coordinator' 
+   or role == 'admin'
+%}
+  <hr>
+  <a href="/download">
+  <button class="btn btn-info" name="">Összes bejelentés letöltése csv-ben</button>
+  </a>
+  <br>
+{% endif %}
+
 <hr>
 
 <p>[Felhasználói feltételek link]</p>

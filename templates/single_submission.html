@@ -54,10 +54,23 @@
          </strong>{{ submission[0].solution }}</p>
         {% endif %}
         
+        {% if submission[0].status != 'Befejezve' 
+        and submission[0].status != 'Inaktív' 
+        and submission[0].status != 'Duplika'
+        and submission[0].status != 'Hivatal megoldotta'
+        %}
+          <p>Ha szeretnél résztvenni a felújításban, írj nekünk a
+            <a href="mailto: ketfarkukutya@gmail.com?subject=Városfelújítós jelentkezés: {{ submission[0].title }} id:{{ submission[0].id }}">
+             <strong>ketfarkukutya@gmail.com</strong>
+            </a>-ra!
+          </p>
+        {% endif %}     
+        
         {% if current_user.email == submission[0].owner_email
            or role == 'coordinator' 
            or role == 'admin'
         %}
+        
         <a href="/change_submission_data/{{submission[0].id}}">
             <button class="btn btn-light form-control rounded-0">Adatok módosítása</button>
         </a>
