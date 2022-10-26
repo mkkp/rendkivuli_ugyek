@@ -27,6 +27,7 @@
             <label for="status"><strong>Státusz:</strong></label>
             <select class="form-select form-control rounded-0" aria-label="Select status" name="status" onchange="detectChange(this)">
 	     <option selected>{{ submission.status }}</option>
+	     <option value="Bejelentve">Bejelentve</option>
 	     <option value="Folyamatban">Folyamatban</option>
 	     <option value="Készül">Készül</option>
 	     <option value="Hivatal megoldotta">Hivatal megoldotta</option>	     
@@ -45,8 +46,14 @@
             <br> 
             <hr> 
             </div>
+            
+ 	    <!--ÜGY BEJELENTŐJÉNEK EMAIL CÍM MÓDOSÍTÁSA-->
+ 	    <p><strong>Bejelentő email címe: </strong> {{ submission.submitter_email }} </p>
+ 	    <label>Email módosítása:</label>
+ 	    <input type="text" class="form-control rounded-0" id="new_email" name="new_email">
+ 	    <br>
+ 	    <hr>
 
- 	   
  	    <!--ÜGY NEVÉNEK MÓDOSÍTÁSA-->
  	    <p><strong>Ügy megnevezése: </strong> {{ submission.title }} </p>
  	    <label>Megnevezés módosítása:</label>

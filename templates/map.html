@@ -19,6 +19,35 @@
   <br>
   <h3><b><i>MINDEN ÜGY EGY TÉRKÉPEN</i></b></h3>
   <hr>
+  
+   <form action="" method="post" enctype="multipart/form-data">
+   <div class="form-group">
+    <select class="form-select form-control" 
+            aria-label="Típus kiválasztása" 
+            name="type">
+    <option selected value="">Válassz a típusok közül!</option>
+    <option>Összes</option>  
+    <option>Utca</option>
+    <option>Szemét</option>
+    <option>Közmű</option>
+    <option>Út</option>
+    <option>Járda</option>
+    <option>Akadálymentesítés</option>
+    <option>Növény</option>
+    <option>Állat</option>
+    <option>Épület</option>
+    <option>Közlekedés</option>
+    <option>Tájékoztatás</option>
+    <option>Műemlék</option>
+   </select>
+    </div>
+    <button type="submit" class="btn btn-light form-control rounded-0">Mutasd!</button>
+   </form>
+  <br>
+  {% if submission_type%}
+  <p>Kiválasztott ügytípus:<b> {{submission_type}}</b></p>
+  {% endif %}
+  
   <div id='map' style='width: auto; height: 50em;'></div>
   <img src={{url_for('static',filename='site_img/jelmagyarazat.png')}}/>
   <hr>
@@ -41,48 +70,40 @@
       );
       
       map.on('load', () => {
-	// Add a new source from our GeoJSON data and
+	// Add a new source from GeoJSON data and
 	// set the 'cluster' option to true. GL-JS will
-	// add the point_count property to your source data.
+	// add the point_count property to source data.
       map.addSource('submissions', {
-      type: 'geojson',
-	// Point to GeoJSON data. This example visualizes all M1.0+ earthquakes
-	// from 12/22/15 to 1/21/16 as logged by USGS' Earthquake hazards program.
+      type: 'geojson', // Point to GeoJSON data.
       data: {{ feature_collection | safe}},
       cluster: true,
       clusterMaxZoom: 14, // Max zoom to cluster points on
       clusterRadius: 50 // Radius of each cluster when clustering points (defaults to 50)
       })
       
-	map.addLayer({
+      map.loadImage('/static/marker/kutyafejek/marker_red.png',
+	  (error, image) => {
+	    if (error) throw error;
+	    map.addImage('custom-marker', image);
+	    map.addLayer({
+		id: 'unclustered-point',
+		type: 'symbol',
+		source: 'submissions',
+		filter: ['!', ['has', 'point_count']],
+		layout: {
+		'icon-image': 'custom-marker',
+	}
+	});
+	});
+      
+      map.addLayer({
 	id: 'clusters',
 	type: 'circle',
 	source: 'submissions',
 	filter: ['has', 'point_count'],
 	paint: {
-	// Use step expressions (https://docs.mapbox.com/mapbox-gl-js/style-spec/#expressions-step)
-	// with three steps to implement three types of circles:
-	//   * Blue, 20px circles when point count is less than 100
-	//   * Yellow, 30px circles when point count is between 100 and 750
-	//   * Pink, 40px circles when point count is greater than or equal to 750
-	'circle-color': [
-	'step',
-	['get', 'point_count'],
-	'#81c000',
-	100,
-	'#f1f075',
-	750,
-	'#f28cb1'
-	],
-	'circle-radius': [
-	'step',
-	['get', 'point_count'],
-	20,
-	100,
-	30,
-	750,
-	40
-	]
+	'circle-color': '#81c000',
+	'circle-radius': 20,
 	}
 	});
 	
@@ -93,11 +114,12 @@
 	filter: ['has', 'point_count'],
 	layout: {
 	'text-field': '{point_count_abbreviated}',
-	'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
-	'text-size': 12
+	'text-size': 14
 	}
 	});
 	
+	
+	/*
 	map.addLayer({
 	id: 'unclustered-point',
 	type: 'circle',
@@ -110,6 +132,7 @@
 	'circle-stroke-color': '#000000'
 	}
 	});
+	*/
 	
 	// inspect a cluster on click
 	map.on('click', 'clusters', (e) => {
@@ -137,6 +160,8 @@
 	const submission_title = e.features[0].properties.title;
 	const submission_type = e.features[0].properties.type;
 	const submission_status = e.features[0].properties.status;
+	const submission_img = e.features[0].properties.cover_image;
+	const img_path = "{{url_for( 'static',filename='upload/')}}" + submission_id + "/" + submission_img
 
 	// Ensure that if the map is zoomed out such that
 	// multiple copies of the feature are visible, the
@@ -144,17 +169,22 @@
 	while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
 	coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
 	}
-	 
+	
+	console.log(submission_status + submission_type)
+	
 	new mapboxgl.Popup()
 	.setLngLat(coordinates)
 	.setHTML(
+	`<div class="" style='padding:0.5em'>` + 
+	`<img height='10' width = 'auto' src=${img_path}/>` + 
 	`<span><b>${submission_title}</b> | </span>` +
 	`<span>${submission_type} | </span>`+
 	`<span>${submission_status}</span>` +
 	`<a href=/single_submission/${submission_id}` + 
                    " target='blank' rel='noopener noreferrer'>" +
                    "<p>Adatlap</p>" +
-                   "</a>"
+                   "</a>" + 
+        `</div>`
 	)
 	.addTo(map);
 	});      

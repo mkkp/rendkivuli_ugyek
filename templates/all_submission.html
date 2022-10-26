@@ -120,6 +120,7 @@
     <option>Járda</option>
     <option>Akadálymentesítés</option>
     <option>Növény</option>
+    <option>Állat</option>
     <option>Épület</option>
     <option>Közlekedés</option>
     <option>Tájékoztatás</option>
@@ -152,7 +153,7 @@
      <option>Zala</option>
     </select>
     
-    <label for="type">Szöveges keresés a leírásban</label>
+    <label for="type">Szöveges keresés az összes ügy leírásában</label>
     <input value="" type="text" class="form-control" id="full_text_search" placeholder="" name="full_text_search">
     
    </div> <!--detailed_search-->
@@ -174,28 +175,28 @@
       <div class="card">
        {% set status = row.status %}
        {% if status == 'Bejelentve' %}
-         <div class='card_head' style="background-color:blue; color:white;">
+         <div class='card_head' style="background-color:#f45d5f; color:white;">
           <div class='card_label'>
            <img src="/static/category/{{row.problem_type}}.png">
            <label>&nbsp;&nbsp;{{row.problem_type}}</label>
           </div>
          </div>
        {% elif status == 'Folyamatban' %}
-         <div class='card_head' style="background-color:coral; color:white;">
+         <div class='card_head' style="background-color:#feb955; color:white;">
           <div class='card_label'>
            <img src="/static/category/{{row.problem_type}}.png">
            <label>&nbsp;&nbsp;{{row.problem_type}}</label>
           </div>
          </div>
        {% elif status == 'Készül' %}
-         <div class='card_head' style="background-color:red; color:white;">
+         <div class='card_head' style="background-color:#22325e; color:white;">
           <div class='card_label'>
            <img src="/static/category/{{row.problem_type}}.png">
            <label>&nbsp;&nbsp;{{row.problem_type}}</label>
           </div>
          </div>
        {% elif status == 'Hivatal megoldotta' %}
-         <div class='card_head' style="background-color:pink; color:white;">
+         <div class='card_head' style="background-color:#656d77; color:white;">
           <div class='card_label'>
            <img src="/static/category/{{row.problem_type}}.png">
            <label>&nbsp;&nbsp;{{row.problem_type}}</label>
@@ -209,14 +210,14 @@
           </div>
          </div>
        {% elif status == 'Duplika' %}
-         <div class='card_head' style="background-color:purple; color:white;">
+         <div class='card_head' style="background-color:grey; color:white;">
           <div class='card_label'>
            <img src="/static/category/{{row.problem_type}}.png">
            <label>&nbsp;&nbsp;{{row.problem_type}}</label>
           </div>
          </div>
        {% elif status == 'Befejezve' %}
-         <div class='card_head' style="background-color:green; color:white;">
+         <div class='card_head' style="background-color:#35968a; color:white;">
           <div class='card_label'>
            <img src="/static/category/{{row.problem_type}}.png">
            <label>&nbsp;&nbsp;{{row.problem_type}}</label>

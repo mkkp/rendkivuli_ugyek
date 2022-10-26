@@ -4,7 +4,7 @@
 {% if role == 'coordinator' or role == 'admin' %}
     <div class="container">
         <h2>{{submission.title}}</h2>
-	<h3>Rendező hozzáadása az ügyhöz</h3>
+	<h3>Szervező hozzáadása az ügyhöz</h3>
 	<form action="" method = "POST">
 	<input type="text" class="form-control rounded-0" id="myInput" onkeyup="TableFilter()" placeholder="tudod-e az email címét?">
 	<br>
@@ -39,7 +39,7 @@
          {% endfor %}
          </tbody>
 	</table>
-        <small>Egy bejelentéshez csak egy rendezőt lehet hozzáadni.</small>
+        <small>Egy bejelentéshez csak egy szervezőt lehet hozzáadni.</small>
         <br>
         <input type = "submit" class="btn btn-success" value = "Hozzáadom!" />
 	</form>

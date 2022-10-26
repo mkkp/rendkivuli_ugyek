@@ -37,7 +37,7 @@
 {% endif%}
 <br>
 {% if owner_list is defined %}
-<p><strong>Rendező vagyok:</strong></p>
+<p><strong>Szervező vagyok:</strong></p>
 <ul class="list-group">
 {% for row in owner_list %}
    {% if row.title %}
@@ -63,8 +63,7 @@
 
 <hr>
 
-<p>[Felhasználói feltételek link]</p>
-<p>[Adatvédelmi tájékoztató link]</p>
+<a href="/user_data_info" target="_blank">Adatkezelési szabályzat</a></label>
   
 </div>
 {% endblock %}

@@ -24,11 +24,20 @@
         <h2><b><i>PROBLÉMA BEJELENTÉSE</i></b></h2>
         <p>[folyamat ismertetése szöveg vagy piktogram]</p>
         <hr>
-        <form action="" method="post" enctype="multipart/form-data">
+        <form action="" method="post" enctype="multipart/form-data" class="was-validated">
             <div class="form-group">
                 <strong><label for="megnevezes">Probléma megnevezése</label></strong>
-                <input value="" type="text" class="form-control" id="megnevezes" placeholder="" name="title" autofocus required>
-            </div>
+                <input value="" type="text" 
+                       class="form-control" 
+                       id="megnevezes" 
+                       placeholder="" 
+                       name="title" 
+                       autofocus 
+                       required                       
+                       \>
+              <div class="invalid-feedback">Ha nem tudod megnevezni, akkor az nem probléma.</div>
+              </div>
+
             <br>
             <div class="form-group">
                 <strong><label for="tipus">Típus</label></strong>
@@ -47,11 +56,14 @@
                  <option value="Tájékoztatás">Tájékoztatás</option>
                  <option value="Műemlék">Műemlék</option>
 	  </select>
+	      <div class="valid-feedback"></div>
+              <div class="invalid-feedback">Tök széles a választék, bökj rá egyre!</div>
             </div>
             <br>
             <div class="form-group">
                 <strong><label for="reszletes_leiras">Részletes leírás</label></strong>
-                <textarea class="form-control rounded-0" id="reszletes" rows="3" name="description" required></textarea>
+                <textarea class="form-control rounded-0" id="reszletes" rows="3" name="description"></textarea>
+                <div class="valid-feedback">Nem baj, ha nem töltöd ki. Tényleg. Csináld csak! Semmi baj. Nem haragszunk. Azt csinálsz, amit akarsz.</div>
             </div>
             <br>
             <div class="form-group">
@@ -61,6 +73,7 @@
             <br>
             <div class="form-group">
                 <strong><label for="files" style=>Képek feltöltése</label></strong>
+                <small>maximum 50 megabyte</small>
                 <input type="file" 
                        id="files" 
                        name="files" 
@@ -70,7 +83,9 @@
                        accept="image/x-png, image/jpeg"
                        onchange="show_additional_file_input()"
                        />
+            <div class="invalid-feedback">Ellopták a képfájlt. Próbáld újra!</div>
             </div>
+            
             <div class="hidden_file_upload" id="hidden_file_upload">
             <strong><label for="additional_files" style=>További képek feltöltése</label></strong>
                 <input type="file" 
@@ -94,9 +109,11 @@
                         value={{current_user.email}}
                        {% endif %}
                        required>
+            <div class="invalid-feedback">A PIN-kódod jól jönne, de inkább írd be ide a mailed.</div>
             </div>
             <div class="checkbox">
-              <label><input type="checkbox" required> <a href="/user_data_info" target="_blank">Adatvédelmi nyilatkozat elfogadása </a></label>
+              <label><input type="checkbox" required> <a href="/user_data_info" target="_blank">Adatkezelési szabályzat elfogadása </a></label>
+              <div class="invalid-feedback">Haladjunk, kérem, haladjunk.</div>
             </div>
             <div class="form-group">
                 <strong><label for="address">Cím</label></strong> 
@@ -106,12 +123,14 @@
                        id="address" 
                        name="address" 
                        placeholder="Klikk a térképre!"
-                       onkeyup="getLocation()"/>
+                       onkeyup="getLocation()"
+                       required/>
                 <input hidden type="text" id="lng" name="lng" value=0></p> <!--Ide lehetne valami vicces default értéket adni, pl parlament-->
                 <input hidden type="text" id="lat" name="lat" value=0></p> <!--Ide lehetne valami vicces default értéket adni, pl parlament-->
                 <input hidden type="text" id="city" name="city" value="nem meghatározott"></p>
                 <input hidden type="text" id="county" name="county" value="nem meghatározott"></p>
                 <button type="button" class="btn btn-light form-control rounded-0 border border-dark" onclick="complete_address()">Cím kiegészítése</button>
+                <div class="invalid-feedback">Sajnos pontosan meg kell mondanod, hogy hol van mi, merre, miként.</div>
             </div>
             <br>
             <div id='map' style='width: auto; height: 30em;'></div>
@@ -423,6 +442,8 @@ function showError(error) {
 
 //<--UTILS
 </script>
+
+
 
 </html>
 

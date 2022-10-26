@@ -141,6 +141,41 @@ def create_all():
 @app.route('/full_map', methods = ['POST', 'GET'])
 def full_map():
     "#"
+    
+    if request.method == 'POST':
+    
+        submission_type = request.form["type"],
+        
+        filtered_list = SubmissionModel.query.filter_by(problem_type=submission_type[0]).all()
+        
+        if submission_type[0] == "Összes":
+            filtered_list = SubmissionModel.query.all()
+            
+        if submission_type[0] == "":
+            filtered_list = SubmissionModel.query.all()            
+        
+        point_list=[]
+        for i, post in enumerate(filtered_list):
+            i = Feature(geometry=Point((post.lng, post.lat)))
+            i.properties['id'] = post.id
+            i.properties['title'] = post.title
+            i.properties['status'] = post.status
+            i.properties['type'] = post.problem_type
+            i.properties['cover_image'] = post.cover_image
+            point_list.append(i)
+
+        feature_collection = FeatureCollection(point_list)
+        dump = gj_dump(feature_collection, sort_keys=True)
+
+        return render_template('map.html',
+                           ACCESS_KEY=MAP_KEY,
+                           lat=INIT_LAT,
+                           lng=INIT_LNG,
+                           post_list=filtered_list,
+                           feature_collection = dump,
+                           submission_type = submission_type[0]
+                           )
+    
     post_list = SubmissionModel.query.all()
     point_list=[]
     for i, post in enumerate(post_list):
@@ -149,6 +184,7 @@ def full_map():
         i.properties['title'] = post.title
         i.properties['status'] = post.status
         i.properties['type'] = post.problem_type
+        i.properties['cover_image'] = post.cover_image
         point_list.append(i)
 
     feature_collection = FeatureCollection(point_list)
@@ -194,7 +230,7 @@ def callback():
                              active=True)
         db.session.add(reg_user)
         db.session.commit()
-        user = UserModel.query.filter_by(email = user_email).first()
+        user = UserModel.query.filter_by(email=user_email).first()
         login_user(user)
         user.last_login = get_date()
 
@@ -299,11 +335,13 @@ def add_submission():
               ],
               "Subject":  "Sikeres városmódosító bejelentés!",
               "TextPart": "Sikeres városmódosító bejelentés!",
-              "HTMLPart": f"""<h3>Gratulálunk!</h3>
-                              <h4>Sikeres városmódosító bejelentést tettél!</h4>
-                              <p>{submission.title}</p>
-                              <p>Az ügy adatlapját itt találod:</p>
-                              <p>https://rendkivuliugyek.site/single_submission/{submission.id}</p>
+              "HTMLPart": f"""<h3>Szia!</h3>
+                              <p>Köszi, hogy jelezted nekünk az alábbi problémát: {submission.title}<br>
+                              4000 mérnökünk és 3600 menyétünk elkezdett dolgozni rajta.<br>Hamarosan megoldjuk vagy nem.
+                              </p>
+                              <p>Keresünk majd, amint kitaláltuk, hogy mit csináljunk a dologgal.<br>
+                              Addig is itt tudod nyomon követni, hogyan állunk vele: https://rendkivuliugyek.site/single_submission/{submission.id}</p>
+		              <p><b>Rendkívüli Ügyek Minisztériuma</b></p>                            
                               """,
               "CustomID": "MKKP városmódosító bejelentés"
             }
@@ -337,6 +375,12 @@ def change_submission_data(submission_id):
             submission.title = new_title
             db.session.commit()
             flash("Sikeresen módosítottad az ügy megnevezését!", "success")
+            
+        if request.form["new_email"] != "":
+            new_email = request.form["new_email"]
+            submission.submitter_email = new_email
+            db.session.commit()
+            flash("Sikeresen módosítottad az ügy bejelentő email címét!", "success")            
 
         if request.form["new_type"] != submission.problem_type:
             new_type = request.form["new_type"]
@@ -385,6 +429,7 @@ def change_submission_data(submission_id):
 		                      </p>
 		                      <p>Az ügy adatlapját itt találod:</p>
 		                      <p>https://rendkivuliugyek.site/single_submission/{submission.id}</p>
+			              <p><b>Rendkívüli Ügyek Minisztériuma</b></p>
 		                      """,
 		      "CustomID": "MKKP városmódosító bejelentés"
 		    }
@@ -392,10 +437,39 @@ def change_submission_data(submission_id):
 		}
 
                 mailjet.send.create(data=status_change_mail)
-                flash(f"Sikeresen módosítottad az ügy státuszát erre: {new_status}, a rendezőnek ment levél.", "success")          
+                flash(f"Sikeresen módosítottad az ügy státuszát erre: {new_status}. A szervezőnek ment levél.", "success")          
             
             else:
                 flash(f"Sikeresen módosítottad az ügy státuszát erre: {new_status}", "success")
+                
+
+            if new_status == "Befejezve":
+
+                solution_mail_to_submitter = {'Messages': [
+		    {
+		    "From": {
+		    "Email": f"{FROM_MAIL}",
+		    "Name":  "MKKP"
+		      },
+		      "To": [
+		    {
+		      "Email": f"{submission.submitter_email}",
+		      "Name":  "MKKP"
+		    }
+		      ],
+		      "Subject":  f"Befejezett ügy: {submission.title}",
+		      "TextPart": "Befejezett ügy",
+		      "HTMLPart": f"""<h3>Szia!</h3>
+			              <p>Jó hír: sikerült megoldanunk a problémát, amit bejelentettél: {submission.title}</p>
+			              <p>Itt tudod megnézni, hogy mire jutottunk: https://rendkivuliugyek.site/single_submission/{submission.id}</p>
+				      <p><b>Rendkívüli Ügyek Minisztériuma</b></p>
+			              """,
+		      "CustomID": "MKKP városmódosító bejelentés"
+		      }
+		    ]
+		   }
+
+                mailjet.send.create(data=solution_mail_to_submitter) 
 
         if request.form["closing_solution"] != "":
             closing_solution = request.form["closing_solution"]
@@ -406,8 +480,10 @@ def change_submission_data(submission_id):
             submission.status_changed_date =  get_date()
             submission.status_changed_by = changed_by
             db.session.commit()
+
             flash("""Sikeresen hozzáadtad a bejelentés zárószövegét!
-            Az ügy innentől kezdve befejezettnek minősül.", "success""")
+            Az ügy innentől kezdve befejezettnek minősül.""", 
+            "success")
 
         if request.form["new_address"] != "":
             new_address = request.form["new_address"]
@@ -551,7 +627,7 @@ def all_submission():
                            )
 
 
-#BEJELENTÉS RENDEZŐ HOZZÁADÁSA
+#BEJELENTÉS SZERVEZŐ HOZZÁADÁSA
 @app.route('/assign/<id>', methods = ['POST', 'GET'])
 @login_required
 def assign(id):
@@ -563,6 +639,7 @@ def assign(id):
 
         submission.owner_email = request.form['email']
         submission.owner_user = request.form['username']
+        submission.status = "Folyamatban"
         db.session.commit()
 
         organiser_mail = {'Messages': [
@@ -577,13 +654,20 @@ def assign(id):
               "Name":  "MKKP"
             }
               ],
-              "Subject":  "MKKP rendező lettél!",
-              "TextPart": "MKKP rendező lettél!",
-              "HTMLPart": f"""<h2>Gratulálunk!</h2><h3>Rendezőként lettél beállítva
-               a Rendkívüli Ügyek Minisztériumának következő bejelentésénél:</h3>
-              https://rendkivuliugyek.site/single_submission/{id}
+              "Subject":  "MKKP szervező lettél!",
+              "TextPart": "MKKP szervező lettél!",
+              "HTMLPart": f"""<h2>Gratulálunk!</h2>
+              <h3>Szervezőként lettél beállítva
+               a Rendkívüli Ügyek Minisztériumának következő bejelentésénél:
+              </h3>
+              <br>
+              <p>{{submission.title}}</p>
+              <p>https://rendkivuliugyek.site/single_submission/{id}</p>
+              <p>Üdvözlettel:<br>
+              Rendkívüli Ügyek Minisztériuma
+              </p>             
               """,
-              "CustomID": "MKKP rendező lettél!"
+              "CustomID": "MKKP szervező lettél!"
             }
           ]
         }
@@ -669,15 +753,25 @@ def statistics():
     user_count = UserModel.query.count()
     submitted_count = SubmissionModel.query.filter_by(status="Bejelentve").count()
     wip_count = SubmissionModel.query.filter_by(status="Folyamatban").count()
+    progress_count = SubmissionModel.query.filter_by(status="Készül").count()
     completed_count = SubmissionModel.query.filter_by(status="Befejezve").count()
+    
+    from sqlalchemy import func
+    grouped = SubmissionModel.query.group_by('county').all()
+    for i in grouped:
+        print(i.county)
+        print(i)
+    print(grouped)
+    
     #upload_stat = os.stat(UPLOAD_FOLDER)
     #upload_size = os.stat(UPLOAD_FOLDER).st_size / 1000
-
+    
     return render_template('statistics.html',
                             post_count=post_count,
                             user_count=user_count,
                             submitted_count = submitted_count,
                             wip_count=wip_count,
+                            progress_count=progress_count,
                             completed_count=completed_count,
                             #upload_size=upload_size
                           )
@@ -812,8 +906,8 @@ def download_data():
     	    'Szélességi fok': lat,
     	    'Hosszúsági fok': lng,
     	    'Bejelentő email': submitter_email,
-    	    'Rendező email': owner_email,
-    	    'Rendező felhasználó': owner_user,
+    	    'Szervező email': owner_email,
+    	    'Szervező felhasználó': owner_user,
     	    'Létrehozva': created_date,
     	    'Státusz': status,
     	    'Státusz változás dátuma': status_changed_date,

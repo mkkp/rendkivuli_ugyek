@@ -1,25 +1,27 @@
 {% extends "base.html" %} 
 {% block content %}
  {% block head %}
-  {% set img_url = 'https://rendkivuliugyek.site/static/upload/' + submission[0].id | string + '/' + before_img_list[0].file_name%}
+  {% set img_url = 'https://rendkivuliugyek.site/static/upload/' + submission[0].id | string + '/' + before_img_list[0].file_name %}
+  {% set img_url = 'https://rendkivuliugyek.site/static/upload/' + submission[0].id | string + '/' + submission[0].cover_image %}
+  
   <head>
     <link href='https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.css' rel='stylesheet' /> 
     <link rel="stylesheet" href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.1/mapbox-gl.css" type="text/css" />
     <link href="../static/css/lightbox.css" rel="stylesheet">   
     <title>{{ submission[0].title }}</title>
-    <meta property="og:site_name"      content="Rendkívüli Ügyek Minisztériuma" />  
-    <meta property="og:title"          content="{{ submission[0].title }}" />
+    <meta property="og:site_name" content="Rendkívüli Ügyek Minisztériuma" />  
+    <meta property="og:title" content="{{ submission[0].title }}" />
     
     {% if submission[0].solution  %}
-    <meta property="og:description"       content="{{ submission[0].solution }}" />
+    <meta property="og:description" content="{{ submission[0].solution }}" />
     {% else %}
-    <meta property="og:description"    content="{{ submission[0].description }}" />
+    <meta property="og:description" content="{{ submission[0].description }}" />
     {% endif %}
     
-    <meta property="og:type"           content="article" />
-    <meta property="og:url"            content="https://rendkivuliugyek.site/single_submission/{{  submission[0].id  }}" />
-    <meta property="og:image"          content="{{ img_url }}" />
-    <meta property="og:locale"         content="hu_HU" />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://rendkivuliugyek.site/single_submission/{{  submission[0].id  }}" />
+    <meta property="og:image" content="{{ img_url }}" />
+    <meta property="og:locale" content="hu_HU" />
     
     {{ super() }}
   <style>
@@ -36,6 +38,10 @@
         <hr>
         <h3><b>{{ submission[0].title }}</b></h3>
         <hr>
+        <a href={{ url_for('static',filename='upload/' + submission[0].id | string + '/' + submission[0].cover_image) }} data-lightbox="roadtrip">
+          <img height="200" src={{url_for( 'static',filename='upload/' + submission[0].id | string + "/" + submission[0].cover_image)}}/>
+        </a>
+        <br><br>
         <p><strong>Leírás:</strong> {{ submission[0].description }}</p>
         <p><strong>Megoldási javaslat:</strong> {{ submission[0].suggestion }}</p>
         <p><strong>Státusz:</strong> {{ submission[0].status }}</p>
@@ -60,8 +66,8 @@
         and submission[0].status != 'Hivatal megoldotta'
         %}
           <p>Ha szeretnél résztvenni a felújításban, írj nekünk a
-            <a href="mailto: ketfarkukutya@gmail.com?subject=Városfelújítós jelentkezés: {{ submission[0].title }} id:{{ submission[0].id }}">
-             <strong>ketfarkukutya@gmail.com</strong>
+            <a href="mailto: kovacs.gergely@mkkp.hu?subject=Városfelújítós jelentkezés: {{ submission[0].title }} id:{{ submission[0].id }}">
+             <strong>kovacs.gergely@mkkp.hu</strong>
             </a>-ra!
           </p>
         {% endif %}     
@@ -110,10 +116,13 @@
         
         <form action="" method="post">
         <!--ELŐTTE KÉPEK MUTATÁSA-->
-        <h4>Előtte képek:</h4>
-        <br> 
+        {% if before_img_list.count() > 1 %}
+          <h4>Előtte képek:</h4>
+        {% endif %}
+        
         {% for img in before_img_list %}
         <figure class="figure">
+           {% if submission[0].cover_image != img.thumb_file_name%}
             <a href={{url_for( 'static',filename='upload/' + submission[0].id | string + '/' + img.file_name)}} data-lightbox="roadtrip">
                 <img height="200" src={{url_for( 'static',filename='upload/' + submission[0].id | string + "/" + img.thumb_file_name)}}/>
             </a>
@@ -123,9 +132,6 @@
                 or role == 'admin'
               %}
               
-             {% if submission[0].cover_image == img.thumb_file_name%}
-               <figcaption>☝Jelenlegi borítókép</figcaption>
-             {% else %}
                <figcaption>
                <label for="thumbnail"> Borító képpé</label>
                <input type="checkbox" name="new_thumb" value={{img.thumb_file_name}}>
@@ -156,16 +162,13 @@
                 or role == 'coordinator' 
                 or role == 'admin'
               %}
-               {% if submission[0].cover_image == img.thumb_file_name%}
-                 <figcaption>☝Jelenlegi borítókép</figcaption>
-               {% else %}
+
                  <figcaption>
                  <label for="thumbnail"> Borító képpé</label>
                  <input type="checkbox" name="new_thumb" value={{img.thumb_file_name}}>
                  <label> Törlés: </label>
                  <a href="/delete_picture/before/{{img.id}}">🗑</a>
                  </figcaption>
-               {% endif %}
              
             {% endif %}
          </figure>
@@ -176,10 +179,12 @@
            or role == 'coordinator' 
            or role == 'admin'
         %}
-        <br>      
-        <button type="submit" id="change_tumbnail" name="change_tumbnail" class="btn rounded-0">Borítókép módosítása</button> 
-        <br>
-        <br>
+         {% if before_img_list.count() > 1 %}
+          <br>      
+          <button type="submit" id="change_tumbnail" name="change_tumbnail" class="btn rounded-0">Borítókép módosítása</button> 
+          <br>
+          <br>
+         {% endif %}
         {% endif %}
         </form>        
  
@@ -229,7 +234,7 @@
         
          {% if role == 'coordinator' or role == 'admin' %}
          <a href="/assign/{{submission[0].id}}" rel="noopener noreferrer">
-            <button type="button" class="btn btn-success form-control rounded-0">Rendezőt adok a bejelentéshez!</button>
+            <button type="button" class="btn btn-success form-control rounded-0">Szervezőt adok a bejelentéshez!</button>
          </a>
          {% endif %}          
 
@@ -266,11 +271,11 @@
 	map.on('load', () => {
 	// Add an image to use as a custom marker
 	map.loadImage('/static/marker/kutyafejek/marker_red.png',
-	(error, image) => {
-	if (error) throw error;
-	map.addImage('custom-marker', image);
+	  (error, image) => {
+	    if (error) throw error;
+	    map.addImage('custom-marker', image);
+	    
 	// Add a GeoJSON source with 2 points
-	
 	map.addSource('points', {
 		 'type': 'geojson',
 		 'data': {
@@ -293,19 +298,11 @@
 	'source': 'points',
 	'layout': {
 	'icon-image': 'custom-marker',
-	// get the title name from the source's "title" property
-	'text-field': ['get', 'title'],
-	'text-font': [
-	'Open Sans Semibold',
-	'Arial Unicode MS Bold'
-	],
-	'text-offset': [0, 1.25],
-	'text-anchor': 'top'
 	}
 	});
-	}
-	);
-	});
+	}  
+	); //loadImage
+	});//on load
 	
 	map.addControl(new mapboxgl.NavigationControl());
 	map.addControl(new mapboxgl.FullscreenControl());
