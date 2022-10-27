@@ -63,7 +63,7 @@
      var map = new mapboxgl.Map({
        container: 'map',
        center: [{{lat}}, {{lng}}],
-       zoom: 10,
+       zoom: 6.5,
        language: 'auto',
        style: 'mapbox://styles/mapbox/streets-v11' //'mapbox://styles/mapbox/navigation-night-v1'
        }
@@ -176,13 +176,13 @@
 	.setLngLat(coordinates)
 	.setHTML(
 	`<div class="" style='padding:0.5em'>` + 
-	`<img height='10' width = 'auto' src=${img_path}/>` + 
 	`<span><b>${submission_title}</b> | </span>` +
 	`<span>${submission_type} | </span>`+
 	`<span>${submission_status}</span>` +
 	`<a href=/single_submission/${submission_id}` + 
                    " target='blank' rel='noopener noreferrer'>" +
                    "<p>Adatlap</p>" +
+                   `<img height='10' width = 'auto' src=${img_path}/>` +
                    "</a>" + 
         `</div>`
 	)

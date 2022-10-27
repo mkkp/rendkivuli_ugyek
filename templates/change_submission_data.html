@@ -18,7 +18,7 @@
          {% if current_user.email == submission.owner_email
            or role == 'coordinator' 
            or role == 'admin'
-        %}
+         %}
 
  	<form action="" method="post">
  	  <input hidden type=text, value={{current_user.user_name}} name="current_user" />
@@ -53,6 +53,13 @@
  	    <input type="text" class="form-control rounded-0" id="new_email" name="new_email">
  	    <br>
  	    <hr>
+ 	    
+ 	    <!--ÜGY BEJELENTŐJÉNEK EMAIL CÍM MÓDOSÍTÁSA-->
+ 	    <p><strong>Bejelentő telefonszáma: </strong> {{ submission.submitter_phone }} </p>
+ 	    <label>Telefonszám módosítása:</label>
+ 	    <input type="text" class="form-control rounded-0" id="new_phone" name="new_phone">
+ 	    <br>
+ 	    <hr> 	   
 
  	    <!--ÜGY NEVÉNEK MÓDOSÍTÁSA-->
  	    <p><strong>Ügy megnevezése: </strong> {{ submission.title }} </p>
@@ -66,11 +73,9 @@
  	    <label>Típus módosítása:</label>
             <select class="form-select form-control rounded-0" aria-label="Select type" name="new_type">
 	     <option selected>{{ submission.problem_type }}</option>
-	     <option value="Utca">Utca</option>
 	     <option value="Szemét">Szemét</option>
 	     <option value="Közmű">Közmű</option>
-	     <option value="Út">Út</option>
-	     <option value="Járda">Járda</option>
+	     <option value="Út és Járda">Út és Járda</option>
 	     <option value="Akadálymentesítés">Akadálymentesítés</option>
 	     <option value="Növény">Növény</option>
 	     <option value="Épület">Épület</option>

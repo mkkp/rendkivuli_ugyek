@@ -38,8 +38,8 @@
         <hr>
         <h3><b>{{ submission[0].title }}</b></h3>
         <hr>
-        <a href={{ url_for('static',filename='upload/' + submission[0].id | string + '/' + submission[0].cover_image) }} data-lightbox="roadtrip">
-          <img height="200" src={{url_for( 'static',filename='upload/' + submission[0].id | string + "/" + submission[0].cover_image)}}/>
+        <a href={{ url_for('static',filename='upload/' + submission[0].id | string + '/' + submission[0].cover_image_full) }} data-lightbox="roadtrip">
+          <img height="400" src={{url_for( 'static',filename='upload/' + submission[0].id | string + "/" + submission[0].cover_image_full)}}/>
         </a>
         <br><br>
         <p><strong>Leírás:</strong> {{ submission[0].description }}</p>
@@ -193,7 +193,7 @@
         <label for="comment">Korábbi hozzászólások</label>
         <br>
         {% endif %}
-        {% for comment in comment_list %} 
+        {% for comment in comment_list %}
         {% if comment.commenter == current_user.user_name or role == 'admin' %}
         <a href="/delete_comment/{{comment.id}}">
             <button class="btn btn-danger rounded-0" id="comment-delete" name="comment-delete">törlés</button>
@@ -206,8 +206,9 @@
         
         {% if comment.commenter == current_user.user_name or role == 'admin' %}
         <form action="" method="post">
+        <p>{{ comment.body }}</p>
             <input class="form-control rounded-0" id="comment" rows="1" name="comment" style="padding:0.2em; word-wrap: break-word;"
-              value={{ comment.body }}/>
+              value='{{ comment.body }}'/>
 
             <button class="btn btn-warning rounded-0" id="comment-edit" name="comment-edit">szerkesztés mentése</button>
             <input hidden type=text, value={{comment.id}} name="comment_id" />

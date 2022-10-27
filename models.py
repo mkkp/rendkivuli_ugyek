@@ -59,10 +59,13 @@ class SubmissionModel(db.Model):
     lat = db.Column(db.Float)
     lng = db.Column(db.Float)
     submitter_email = db.Column(db.String(), index=True)
+    submitter_phone = db.Column(db.String(), index=True)
     owner_email = db.Column(db.String(), index=True)
     owner_user = db.Column(db.String(), index=True)
     created_date = db.Column(db.String())
     cover_image = db.Column(db.String())
+    cover_image_full = db.Column(db.String())
+    test = db.Column(db.String())
     status = db.Column(db.String())
     status_changed_date = db.Column(db.String()) #2022-09-01
     status_changed_by = db.Column(db.String(), index=True)

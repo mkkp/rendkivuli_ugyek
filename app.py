@@ -286,6 +286,7 @@ def add_submission():
 		     lat=request.form["lat"],
 		     lng=request.form["lng"],
 		     submitter_email=request.form["email"],
+		     submitter_phone=request.form["phone"],
 		     owner_email="",
 		     status="Bejelentve",
 		     status_changed_date=get_date(),
@@ -337,10 +338,10 @@ def add_submission():
               "TextPart": "Sikeres városmódosító bejelentés!",
               "HTMLPart": f"""<h3>Szia!</h3>
                               <p>Köszi, hogy jelezted nekünk az alábbi problémát: {submission.title}<br>
-                              4000 mérnökünk és 3600 menyétünk elkezdett dolgozni rajta.<br>Hamarosan megoldjuk vagy nem.
+                              4000 mérnökünk és 3600 menyétünk elkezdett dolgozni rajta.<br>Hamarosan megoldjuk, vagy nem.
                               </p>
                               <p>Keresünk majd, amint kitaláltuk, hogy mit csináljunk a dologgal.<br>
-                              Addig is itt tudod nyomon követni, hogyan állunk vele: https://rendkivuliugyek.site/single_submission/{submission.id}</p>
+                              Addig is itt tudod nyomonkövetni, hogyan állunk vele: https://rendkivuliugyek.site/single_submission/{submission.id}</p>
 		              <p><b>Rendkívüli Ügyek Minisztériuma</b></p>                            
                               """,
               "CustomID": "MKKP városmódosító bejelentés"
@@ -380,7 +381,13 @@ def change_submission_data(submission_id):
             new_email = request.form["new_email"]
             submission.submitter_email = new_email
             db.session.commit()
-            flash("Sikeresen módosítottad az ügy bejelentő email címét!", "success")            
+            flash("Sikeresen módosítottad az ügy bejelentő email címét!", "success")
+            
+        if request.form["new_phone"] != "":
+            new_phone = request.form["new_phone"]
+            submission.submitter_phone = new_phone
+            db.session.commit()
+            flash("Sikeresen módosítottad az ügy bejelentő telefonszámát!", "success")                     
 
         if request.form["new_type"] != submission.problem_type:
             new_type = request.form["new_type"]
@@ -517,9 +524,10 @@ def single_submission(id):
     if request.method == 'POST':
 
         if "comment-submit" in request.form:
+            form_comment = request.form["comment"]
             comment = CommentModel(commenter=request.form["current_user"],
                                    created_date=get_date(),
-                                   body=request.form["comment"],
+                                   body=form_comment,
                                    parent_id = submission_id)
             db.session.add(comment)
             db.session.commit()
@@ -527,6 +535,7 @@ def single_submission(id):
 
         if "comment-edit" in request.form:
             body_change = request.form["comment"]
+            print(body_change)
             comment_id = request.form["comment_id"]
             comment = CommentModel.query.filter_by(id=comment_id).first()
             comment.body = body_change
@@ -885,6 +894,7 @@ def download_data():
     lat = [submission.lat for submission in submissions]
     lng = [submission.lng for submission in submissions]
     submitter_email = [submission.submitter_email for submission in submissions]
+    submitter_phone = [submission.submitter_phone for submission in submissions]
     owner_email = [submission.owner_email for submission in submissions]
     owner_user = [submission.owner_user for submission in submissions]
     created_date = [submission.created_date for submission in submissions]
@@ -906,6 +916,7 @@ def download_data():
     	    'Szélességi fok': lat,
     	    'Hosszúsági fok': lng,
     	    'Bejelentő email': submitter_email,
+    	    'Bejelentő telefon': submitter_phone,
     	    'Szervező email': owner_email,
     	    'Szervező felhasználó': owner_user,
     	    'Létrehozva': created_date,

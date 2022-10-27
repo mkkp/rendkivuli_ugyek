@@ -24,13 +24,13 @@
         <h2><b><i>PROBLÉMA BEJELENTÉSE</i></b></h2>
         <p>[folyamat ismertetése szöveg vagy piktogram]</p>
         <hr>
-        <form action="" method="post" enctype="multipart/form-data" class="was-validated">
+        <form action="" method="post" enctype="multipart/form-data" id="form" class="needs-validation" novalidate>
             <div class="form-group">
-                <strong><label for="megnevezes">Probléma megnevezése</label></strong>
+                <strong><label for="megnevezes">Probléma megnevezése <label style="color:red">*</label></label></strong>
                 <input value="" type="text" 
                        class="form-control" 
-                       id="megnevezes" 
-                       placeholder="" 
+                       id="megnevezes"
+                       placeholder=""
                        name="title" 
                        autofocus 
                        required                       
@@ -40,14 +40,12 @@
 
             <br>
             <div class="form-group">
-                <strong><label for="tipus">Típus</label></strong>
+                <strong><label for="tipus">Típus <label style="color:red">*</label></label></strong>
                 <select class="form-select form-control rounded-0" aria-label="Select Problem Type" name="type" required>
 	         <option value="" selected>Válassz a típusok közül!</option>
-	         <option value="Utca">Utca</option>
 	         <option value="Szemét">Szemét</option>
 	         <option value="Közmű">Közmű</option>
-	         <option value="Út">Út</option>
-	         <option value="Járda">Járda</option>
+	         <option value="Út és Járda">Út és Járda</option>
 	         <option value="Akadálymentesítés">Akadálymentesítés</option>
 	         <option value="Növény">Növény</option>
 	         <option value="Állat">Állat</option>
@@ -61,9 +59,9 @@
             </div>
             <br>
             <div class="form-group">
-                <strong><label for="reszletes_leiras">Részletes leírás</label></strong>
-                <textarea class="form-control rounded-0" id="reszletes" rows="3" name="description"></textarea>
-                <div class="valid-feedback">Nem baj, ha nem töltöd ki. Tényleg. Csináld csak! Semmi baj. Nem haragszunk. Azt csinálsz, amit akarsz.</div>
+                <strong><label for="reszletes_leiras">Részletes leírás <label style="color:red">*</label></label></strong>
+                <textarea class="form-control rounded-0" id="reszletes" rows="3" name="description" required></textarea>
+                <div class="invalid-feedback">Nem baj, ha nem töltöd ki. Tényleg. Csináld csak! Semmi baj. Nem haragszunk. Azt csinálsz, amit akarsz.</div>
             </div>
             <br>
             <div class="form-group">
@@ -72,7 +70,7 @@
             </div>
             <br>
             <div class="form-group">
-                <strong><label for="files" style=>Képek feltöltése</label></strong>
+                <strong><label for="files" style=>Képek feltöltése <label style="color:red">*</label></label></strong>
                 <small>maximum 50 megabyte</small>
                 <input type="file" 
                        id="files" 
@@ -98,7 +96,7 @@
             </div>
             <br>
             <div class="form-group">
-                <strong><label for="email">Email cím</label></strong>
+                <strong><label for="email">Email cím <label style="color:red">*</label></label></strong>
                 <input type="text" 
                        inputmode="email" 
                        class="form-control" 
@@ -111,12 +109,25 @@
                        required>
             <div class="invalid-feedback">A PIN-kódod jól jönne, de inkább írd be ide a mailed.</div>
             </div>
-            <div class="checkbox">
-              <label><input type="checkbox" required> <a href="/user_data_info" target="_blank">Adatkezelési szabályzat elfogadása </a></label>
-              <div class="invalid-feedback">Haladjunk, kérem, haladjunk.</div>
-            </div>
+            <br>
             <div class="form-group">
-                <strong><label for="address">Cím</label></strong> 
+                <strong><label for="email">Telefon</label></strong>
+                <input type="tel" 
+                       inputmode="tel" 
+                       class="form-control" 
+                       id="phone" 
+                       autocomplete="off" 
+                       name="phone">
+            </div>            
+            
+            <div class="form-check">
+             <input class="form-check-input" type="checkbox" id="myCheck" name="remember" required>
+             <a href="/user_data_info" target="_blank">Adatkezelési szabályzat elfogadása <label style="color:red">*</label></a></label>
+             <div class="invalid-feedback">Haladjunk, kérem, haladjunk.</div>
+            </div>
+            <br>
+            <div class="form-group">
+                <strong><label for="address">Cím <label style="color:red">*</label></label></strong> 
                 <br> 
                 <input type="text" 
                        class="form-control" 
@@ -144,6 +155,29 @@
 </body>
 
 <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
+<script>
+// Example starter JavaScript for disabling form submissions if there are invalid fields
+(function () {
+  'use strict'
+
+  // Fetch all the forms we want to apply custom Bootstrap validation styles to
+  var forms = document.querySelectorAll('.needs-validation')
+
+  // Loop over them and prevent submission
+  Array.prototype.slice.call(forms)
+    .forEach(function (form) {
+      form.addEventListener('submit', function (event) {
+        if (!form.checkValidity()) {
+          event.preventDefault()
+          event.stopPropagation()
+          document.getElementById("form").scrollIntoView({behavior: 'smooth'});
+        }
+
+        form.classList.add('was-validated')
+      }, false)
+    })
+})()
+</script>
 
 <script>
 function show_additional_file_input(){
@@ -222,7 +256,7 @@ window.onload = function getGPSLocation() {
     var map = new mapboxgl.Map({
       container: 'map',
       center: [{{lat}}, {{lng}}],
-      zoom: 14,
+      zoom: 6,
       style: 'mapbox://styles/mapbox/streets-v11'
     });
     

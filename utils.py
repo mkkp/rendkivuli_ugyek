@@ -110,6 +110,7 @@ def save_picture(pictures, upload_folder, tag, submission_id):
 	#UPDATE SUBMISSION
         submission = SubmissionModel.query.filter_by(id=submission_id).first()
         submission.cover_image = thumbnail_name
+        submission.cover_image_full = new_filename
 
         db.session.add(image)
         db.session.commit()
