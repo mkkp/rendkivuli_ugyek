@@ -48,8 +48,8 @@ class SubmissionModel(db.Model):
     __tablename__ = 'submission'
 
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(), index=True)
-    problem_type = db.Column(db.String(), index=True)
+    title = db.Column(db.String())
+    problem_type = db.Column(db.String())
     description = db.Column(db.String())
     suggestion = db.Column(db.String())
     solution = db.Column(db.String())
@@ -58,17 +58,27 @@ class SubmissionModel(db.Model):
     county = db.Column(db.String())
     lat = db.Column(db.Float)
     lng = db.Column(db.Float)
-    submitter_email = db.Column(db.String(), index=True)
-    submitter_phone = db.Column(db.String(), index=True)
-    owner_email = db.Column(db.String(), index=True)
-    owner_user = db.Column(db.String(), index=True)
+    submitter_email = db.Column(db.String())
+    submitter_phone = db.Column(db.String())
+    owner_email = db.Column(db.String())
+    owner_user = db.Column(db.String())
     created_date = db.Column(db.String())
     cover_image = db.Column(db.String())
     cover_image_full = db.Column(db.String())
-    test = db.Column(db.String())
+    featured = db.Column(db.Boolean())
     status = db.Column(db.String())
     status_changed_date = db.Column(db.String()) #2022-09-01
-    status_changed_by = db.Column(db.String(), index=True)
+    status_changed_by = db.Column(db.String())
+
+
+class featuredModel(db.Model):
+    """
+    table schema for featured submissions
+    """
+    __tablename__ = 'featured'
+    id = db.Column(db.Integer, primary_key=True)
+    created_date = db.Column(db.String(10))
+    parent_id = db.Column(db.Integer, db.ForeignKey("submission.id"))
 
 
 class CommentModel(db.Model):

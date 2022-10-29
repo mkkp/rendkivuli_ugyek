@@ -8,6 +8,7 @@
     display: none; //block 
     overflow: hidden;
     }
+    
   </style>
 
 <div class="container">
@@ -21,8 +22,8 @@
          %}
 
  	<form action="" method="post">
- 	  <input hidden type=text, value={{current_user.user_name}} name="current_user" />
- 	  
+ 	    <input hidden type=text, value={{current_user.user_name}} name="current_user" />
+ 	    
             <!--STÁTUSZ MÓDOSÍTÁSA-->
             <label for="status"><strong>Státusz:</strong></label>
             <select class="form-select form-control rounded-0" aria-label="Select status" name="status" onchange="detectChange(this)">
@@ -114,6 +115,22 @@
                   name="complete_addr" 
                   onclick="complete_address()">Cím ellenőrzése</button>
           <br>
+          <br>
+          
+          {% if role == 'admin' %}
+           <input 
+           class="form-check-input" 
+           type="checkbox" 
+           id="featured" 
+           name="featured"
+           {% if submission.featured == True %}
+           checked
+           {% endif %}
+           >
+           <label for="checkbox"><strong>Kiemelt bejegyzés </strong></label>
+           <br>
+          {% endif %}
+          
           <hr>
           <button type="submit" id="save_changes" name="save_changes" class="btn btn-dark form-control rounded-0">Ment</button>
           <hr>

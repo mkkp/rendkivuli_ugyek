@@ -14,6 +14,14 @@
     display: none; //block 
     overflow: hidden;
     }
+    
+   #loading {  
+   width: 50%;
+   height: auto;
+   display: block;
+   margin-left: auto;
+   margin-right: auto;   
+   } 
   </style>    
     
 </head>
@@ -121,7 +129,7 @@
             </div>            
             
             <div class="form-check">
-             <input class="form-check-input" type="checkbox" id="myCheck" name="remember" required>
+             <input class="form-check-input" type="checkbox" id="accept_toc" name="accept_toc" required>
              <a href="/user_data_info" target="_blank">Adatkezelési szabályzat elfogadása <label style="color:red">*</label></a></label>
              <div class="invalid-feedback">Haladjunk, kérem, haladjunk.</div>
             </div>
@@ -140,13 +148,20 @@
                 <input hidden type="text" id="lat" name="lat" value=0></p> <!--Ide lehetne valami vicces default értéket adni, pl parlament-->
                 <input hidden type="text" id="city" name="city" value="nem meghatározott"></p>
                 <input hidden type="text" id="county" name="county" value="nem meghatározott"></p>
-                <button type="button" class="btn btn-light form-control rounded-0 border border-dark" onclick="complete_address()">Cím kiegészítése</button>
+                <button type="button" class="btn btn-light form-control rounded-0 border border-dark" onclick="complete_address()">Cím ellenőrzése</button>
                 <div class="invalid-feedback">Sajnos pontosan meg kell mondanod, hogy hol van mi, merre, miként.</div>
             </div>
             <br>
+            
+            <div id="loading" style="display:none;">
+            <img src="/static/site_img/loading.gif" id="loading">
+            <br>
+            </div>
+            
             <div id='map' style='width: auto; height: 30em;'></div>
             <hr>
-            <button type="submit" class="btn btn-success form-control rounded-0 border border-dark"><h3>Bejelent</h3></button>
+            
+            <button type="submit" class="btn btn-success form-control rounded-0 border border-dark" onclick="$('#loading').show();"><h3>Bejelent</h3></button>
             <hr>
         </form>
         <br>
@@ -155,29 +170,6 @@
 </body>
 
 <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
-<script>
-// Example starter JavaScript for disabling form submissions if there are invalid fields
-(function () {
-  'use strict'
-
-  // Fetch all the forms we want to apply custom Bootstrap validation styles to
-  var forms = document.querySelectorAll('.needs-validation')
-
-  // Loop over them and prevent submission
-  Array.prototype.slice.call(forms)
-    .forEach(function (form) {
-      form.addEventListener('submit', function (event) {
-        if (!form.checkValidity()) {
-          event.preventDefault()
-          event.stopPropagation()
-          document.getElementById("form").scrollIntoView({behavior: 'smooth'});
-        }
-
-        form.classList.add('was-validated')
-      }, false)
-    })
-})()
-</script>
 
 <script>
 function show_additional_file_input(){
@@ -237,7 +229,7 @@ window.onload = function getGPSLocation() {
       document.getElementById("lng").value = lng
       document.getElementById("lat").value = lat
       
-      map.flyTo({center: [lng, lat]});
+      map.flyTo({center: [lng, lat], zoom:12});
       deletePopup();
       addPopup(lng, lat, address);
       deleteLayer();
@@ -287,7 +279,13 @@ window.onload = function getGPSLocation() {
     
     //FORWARD GEOCODING 2
     $.get(url, function (data) {
+      try {
       var address = data.features[0].place_name;
+      }
+      catch(err) {
+        document.getElementById("address").value = "Sajnos nem találtunk címet!"
+        return;
+      }
       var city = address.split(",")[0].trim()
       var street = address.split(",")[1].trim()
       var postal_code = address.split(",")[2].trim()
@@ -306,7 +304,7 @@ window.onload = function getGPSLocation() {
       document.getElementById("lng").value = lng
       document.getElementById("lat").value = lat
     
-      map.flyTo({center: [lng,lat]});
+      map.flyTo({center: [lng,lat], zoom:12});
       deletePopup();
       addPopup(lng, lat, address);
       deleteLayer();
@@ -330,10 +328,16 @@ function complete_address(){
   "&language=hu" +
   "&access_token={{ACCESS_KEY}}"
   $.get(url, function (data) {
-    var location_center = data.features[0].center;
+    try {
+      var address = data.features[0].place_name;
+      }
+      catch(err) {
+        document.getElementById("address").value = "Sajnos nem találtunk címet!"
+        return;
+      }
+    var location_center = data.features[0].center; 
     var lat = data.features[0].center[1]
     var lng = data.features[0].center[0]
-    var address = data.features[0]['place_name']
     var city = address.split(",")[0].trim()
   
     if (city == "Budapest"){ 
@@ -356,12 +360,10 @@ function complete_address(){
     deleteSource();
     addSource(lng,lat);
     addLayer();
-    map.flyTo({center: [lng,lat]});
+    map.flyTo({center: [lng,lat], zoom:12});
   
 })};
 </script>
-
-
 
 <script>
 //FOWRARD GEOCODING 
@@ -379,12 +381,19 @@ function getLocation(){
       "&access_token=" + mapboxgl.accessToken;
       
       $.get(url, function (data) {
-        const location_center = data.features[0].center;
+        try {
         const place_name = data.features[0].place_name;
+        }
+        catch(err) {
+          console.log("Nem létező cím!")
+          return;
+        }
+        const location_center = data.features[0].center;
         var lat = location_center[0]
         var lng = location_center[1]
         
-        map.flyTo({center: [lat,lng]});
+        
+        map.flyTo({center: [lat,lng], zoom:12});
         deleteLayer();
         deleteSource();     
         addSource(lng,lat);
@@ -477,7 +486,28 @@ function showError(error) {
 //<--UTILS
 </script>
 
+<script>
+//FORM VALIDATION
+(function () {
+  'use strict'
 
+  // Fetch forms
+  var forms = document.querySelectorAll('.needs-validation')
+
+  Array.prototype.slice.call(forms)
+    .forEach(function (form) {
+      form.addEventListener('submit', function (event) {
+        if (!form.checkValidity()) {
+          event.preventDefault()
+          event.stopPropagation()
+          document.getElementById("loading").style.display = "none";
+          document.getElementById("form").scrollIntoView({behavior: 'smooth'});
+        }
+        form.classList.add('was-validated')
+      }, false)
+    })
+})()
+</script>
 
 </html>
 

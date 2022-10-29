@@ -42,7 +42,6 @@
 	  border-radius: 30px;
 	  margin:0.5em;
 	  display: flex;
-	  
 	}
 
 	.card:hover {
@@ -68,7 +67,6 @@
 	border-top-right-radius: 25px;
 	color:white;
 	font-weight:bold;
-	
 	}
 	
 	.card_label{
@@ -78,6 +76,10 @@
 	.col-sm-3{
 	padding:0.2em;
 	}
+	
+	.col-sm-6{
+	padding:0.2em;
+	}	
 
 </style>
 </head>
@@ -113,11 +115,9 @@
             aria-label="Típus kiválasztása" 
             name="type">
     <option selected value="">Válassz a típusok közül!</option>
-    <option>Utca</option>
+    <option>Út és Járda</option>
     <option>Szemét</option>
     <option>Közmű</option>
-    <option>Út</option>
-    <option>Járda</option>
     <option>Akadálymentesítés</option>
     <option>Növény</option>
     <option>Állat</option>
@@ -166,9 +166,92 @@
    
    <hr>
    
+   
+   {% if post_list.page == 1%}
+   
    <div class="row">
- 
+   
+   {% for row in featured %}
+     <div class="col-sm-6">
+     <a href="/single_submission/{{ row.id }}" rel="noopener noreferrer">
+      <div class="card">
+       {% set status = row.status %}
+       {% if status == 'Bejelentve' %}
+         <div class='card_head' style="background-color:#f45d5f; color:white;">
+          <div class='card_label'>
+           <img src="/static/category/{{row.problem_type}}.png">
+           <label>&nbsp;&nbsp;{{row.problem_type}}</label>
+          </div>
+         </div>
+       {% elif status == 'Folyamatban' %}
+         <div class='card_head' style="background-color:#feb955; color:white;">
+          <div class='card_label'>
+           <img src="/static/category/{{row.problem_type}}.png">
+           <label>&nbsp;&nbsp;{{row.problem_type}}</label>
+          </div>
+         </div>
+       {% elif status == 'Készül' %}
+         <div class='card_head' style="background-color:#22325e; color:white;">
+          <div class='card_label'>
+           <img src="/static/category/{{row.problem_type}}.png">
+           <label>&nbsp;&nbsp;{{row.problem_type}}</label>
+          </div>
+         </div>
+       {% elif status == 'Hivatal megoldotta' %}
+         <div class='card_head' style="background-color:#656d77; color:white;">
+          <div class='card_label'>
+           <img src="/static/category/{{row.problem_type}}.png">
+           <label>&nbsp;&nbsp;{{row.problem_type}}</label>
+          </div>
+         </div>
+       {% elif status == 'Inaktív' %}
+         <div class='card_head' style="background-color:grey; color:white;">
+          <div class='card_label'>
+           <img src="/static/category/{{row.problem_type}}.png">
+           <label>&nbsp;&nbsp;{{row.problem_type}}</label>
+          </div>
+         </div>
+       {% elif status == 'Duplika' %}
+         <div class='card_head' style="background-color:grey; color:white;">
+          <div class='card_label'>
+           <img src="/static/category/{{row.problem_type}}.png">
+           <label>&nbsp;&nbsp;{{row.problem_type}}</label>
+          </div>
+         </div>
+       {% elif status == 'Befejezve' %}
+         <div class='card_head' style="background-color:#35968a; color:white;">
+          <div class='card_label'>
+           <img src="/static/category/{{row.problem_type}}.png">
+           <label>&nbsp;&nbsp;{{row.problem_type}}</label>
+          </div>
+         </div>                                         
+       {% endif%}
+       
+       <img class="cropped" src="/static/upload/{{ row.id }}/{{row.cover_image}}" alt={{ row.title }}/>
+         <div class="card_container">
+         <h6><b>{{ row.title | upper}}</b></h6>
+         <i>{{ row.city | upper}}</i>
+         <hr class='card_hr'>
+         {% if row.description %}
+          {% set desc_1 = row.description.split('.') %}
+          <p><i>{{ desc_1[0] }}.</i></p>
+         {% endif %}
+         </div> <!--card_container-->
+       </div> <!--card-->
+       </a>
+     </div> <!--col-sm-3-->
+
+   {% endfor %}
+   
+   </div>
+   
+   {% endif %}
+   
+   <div class="row">
+   
     {% for row in post_list.items %}
+    
+    {% if row.featured == False or row.featured == "" %}
     
      <div class="col-sm-3">
      <a href="/single_submission/{{ row.id }}" rel="noopener noreferrer">
@@ -239,6 +322,7 @@
        </a>
      </div> <!--col-sm-3-->
 
+    {% endif %}
     {% endfor %}
     
    </div> <!-- row -->
@@ -249,7 +333,9 @@
   <div class="text-right">
     <a href="{{ url_for('all_submission', page=post_list.prev_num) }}"
        class="btn btn-outline-dark 
-       {% if post_list.page == 1 %}disabled{% endif %}">
+       {% if post_list.page == 1 %}
+       disabled
+       {% endif %}">
         &laquo;
     </a>
   <!-- Loop through the number of pages to display a link for each-->
@@ -273,7 +359,9 @@
     {% endfor %}
     <a href="{{ url_for('all_submission', page=post_list.next_num) }}"
        class="btn btn-outline-dark 
-       {% if post_list.page == post_list.pages %}disabled{% endif %}">
+       {% if post_list.page == post_list.pages %}
+       disabled
+       {% endif %}">
         &raquo;
     </a>
    </div>

@@ -289,6 +289,7 @@ def add_submission():
 		     submitter_phone=request.form["phone"],
 		     owner_email="",
 		     status="Bejelentve",
+		     featured = False,
 		     status_changed_date=get_date(),
 		     status_changed_by = request.form["email"],
 		     created_date=get_date()
@@ -406,6 +407,15 @@ def change_submission_data(submission_id):
             submission.suggestion = new_suggestion
             db.session.commit()
             flash("Sikeresen módosítottad az ügy megoldási javaslatát!", "success")
+            
+        try:
+            featured = request.form["featured"]
+            submission.featured = True
+            db.session.commit()
+            flash("Sikeresen kiemelted az ügyet!", "success")
+        except Exception as e:
+            submission.featured = False
+            db.session.commit()
 
         if request.form["status"] != submission.status:
             new_status = request.form["status"]
@@ -586,7 +596,9 @@ def all_submission():
     post_list = SubmissionModel.query\
       .order_by(SubmissionModel.created_date.desc())\
       .paginate(page=page, per_page=ROWS_PER_PAGE)
-
+      
+    featured = SubmissionModel.query.filter_by(featured=True).all()
+    
     if request.method == 'POST':
     
         county = request.form["county"]
@@ -633,6 +645,7 @@ def all_submission():
 
     return render_template ("all_submission.html",
                             post_list=post_list,
+                            featured = featured
                            )
 
 

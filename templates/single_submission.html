@@ -22,6 +22,7 @@
     <meta property="og:url" content="https://rendkivuliugyek.site/single_submission/{{  submission[0].id  }}" />
     <meta property="og:image" content="{{ img_url }}" />
     <meta property="og:locale" content="hu_HU" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     {{ super() }}
   <style>
@@ -29,6 +30,14 @@
     display: none; //block 
     overflow: hidden;
     }
+  
+  #top_image{
+  width:50%;
+  height:auto;
+  }
+  
+  
+
   </style>
   </head>
  {% endblock %}
@@ -39,9 +48,12 @@
         <h3><b>{{ submission[0].title }}</b></h3>
         <hr>
         <a href={{ url_for('static',filename='upload/' + submission[0].id | string + '/' + submission[0].cover_image_full) }} data-lightbox="roadtrip">
-          <img height="400" src={{url_for( 'static',filename='upload/' + submission[0].id | string + "/" + submission[0].cover_image_full)}}/>
+          <img id="top_image" src={{url_for( 'static',filename='upload/' + submission[0].id | string + "/" + submission[0].cover_image)}}/>
         </a>
         <br><br>
+        {%if submission[0].featured == True %}
+         <p><strong> Kiemelt ügy </strong></p>
+        {% endif %}        
         <p><strong>Leírás:</strong> {{ submission[0].description }}</p>
         <p><strong>Megoldási javaslat:</strong> {{ submission[0].suggestion }}</p>
         <p><strong>Státusz:</strong> {{ submission[0].status }}</p>
@@ -59,7 +71,7 @@
          <p><strong>Záró szöveg:<br>
          </strong>{{ submission[0].solution }}</p>
         {% endif %}
-        
+         
         {% if submission[0].status != 'Befejezve' 
         and submission[0].status != 'Inaktív' 
         and submission[0].status != 'Duplika'
@@ -266,9 +278,9 @@
         container: 'map',
         center: [{{submission[0].lng}}, {{submission[0].lat}}],
         zoom: 13,
-        style: 'mapbox://styles/mapbox/streets-v11' //'mapbox://styles/mapbox/navigation-night-v1'
+        style: 'mapbox://styles/mapbox/streets-v11', //'mapbox://styles/mapbox/navigation-night-v1'
         });
-    
+
 	map.on('load', () => {
 	// Add an image to use as a custom marker
 	map.loadImage('/static/marker/kutyafejek/marker_red.png',
@@ -290,7 +302,6 @@
 		 'coordinates': [{{submission[0].lng}}, {{submission[0].lat}}]
 		 }}]}
 		})
-
 
 	// Add a symbol layer
 	map.addLayer({
