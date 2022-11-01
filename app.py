@@ -58,6 +58,11 @@ from utils import get_date
 from utils import save_picture
 from utils import get_random_name
 
+#MAIL TEMPLATES
+from mail_template import create_submission_mail
+from mail_template import create_status_change_mail
+from mail_template import create_solution_mail
+from mail_template import create_organiser_mail
 #-------------------------------
 #---------C O N F I G-----------
 #-------------------------------
@@ -322,35 +327,9 @@ def add_submission():
                                ACCESS_KEY=MAP_KEY,
                                lat=INIT_LAT,lng=INIT_LNG
                               )
-
-        submission_mail = {'Messages': [
-            {
-            "From": {
-            "Email": f"{FROM_MAIL}",
-            "Name":  "MKKP"
-              },
-              "To": [
-            {
-              "Email": f"{request.form['email']}",
-              "Name":  "MKKP"
-            }
-              ],
-              "Subject":  "Sikeres városmódosító bejelentés!",
-              "TextPart": "Sikeres városmódosító bejelentés!",
-              "HTMLPart": f"""<h3>Szia!</h3>
-                              <p>Köszi, hogy jelezted nekünk az alábbi problémát: {submission.title}<br>
-                              4000 mérnökünk és 3600 menyétünk elkezdett dolgozni rajta.<br>Hamarosan megoldjuk, vagy nem.
-                              </p>
-                              <p>Keresünk majd, amint kitaláltuk, hogy mit csináljunk a dologgal.<br>
-                              Addig is itt tudod nyomonkövetni, hogyan állunk vele: https://rendkivuliugyek.site/single_submission/{submission.id}</p>
-		              <p><b>Rendkívüli Ügyek Minisztériuma</b></p>                            
-                              """,
-              "CustomID": "MKKP városmódosító bejelentés"
-            }
-          ]
-        }
-
-        result = mailjet.send.create(data=submission_mail)
+        to_mail = request.form['email']
+        submission_mail = create_submission_mail(submission,FROM_MAIL,to_mail)
+        mailjet.send.create(data=submission_mail)
         flash("Sikeres bejelentés! Küldtünk egy levelet is!",'success')
         return redirect(f'/single_submission/{submission.id}')
         
@@ -410,12 +389,15 @@ def change_submission_data(submission_id):
             
         try:
             featured = request.form["featured"]
-            submission.featured = True
-            db.session.commit()
-            flash("Sikeresen kiemelted az ügyet!", "success")
+            if submission.featured != True:
+                submission.featured = True
+                db.session.commit() 
+                flash("Sikeresen kiemelted az ügyet!", "success")
+                
         except Exception as e:
             submission.featured = False
             db.session.commit()
+            flash("Az ügy mostmár nem kiemelt.", "success")
 
         if request.form["status"] != submission.status:
             new_status = request.form["status"]
@@ -427,32 +409,9 @@ def change_submission_data(submission_id):
             db.session.commit()
             
             if submission.owner_email != "":
-                status_change_mail = {'Messages': [
-		    {
-		    "From": {
-		    "Email": f"{FROM_MAIL}",
-		    "Name":  "MKKP"
-		      },
-		      "To": [
-		    {
-		      "Email": f"{submission.owner_email}",
-		      "Name":  "MKKP"
-		    }
-		      ],
-		      "Subject":  f"Státusz változás: {submission.title}",
-		      "TextPart": "Városfelújítós ügy státusz változás",
-		      "HTMLPart": f"""<h3>Kedves {submission.owner_user}!</h3>
-		                      <p>A {submission.title} ügy státusza megváltozott a következőre: {submission.status}
-		                      </p>
-		                      <p>Az ügy adatlapját itt találod:</p>
-		                      <p>https://rendkivuliugyek.site/single_submission/{submission.id}</p>
-			              <p><b>Rendkívüli Ügyek Minisztériuma</b></p>
-		                      """,
-		      "CustomID": "MKKP városmódosító bejelentés"
-		    }
-		  ]
-		}
-
+                print("SZERVEZŐnek levél!")
+                status_change_mail = create_status_change_mail(submission, FROM_MAIL)
+                print(status_change_mail)
                 mailjet.send.create(data=status_change_mail)
                 flash(f"Sikeresen módosítottad az ügy státuszát erre: {new_status}. A szervezőnek ment levél.", "success")          
             
@@ -461,31 +420,7 @@ def change_submission_data(submission_id):
                 
 
             if new_status == "Befejezve":
-
-                solution_mail_to_submitter = {'Messages': [
-		    {
-		    "From": {
-		    "Email": f"{FROM_MAIL}",
-		    "Name":  "MKKP"
-		      },
-		      "To": [
-		    {
-		      "Email": f"{submission.submitter_email}",
-		      "Name":  "MKKP"
-		    }
-		      ],
-		      "Subject":  f"Befejezett ügy: {submission.title}",
-		      "TextPart": "Befejezett ügy",
-		      "HTMLPart": f"""<h3>Szia!</h3>
-			              <p>Jó hír: sikerült megoldanunk a problémát, amit bejelentettél: {submission.title}</p>
-			              <p>Itt tudod megnézni, hogy mire jutottunk: https://rendkivuliugyek.site/single_submission/{submission.id}</p>
-				      <p><b>Rendkívüli Ügyek Minisztériuma</b></p>
-			              """,
-		      "CustomID": "MKKP városmódosító bejelentés"
-		      }
-		    ]
-		   }
-
+                solution_mail_to_submitter = create_solution_mail(submission,FROM_MAIL)
                 mailjet.send.create(data=solution_mail_to_submitter) 
 
         if request.form["closing_solution"] != "":
@@ -545,7 +480,6 @@ def single_submission(id):
 
         if "comment-edit" in request.form:
             body_change = request.form["comment"]
-            print(body_change)
             comment_id = request.form["comment_id"]
             comment = CommentModel.query.filter_by(id=comment_id).first()
             comment.body = body_change
@@ -573,6 +507,17 @@ def single_submission(id):
             tag = "after"
             pictures = request.files.getlist('files')
             save_picture(pictures, UPLOAD_FOLDER, tag, submission_id)
+            
+            #Ha kerül fel egy bejelentéshez utána kép, akkor szerintem átállhatna magától a bejelentés státusza befejezettre
+            changed_by = request.form["current_user"]
+            submission = SubmissionModel.query.filter_by(id=submission_id).first()
+            submission.status = "Befejezve"
+            submission.status_changed_date = get_date()
+            submission.status_changed_by = changed_by
+            db.session.commit()
+            #send mail
+            solution_mail_to_submitter = create_solution_mail(submission,FROM_MAIL)
+            mailjet.send.create(data=solution_mail_to_submitter) 
 
     submission = SubmissionModel.query.filter_by(id=submission_id)
     before_img_list = ImageBeforeModel.query.filter_by(parent_id=submission_id)
@@ -605,8 +550,6 @@ def all_submission():
         problem_type = request.form["type"]
         status = request.form["status"]
         search_text = request.form["full_text_search"]
-        #result = SubmissionModel.query.filter(SubmissionModel.description.like(f"%{search_text}%")).all()
-        #result = SubmissionModel.query.filter_by(description = f"%{search_text}%").all()
 
         county_dict = {}
         problem_type_dict = {}
@@ -663,44 +606,15 @@ def assign(id):
         submission.owner_user = request.form['username']
         submission.status = "Folyamatban"
         db.session.commit()
-
-        organiser_mail = {'Messages': [
-            {
-            "From": {
-            "Email": f"{FROM_MAIL}",
-            "Name":  "MKKP"
-              },
-              "To": [
-            {
-              "Email": f"{request.form['email']}",
-              "Name":  "MKKP"
-            }
-              ],
-              "Subject":  "MKKP szervező lettél!",
-              "TextPart": "MKKP szervező lettél!",
-              "HTMLPart": f"""<h2>Gratulálunk!</h2>
-              <h3>Szervezőként lettél beállítva
-               a Rendkívüli Ügyek Minisztériumának következő bejelentésénél:
-              </h3>
-              <br>
-              <p>{{submission.title}}</p>
-              <p>https://rendkivuliugyek.site/single_submission/{id}</p>
-              <p>Üdvözlettel:<br>
-              Rendkívüli Ügyek Minisztériuma
-              </p>             
-              """,
-              "CustomID": "MKKP szervező lettél!"
-            }
-          ]
-        }
-
+        
+        to_mail = request.form['email']
+        organiser_mail = create_organiser_mail(submission,FROM_MAIL,to_mail)
         mailjet.send.create(data=organiser_mail)
 
-        flash("Szervező sikeresen hozzárendelve!","success")
+        flash("Szervező sikeresen hozzáadva!","success")
         return redirect(f'/single_submission/{id}')
 
     return render_template('assign.html', user_list=user_list, submission=submission)
-
 
 #KOMMENT TÖRLÉS
 @app.route('/delete_comment/<id>')
@@ -912,6 +826,7 @@ def download_data():
     owner_user = [submission.owner_user for submission in submissions]
     created_date = [submission.created_date for submission in submissions]
     status = [submission.status for submission in submissions]
+    featured = [submission.featured for submission in submissions]
     status_changed_date = [submission.status_changed_date for submission in submissions]
     status_changed_by = [submission.status_changed_by for submission in submissions]
     
@@ -924,6 +839,7 @@ def download_data():
     	    'Megoldási javaslat': suggestion,
     	    'Megoldás': solution,
     	    'Cím': address,
+    	    'Kiemelt': featured,
     	    'Város': city,
     	    'Megye': county,
     	    'Szélességi fok': lat,
@@ -956,11 +872,13 @@ def logout():
     flash("Sikeres kijelentkezés!",'success')
     return redirect('/')
 
+#ERROR HANDLER 404
 @app.errorhandler(404)
 def page_not_found():
     "#"
     return render_template('404.html')
-    
+
+#ERROR HANDLER 502   
 @app.errorhandler(502)
 def page_not_found():
     "#"

@@ -31,6 +31,13 @@
 	  object-position: 50% 50%;
 	}
 	
+	.featured_cropped {
+	  width: auto; 
+	  height: 15em; 
+	  object-fit: cover;
+	  object-position: 50% 50%;
+	}	
+	
 	.content {
 	  display: none;
 	  overflow: hidden;
@@ -76,11 +83,10 @@
 	.col-sm-3{
 	padding:0.2em;
 	}
-	
 	.col-sm-6{
 	padding:0.2em;
 	}	
-
+	
 </style>
 </head>
  <body>
@@ -227,7 +233,7 @@
          </div>                                         
        {% endif%}
        
-       <img class="cropped" src="/static/upload/{{ row.id }}/{{row.cover_image}}" alt={{ row.title }}/>
+       <img class="featured_cropped" src="/static/upload/{{ row.id }}/{{row.cover_image_full}}" alt={{ row.title }}/>
          <div class="card_container">
          <h6><b>{{ row.title | upper}}</b></h6>
          <i>{{ row.city | upper}}</i>

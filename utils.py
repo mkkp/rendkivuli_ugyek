@@ -60,14 +60,6 @@ def save_picture(pictures, upload_folder, tag, submission_id):
         if not os.path.exists(picture_dir):
             os.mkdir(picture_dir)
             
-        """
-        else:
-            for p in os.listdir(picture_dir):
-                biggest_id = max([picture for picture in last_id = p.split("_")[-1:][0].split(".")[0]])
-                print(biggest_id)
-                #.split(".")[0]
-        """
-            
         #GET ORIGINAL EXTENSION
         original_suffix = picture.filename.split(".")[-1:][0]
 
@@ -118,8 +110,7 @@ def save_picture(pictures, upload_folder, tag, submission_id):
         img_count += 1
 
     return
-
-
+    
 def mk_upload_dir(upload_dir: str):
     "#"
     if not os.path.isdir(upload_dir):
