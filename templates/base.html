@@ -1,28 +1,24 @@
-<!DOCTYPE html>
+<!DOCTYPE HTML>
 {% from "_formhelpers.html" import render_field %}
 {% set role = current_user["role"]%}
 {% block head %}
 <head>
+  <!--
+    __MKKP__
+    \ \__/ /
+     \O  O/     
+     _\  /_ 
+    |  \/  |
+  -->
   <title>Városfelújítós</title>
-  <link rel="icon" type="image/x-icon" href="/static/logo/favicon.ico">
-  <meta charset="UTF-8">
   <html lang="hu">
+  <meta charset="UTF-8">
   <meta name="author" content="prof_of_duplo">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta property="og:image" content="/static/site_img/kezdo_kep.jpg"/>
+  <link rel="icon" type="image/x-icon" href="/static/logo/favicon.ico">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" 
   integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" 
-  integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" 
-  crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" 
-  integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" 
-  crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" 
-  integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" 
-  crossorigin="anonymous"></script>
-  <!--MAPBOX-->
-  <script id="search-js" defer src="https://api.mapbox.com/search-js/v1.0.0-beta.13/web.js"></script>
-  <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.js'></script>
   <link type="text/css" rel="stylesheet" href="{{url_for('static', filename='css/titillium_font.css')}}"/> 
   
   <style>
@@ -145,6 +141,15 @@
 <div id="content">
 {% block content %}
 {% endblock %}
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" 
+  integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" 
+  crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" 
+  integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" 
+  crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" 
+  integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" 
+  crossorigin="anonymous"></script>
 </div>
 
 

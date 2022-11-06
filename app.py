@@ -133,6 +133,7 @@ mailjet = Client(auth=(M_KEY, M_SECRET), version='v3.1')
 #---------V I E W S-------------
 #-------------------------------
 
+#ADATBÁZIS LÉTREHOZÁSA
 @app.before_first_request
 def create_all():
     """
@@ -140,112 +141,6 @@ def create_all():
     based on schema that is defined in models.py
     """
     db.create_all()
-
-
-#TÉRKÉP
-@app.route('/full_map', methods = ['POST', 'GET'])
-def full_map():
-    "#"
-    
-    if request.method == 'POST':
-    
-        submission_type = request.form["type"],
-        
-        filtered_list = SubmissionModel.query.filter_by(problem_type=submission_type[0]).all()
-        
-        if submission_type[0] == "Összes":
-            filtered_list = SubmissionModel.query.all()
-            
-        if submission_type[0] == "":
-            filtered_list = SubmissionModel.query.all()            
-        
-        point_list=[]
-        for i, post in enumerate(filtered_list):
-            i = Feature(geometry=Point((post.lng, post.lat)))
-            i.properties['id'] = post.id
-            i.properties['title'] = post.title
-            i.properties['status'] = post.status
-            i.properties['type'] = post.problem_type
-            i.properties['cover_image'] = post.cover_image
-            point_list.append(i)
-
-        feature_collection = FeatureCollection(point_list)
-        dump = gj_dump(feature_collection, sort_keys=True)
-
-        return render_template('map.html',
-                           ACCESS_KEY=MAP_KEY,
-                           lat=INIT_LAT,
-                           lng=INIT_LNG,
-                           post_list=filtered_list,
-                           feature_collection = dump,
-                           submission_type = submission_type[0]
-                           )
-    
-    post_list = SubmissionModel.query.all()
-    point_list=[]
-    for i, post in enumerate(post_list):
-        i = Feature(geometry=Point((post.lng, post.lat)))
-        i.properties['id'] = post.id
-        i.properties['title'] = post.title
-        i.properties['status'] = post.status
-        i.properties['type'] = post.problem_type
-        i.properties['cover_image'] = post.cover_image
-        point_list.append(i)
-
-    feature_collection = FeatureCollection(point_list)
-    dump = gj_dump(feature_collection, sort_keys=True)
-
-    return render_template('map.html',
-                           ACCESS_KEY=MAP_KEY,
-                           lat=INIT_LAT,
-                           lng=INIT_LNG,
-                           post_list=post_list,
-                           feature_collection = dump
-                          )
-
-#BEJELENTKEZÉS
-@app.route("/login")
-def site_login():
-    "#"
-    return oauth.auth0.authorize_redirect(
-        redirect_uri=url_for("callback", _external=True))
-
-
-@app.route("/callback", methods=["GET", "POST"])
-def callback():
-    "#"
-    token = oauth.auth0.authorize_access_token()
-    #access_token = token['access_token']
-    session["user"] = token
-    user_email = token['userinfo']['email']
-    aud = token['userinfo']['aud']
-    user_name = token['userinfo']['name']
-    user = UserModel.query.filter_by(email = user_email).first()
-
-    if aud != AUTH0_CLIENT_ID:
-        flash("sikertelen bejelentkezés","danger")
-        return redirect("/")
-
-    if not user:
-        user_name = get_random_name() + " " + str(randint(1,1000))
-        reg_user = UserModel(email=user_email,
-                             created_date=get_date(),
-                             role="registered",
-                             user_name = user_name,
-                             active=True)
-        db.session.add(reg_user)
-        db.session.commit()
-        user = UserModel.query.filter_by(email=user_email).first()
-        login_user(user)
-        user.last_login = get_date()
-
-    if user:
-        login_user(user)
-        user.last_login = get_date()
-        db.session.commit()
-
-    flash("Sikeres bejelentkezés!","success")
-    return redirect("/")
 
 
 #INDEX
@@ -258,7 +153,7 @@ def index():
     return render_template('index.html')
 
 
-#BEJELENTÉS
+#ÜGY BEJELENTÉS
 @app.route('/submission', methods = ['POST', 'GET'])
 def add_submission():
     """
@@ -338,6 +233,7 @@ def add_submission():
                                ACCESS_KEY=MAP_KEY,
                                lat=INIT_LAT,lng=INIT_LNG
                               )
+
 
 #ÜGY ADATAINAK MÓDOSÍTÁSA
 @app.route('/change_submission_data/<submission_id>', methods = ['POST', 'GET'])
@@ -460,7 +356,8 @@ def change_submission_data(submission_id):
                             ACCESS_KEY=MAP_KEY
                             )
 
-#EGY BEJELENTÉS
+
+#BEJELENTÉS ADATLAP
 @app.route('/single_submission/<id>', methods = ['POST', 'GET'])
 def single_submission(id):
     "#"
@@ -533,7 +430,7 @@ def single_submission(id):
                            )
 
 
-#ÖSSZES BEJELENTÉS
+#ÖSSZES BEJELENTÉS KÁRTYÁI
 @app.route('/all_submission/', methods = ['POST', 'GET'])
 def all_submission():
     "#"
@@ -616,8 +513,9 @@ def assign(id):
 
     return render_template('assign.html', user_list=user_list, submission=submission)
 
+
 #KOMMENT TÖRLÉS
-@app.route('/delete_comment/<id>')
+@app.route('/delete_comment/<id>', methods = ['GET'])
 @login_required
 def delete_comment(id):
     "#"
@@ -630,7 +528,7 @@ def delete_comment(id):
 
 
 #KÉP TÖRLÉS
-@app.route('/delete_picture/<status_type>/<id>')
+@app.route('/delete_picture/<status_type>/<id>', methods = ['GET'])
 @login_required
 def delete_picture(status_type, id):
     "#"
@@ -658,7 +556,7 @@ def delete_picture(status_type, id):
 
 
 #BEJELENTÉS TÖRLÉS
-@app.route('/delete_submission/<id>')
+@app.route('/delete_submission/<id>', methods = ['GET'])
 @login_required
 def delete_submission(id):
     "#"
@@ -692,15 +590,12 @@ def statistics():
     progress_count = SubmissionModel.query.filter_by(status="Készül").count()
     completed_count = SubmissionModel.query.filter_by(status="Befejezve").count()
     
-    from sqlalchemy import func
     grouped = SubmissionModel.query.group_by('county').all()
+    county_count_dict = {}
     for i in grouped:
-        print(i.county)
-        print(i)
-    print(grouped)
-    
-    #upload_stat = os.stat(UPLOAD_FOLDER)
-    #upload_size = os.stat(UPLOAD_FOLDER).st_size / 1000
+        county_count_dict[i.county] = SubmissionModel.query.filter_by(county=i.county).count()
+    county_dump = gj_dump(county_count_dict, sort_keys=True)
+    print(county_dump)
     
     return render_template('statistics.html',
                             post_count=post_count,
@@ -709,14 +604,88 @@ def statistics():
                             wip_count=wip_count,
                             progress_count=progress_count,
                             completed_count=completed_count,
-                            #upload_size=upload_size
+                            county_count_dict=county_dump,
                           )
-
-#REGISZTRÁCIÓ
-@app.route('/register', methods=['POST', 'GET'])
-def register():
+     
+                          
+#TÉRKÉP
+@app.route('/full_map', methods = ['POST', 'GET'])
+def full_map():
     "#"
-    return redirect('https://passziv.mkkp.party/regisztracio', code=302)
+    emtpy_result = False
+    
+    if request.method == 'POST':
+    
+        submission_type = request.form["type"]
+        submission_status = request.form["status"]
+        
+        problem_type_dict = {}
+        status_dict = {}
+        
+        if submission_type != "":
+            problem_type_dict = {"problem_type":submission_type}
+            
+        if submission_status != "":
+            status_dict = {"status":submission_status}
+            
+        query_dict = problem_type_dict | status_dict
+
+        filtered_list = SubmissionModel.query.filter_by(**query_dict).all()
+        
+        if len(filtered_list) == 0:
+            filtered_list = SubmissionModel.query.all()
+            emtpy_result = True
+
+        point_list=[]
+        for i, post in enumerate(filtered_list):
+            i = Feature(geometry=Point((post.lng, post.lat)))
+            i.properties['id'] = post.id
+            i.properties['title'] = post.title
+            i.properties['status'] = post.status
+            i.properties['type'] = post.problem_type
+            i.properties['cover_image'] = post.cover_image
+            point_list.append(i)
+
+        feature_collection = FeatureCollection(point_list)
+        dump = gj_dump(feature_collection, sort_keys=True)
+        
+        if emtpy_result:
+            flash(f"Sajnos nem találtuk a {submission_type} és {submission_status} keresztmetszetét.","warning")
+            submission_type = None
+            submission_status = None
+
+        return render_template('map.html',
+                           ACCESS_KEY=MAP_KEY,
+                           lat=INIT_LAT,
+                           lng=INIT_LNG,
+                           post_list=filtered_list,
+                           feature_collection = dump,
+                           submission_type = submission_type,
+                           submission_status = submission_status
+                           )
+    
+    post_list = SubmissionModel.query.all()
+    point_list=[]
+    for i, post in enumerate(post_list):
+        i = Feature(geometry=Point((post.lng, post.lat)))
+        i.properties['id'] = post.id
+        i.properties['title'] = post.title
+        i.properties['status'] = post.status
+        i.properties['type'] = post.problem_type
+        i.properties['cover_image'] = post.cover_image
+        point_list.append(i)
+
+    feature_collection = FeatureCollection(point_list)
+    dump = gj_dump(feature_collection, sort_keys=True)
+
+    return render_template('map.html',
+                           ACCESS_KEY=MAP_KEY,
+                           lat=INIT_LAT,
+                           lng=INIT_LNG,
+                           post_list=post_list,
+                           feature_collection = dump
+                          )                          
+
 
 #FELHASZNÁLÓI FIÓK
 @app.route('/user_account', methods = ['POST', 'GET'])
@@ -734,7 +703,6 @@ def user_account():
             flash("Mostantól így hívunk.","success")
 
         if "own_submissions" in request.form:
-
             user_id = int(request.form["user_id"])
             user = UserModel.query.filter_by(id=user_id).first()
             post_list = SubmissionModel.query.filter_by(submitter_email = user.email)
@@ -776,6 +744,7 @@ def change_user_data(user_id):
     return render_template ("change_user_data.html",
     user = user)
 
+
 #FELHASZNÁLÓK ÁTTEKINTÉSE (ADMIN FELÜLET)
 @app.route('/user_administration', methods = ['POST', 'GET'])
 @login_required
@@ -802,6 +771,7 @@ def user_manage(id):
         return render_template("single_user.html",user=user)
 
     return render_template("single_user.html",user=user)
+
 
 #ÜGYEK TÁBLÁZATOS LETÖLTÉSE
 @login_required
@@ -858,11 +828,58 @@ def download_data():
                                          file_name=filename
                                         )
 
-#ADATVÉDELMI TÁJÉKOZTATÓ
-@app.route('/user_data_info', methods = ['GET'])
-def user_data_info():
+
+#REGISZTRÁCIÓ
+@app.route('/register', methods=['POST', 'GET'])
+def register():
     "#"
-    return render_template("user_data_info.html")
+    return redirect('https://passziv.mkkp.party/regisztracio', code=302)
+
+
+#BEJELENTKEZÉS
+@app.route("/login")
+def site_login():
+    "#"
+    return oauth.auth0.authorize_redirect(
+        redirect_uri=url_for("callback", _external=True))
+
+
+@app.route("/callback", methods=["GET", "POST"])
+def callback():
+    "#"
+    token = oauth.auth0.authorize_access_token()
+    #access_token = token['access_token']
+    session["user"] = token
+    user_email = token['userinfo']['email']
+    aud = token['userinfo']['aud']
+    user_name = token['userinfo']['name']
+    user = UserModel.query.filter_by(email = user_email).first()
+
+    if aud != AUTH0_CLIENT_ID:
+        flash("sikertelen bejelentkezés","danger")
+        return redirect("/")
+
+    if not user:
+        user_name = get_random_name() + " " + str(randint(1,1000))
+        reg_user = UserModel(email=user_email,
+                             created_date=get_date(),
+                             role="registered",
+                             user_name = user_name,
+                             active=True)
+        db.session.add(reg_user)
+        db.session.commit()
+        user = UserModel.query.filter_by(email=user_email).first()
+        login_user(user)
+        user.last_login = get_date()
+
+    if user:
+        login_user(user)
+        user.last_login = get_date()
+        db.session.commit()
+
+    flash("Sikeres bejelentkezés!","success")
+    return redirect("/")
+
 
 #KIJELENTKEZÉS
 @app.route('/logout')
@@ -871,6 +888,14 @@ def logout():
     logout_user()
     flash("Sikeres kijelentkezés!",'success')
     return redirect('/')
+    
+    
+#ADATVÉDELMI TÁJÉKOZTATÓ
+@app.route('/user_data_info', methods = ['GET'])
+def user_data_info():
+    "#"
+    return render_template("user_data_info.html")
+    
 
 #ERROR HANDLER 404
 @app.errorhandler(404)
@@ -878,11 +903,13 @@ def page_not_found():
     "#"
     return render_template('404.html')
 
+
 #ERROR HANDLER 502   
 @app.errorhandler(502)
 def page_not_found():
     "#"
     return render_template('404.html')
+
 
 #APP RUN
 if __name__ == '__main__':

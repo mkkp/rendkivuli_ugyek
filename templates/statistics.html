@@ -1,3 +1,4 @@
+<!DOCTYPE HTML>
 {% extends "base.html" %}
 {% block content %}
 
@@ -8,59 +9,116 @@
         <br>
 	<h3><b><i>STATISZTIKÁK</i></b></h3>
 	<hr>
-	<p><strong>Összes statisztika az oldalon: </strong>11</p>
-	<p><strong>Összes bejelentés a honlapon: </strong>{{post_count}}</p>
 	<p><strong>Kényelmetlen fehérneműk száma a Parlamentben: </strong>199</p>
+	<p><strong>Összes statisztika az oldalon: </strong>11</p>
 	<p><strong>Főispánok száma Magyarországon: </strong>19</p>
+	<p><strong>Összes bejelentés a honlapon: </strong>{{post_count}}</p>
 	<p><strong>Összes bolygó száma a Naprendszerben: </strong>8</p>
 	<p><strong>Összes regisztrált felhasználó: </strong>{{user_count}}</p>	
 	<p><strong>Magyarországon található települések száma:</strong> 3155</p>
 	<p><strong>Összes bejelentett státuszú bejelentés: </strong>{{submitted_count}}</p>
 	<p><strong>Összes folyamatban státuszú bejelentés: </strong>{{wip_count}}</p>
 	<p><strong>Összes befejezett státuszú bejelentés: </strong>{{completed_count}}</p>
-	<p><strong>Ételautomaták által évente átlagosan megölt emberek száma a világban: </strong>10</p>
+	<p><strong>Ételautomaták által évente megölt emberek száma átlagosan a világon: </strong>10</p>
 	<div>
+	<hr>
+	<h3>Bejelentések száma státusz szerint</h3>
          <canvas id="status_chart"></canvas>
+         <br>
+         <h3>Bejelentések megoszlása megye szerint</h3>
+         <canvas id="city_chart"></canvas>
         </div>
+        <br>
+        <hr>
     </div>
-
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <script>
-     const labels = [
+    //városok szerinti bontás
+    county_count = {{ county_count_dict | safe}}
+    
+    labels = []
+    v_counts = []
+    
+    Object.entries(county_count).forEach(([key, value]) => {
+    labels.push(key)
+    v_counts.push(value)
+    })
+    
+    var data = {
+      labels: labels,
+      datasets: [{
+        backgroundColor:[
+        '#656d77'
+        ],
+        data: v_counts,
+    }]
+   };
+  
+    var config = {
+    type: 'bar',
+    data: data,
+    options : {
+    responsive: true,
+    plugins: {
+      legend: {
+        display: false,
+      },
+      title: {
+        display: false,
+        text: 'Chart.js Line Chart',
+      },
+    },
+    },
+    };
+    
+    var myChart = new Chart(
+    document.getElementById('city_chart'),
+    config); 
+    </script>
+    
+    <script>
+     var labels = [
       'bejelentett',
       'folyamatban',
       'készül',
       'befejezett'
      ];
 
-  const data = {
+    var data = {
     labels: labels,
     datasets: [{
-      label: 'Bejelentések státusz szerint',
       backgroundColor:[
-      'rgba(252, 239, 2, 0.5)',
-      'rgba(2, 223, 252, 0.5)',
-      'rgba(252, 2, 19, 0.5)',
-      'rgba(15, 252, 2, 0.5)',
+      '#f45d5f',
+      '#feb955',
+      '#22325e',
+      '#35968a',
       ],
-      borderColor: 'rgb(0, 0, 0)',
-      borderWidth: 0.5,
       data: [{{submitted_count}},{{wip_count}},{{progress_count}},{{completed_count}}],
     }]
-  };
+    };
 
-  const config = {
+    var config = {
     type: 'bar',
     data: data,
-    options: {}
+    options : {
+    responsive: true,
+    plugins: {
+      legend: {
+        display: false,
+      },
+      title: {
+        display: false,
+        text: 'Chart.js Line Chart',
+      },
+    },
+    },
   };
-</script>
-
-<script>
-  const myChart = new Chart(
+  
+    var myChart = new Chart(
     document.getElementById('status_chart'),
-    config
-  );
+    config); 
 </script>
     </body>
 </html>

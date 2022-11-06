@@ -1,48 +1,38 @@
+<!DOCTYPE HTML>
 {% extends "base.html" %} 
 {% block content %}
  {% block head %}
-  {% set img_url = 'https://rendkivuliugyek.site/static/upload/' + submission[0].id | string + '/' + before_img_list[0].file_name %}
-  {% set img_url = 'https://rendkivuliugyek.site/static/upload/' + submission[0].id | string + '/' + submission[0].cover_image %}
-  
+  {% set img_url = 'https://rendkivuliugyek.site/static/upload/' + submission[0].id | string + '/' + submission[0].cover_image_full %}
   <head>
+   <!--MAPBOX-->
     <link href='https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.css' rel='stylesheet' /> 
-    <link rel="stylesheet" href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.1/mapbox-gl.css" type="text/css" />
-    <link href="../static/css/lightbox.css" rel="stylesheet">   
+    <link rel="stylesheet" href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.1/mapbox-gl.css" type="text/css" />    
+    <!--LIGHTBOX-->
+    <link href="../static/css/lightbox.css" rel="stylesheet">  
+    <!--META-->
     <title>{{ submission[0].title }}</title>
     <meta property="og:site_name" content="Rendkívüli Ügyek Minisztériuma" />  
     <meta property="og:title" content="{{ submission[0].title }}" />
-    
     {% if submission[0].solution  %}
     <meta property="og:description" content="{{ submission[0].solution }}" />
     {% else %}
     <meta property="og:description" content="{{ submission[0].description }}" />
     {% endif %}
-    
     <meta property="og:type" content="article" />
     <meta property="og:url" content="https://rendkivuliugyek.site/single_submission/{{  submission[0].id  }}" />
     <meta property="og:image" content="{{ img_url }}" />
     <meta property="og:locale" content="hu_HU" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
     {{ super() }}
   <style>
   .submission_solution {
     display: none; //block 
     overflow: hidden;
     }
-  
   .top_image{
-    width:50%;
-    height:auto;
-   }
-  
-  .cropped {
-    width: auto; 
-    height: 30em; 
+    width:30em;
     object-fit: cover;
-    object-position: 50% 50%;
-  }
-  
+   }
   </style>
   </head>
  {% endblock %}
@@ -53,7 +43,7 @@
         <h3><b>{{ submission[0].title }}</b></h3>
         <hr>
         <a href={{ url_for('static',filename='upload/' + submission[0].id | string + '/' + submission[0].cover_image_full) }} data-lightbox="roadtrip">
-          <img class="top_image cropped" src={{url_for( 'static',filename='upload/' + submission[0].id | string + "/" + submission[0].cover_image_full)}}/>
+          <img class="top_image img-thumbnail" src={{url_for( 'static',filename='upload/' + submission[0].id | string + "/" + submission[0].cover_image_full)}}/>
         </a>
         <br><br>
         {%if submission[0].featured == True %}
@@ -134,7 +124,7 @@
         
         <form action="" method="post">
         <!--ELŐTTE KÉPEK MUTATÁSA-->
-        {% if before_img_list.count() > 1 %}
+        {% if before_img_list.count() >= 1 %}
           <h4>Előtte képek:</h4>
         {% endif %}
         
@@ -142,7 +132,7 @@
         <figure class="figure">
            {% if submission[0].cover_image != img.thumb_file_name%}
             <a href={{url_for( 'static',filename='upload/' + submission[0].id | string + '/' + img.file_name)}} data-lightbox="roadtrip">
-                <img height="200" src={{url_for( 'static',filename='upload/' + submission[0].id | string + "/" + img.thumb_file_name)}}/>
+                <img height="200px" src={{url_for( 'static',filename='upload/' + submission[0].id | string + "/" + img.thumb_file_name)}}/>
             </a>
              {% if current_user.email == submission[0].submitter_email
                 or current_user.email == submission[0].owner_email
@@ -173,7 +163,7 @@
         {% for img in after_img_list %}
          <figure class="figure">
             <a href={{url_for( 'static',filename='upload/' + submission[0].id | string + "/" + img.file_name)}} data-lightbox="roadtrip">
-                <img height="200" src={{url_for( 'static',filename='upload/' + submission[0].id | string + "/" + img.thumb_file_name)}}/>
+                <img height="200px" src={{url_for( 'static',filename='upload/' + submission[0].id | string + "/" + img.thumb_file_name)}}/>
             </a>
              {% if current_user.email == submission[0].submitter_email
                 or current_user.email == submission[0].owner_email
@@ -197,7 +187,7 @@
            or role == 'coordinator' 
            or role == 'admin'
         %}
-         {% if before_img_list.count() > 1 %}
+         {% if before_img_list.count() >= 1 %}
           <br>      
           <button type="submit" id="change_tumbnail" name="change_tumbnail" class="btn rounded-0">Borítókép módosítása</button> 
           <br>
@@ -262,7 +252,7 @@
         <div id='map' style='width: auto; height: 30em;'></div>
 
         <a href="https://www.google.com/maps/@{{submission[0].lat}},{{submission[0].lng}},17z" target="_blank" rel="noopener noreferrer">
-            <p>De nekem a Google Maps kell!</p>
+            <p>Mutasd ugyanezt Google térképen!</p>
         </a>
 
         {% if current_user.email == submission[0].owner_email or role == 'coordinator' or role == 'admin' %}
@@ -278,18 +268,57 @@
         <br>
     </div>
     
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.js'></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>   
+    <script src="../static/js/lightbox.js"></script>
+    
     <script>
         mapboxgl.accessToken = '{{ACCESS_KEY}}';
         var map = new mapboxgl.Map({
         container: 'map',
         center: [{{submission[0].lng}}, {{submission[0].lat}}],
         zoom: 13,
+        minZoom:5,
         style: 'mapbox://styles/mapbox/streets-v11', //'mapbox://styles/mapbox/navigation-night-v1'
         });
 
 	map.on('load', () => {
 	// Add an image to use as a custom marker
-	map.loadImage('/static/marker/kutyafejek/marker_red.png',
+	
+	var status_dict = {
+	'Befejezve': 'befejezve',
+	'Bejelentve': 'bejelentve',
+	'Duplika': 'szurke',
+	'Folyamatban': 'folyamatban',
+	'Hivatal megoldotta': 'szurke',
+	'Inaktív': 'szurke',
+	'Készül': 'keszul',
+	}
+
+	var type_dict = {
+	'Akadálymentesítés': 'akadalymentesites',
+	'Állat': 'allat',
+	'Közlekedés': 'kozlekedes',
+	'Közmű': 'kozmu',
+	'Egyéb': 'egyeb',
+	'Épület': 'epulet',
+	'Növény': 'noveny',
+	'Műemlék': 'muemlek',
+	'Szemét': 'szemet',
+	'Tájékoztatás': 'tajekoztatas',
+	'Utcabútor':'utcabutor',
+	'Út és Járda': 'ut_es_jarda',
+	}	
+	
+	const status = status_dict['{{ submission[0].status }}']
+	const submission_type = type_dict['{{ submission[0].problem_type }}']
+	const img_path = "{{url_for( 'static',filename='marker/')}}" +
+	                 status +
+	                 "/" +
+	                 submission_type+
+	                 ".png"
+             
+	map.loadImage(img_path,
 	  (error, image) => {
 	    if (error) throw error;
 	    map.addImage('custom-marker', image);
@@ -328,92 +357,24 @@
     </script>
     
     <script>
-        (function(d, s, id) {
-        var js, fjs = d.getElementsByTagName(s)[0];
-	if (d.getElementById(id)) return;
-	js = d.createElement(s); js.id = id;
-	js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
-	fjs.parentNode.insertBefore(js, fjs);
-	}(document, 'script', 'facebook-jssdk'));
+    //Facebook share button
+	(function(d, s, id) {
+	  var js, fjs = d.getElementsByTagName(s)[0];
+	  if (d.getElementById(id)) return;
+	  js = d.createElement(s); js.id = id;
+	  js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
+	  fjs.parentNode.insertBefore(js, fjs);
+	  }(document, 'script', 'facebook-jssdk'));
     </script>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script>
-//UTILS
-function deleteSource(){
-    if (map.getSource('points')) {
-      map.removeSource('points')
-    }
-};
-
-function deleteLayer(){
-    if (map.getLayer('circle')) {
-      map.removeLayer('circle')
-    }
-};
-
-function addSource(lng,lat){
-    map.addSource('points', {
-    'type': 'geojson',
-    'data': {
-      'type': 'FeatureCollection',
-      'features': [
-        {
-        'type': 'Feature',
-        'properties': {},
-        'geometry': {
-          'type': 'Point',
-          'coordinates': [lng,lat]
-          }
-        }
-      ]
-    }
-    });
-};
-
-
-function addLayer(){
-	map.addLayer({
-	    'id': 'circle',
-	    'type': 'circle',
-	    'source': 'points', //refers to first parameter of addSource
-	    'paint': {
-	      'circle-color': '#ff0000',
-	      'circle-radius': 10,
-	      'circle-stroke-width': 2,
-	      'circle-stroke-color': '#000000',
-	      'circle-opacity' : 0.5
-	    }})    
-};
-
-//DELETE POPUP
-function deletePopup(){
-  const popups = document.getElementsByClassName("mapboxgl-popup");
-  if (popups.length) { 
-    popups[0].remove() 
-    }
-};
-
-//ADD POPUP
-function addPopup(lng, lat, address){
-    const popup = new mapboxgl.Popup({ closeOnClick: false })
-    .setLngLat([lng,lat])
-    .setHTML(`<p>${address}</p>`)
-    .addTo(map);
-}
-
-//<--UTILS
-</script>
-
-<script src="../static/js/lightbox.js"></script>
-<script>
+    <script>
     lightbox.option({
       'resizeDuration': 100,
       'wrapAround': true,
       'alwaysShowNavOnTouchDevices':false,
       'albumLabel':"%1 / %2"
     })
-</script>
+    </script>
 
 </body>
 

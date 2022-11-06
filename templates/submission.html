@@ -1,14 +1,14 @@
+<!DOCTYPE HTML>
 {% extends "base.html" %}
 
 {% block content %}
 <html>
 
 <head>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <link href='https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.css' rel='stylesheet' />
     <link rel="stylesheet" href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.1/mapbox-gl.css" type="text/css" />
     <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" type="text/css">
-
+    
   <style>
   .hidden_file_upload {
     display: none; //block 
@@ -155,6 +155,7 @@
             
             <div id="loading" style="display:none;">
             <img src="/static/site_img/loading.gif" id="loading">
+            <label>Kis türelem, már dolgozunk rajta!</label>
             <br>
             </div>
             
@@ -169,7 +170,11 @@
     </div>
 </body>
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
 <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
+<script id="search-js" defer src="https://api.mapbox.com/search-js/v1.0.0-beta.13/web.js"></script>
+<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.js'></script>
 
 <script>
 function show_additional_file_input(){
@@ -283,7 +288,7 @@ window.onload = function getGPSLocation() {
       var address = data.features[0].place_name;
       }
       catch(err) {
-        document.getElementById("address").value = "Sajnos nem találtunk címet!"
+        document.getElementById("address").value = "Sajnos nem találtuk meg a címet!"
         return;
       }
       var city = address.split(",")[0].trim()
