@@ -1,264 +1,280 @@
-{% extends "base.html" %}
-{% block content %}
+<!DOCTYPE html>
+
+{% extends "base.html" %} {% block content %}
 
 <head>
- <link href='https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.css' rel='stylesheet' />
- <link rel="stylesheet" href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.1/mapbox-gl.css" type="text/css" />
- <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" type="text/css">
- 
-<style>
+  <link
+    href="https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.css"
+    rel="stylesheet"
+  />
+  <link
+    rel="stylesheet"
+    href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.1/mapbox-gl.css"
+    type="text/css"
+  />
+  <link
+    rel="stylesheet"
+    href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css"
+    type="text/css"
+  />
 
-  img {
-    width: 100%;
-    height: auto;
-  }
+  <style>
+    img {
+      width: 100%;
+      height: auto;
+    }
 
-  .mapboxgl-marker {
-    opacity: 0 !important;
-  }
+    .mapboxgl-marker {
+      opacity: 0 !important;
+    }
 
-  .content {
-    display: none;
-    overflow: hidden;
-  }
-  
-  #map{
-    margin:0.8em;
-  }  
- 
-   
- </style>
+    .content {
+      display: none;
+      overflow: hidden;
+    }
+
+    #map {
+      margin: 0.8em;
+    }
+  </style>
 </head>
 
 <body>
-<div class="container">
-  <br>
-  <h3><b><i>MINDEN ÜGY EGY TÉRKÉPEN</i></b></h3>
-  <hr>
-  <button type="button" class="collapsible btn btn-light form-control rounded-0">Részletes keresés</button>
-  <div class="content" id="content">
-   <form action="" method="post" enctype="multipart/form-data">
-   <div class="form-group">
-    <select class="form-select form-control" 
-            aria-label="Típus kiválasztása" 
-            name="type">
-    <option selected value="">Válassz a típusok közül!</option> 
-    <option>Út és Járda</option> 
-    <option>Szemét</option>
-    <option>Közmű</option>
-    <option>Akadálymentesítés</option>
-    <option>Növény</option>
-    <option>Állat</option>
-    <option>Épület</option>
-    <option>Közlekedés</option>
-    <option>Tájékoztatás</option>
-    <option>Műemlék</option>
-   </select>
-   
-    <select class="form-select form-control" 
-            aria-label="Státusz kiválasztása" 
-            name="status">
-    <option selected value="">Válassz a státuszok közül!</option>
-    <option>Bejelentve</option>
-    <option>Folyamatban</option>
-    <option>Készül</option>
-    <option>Befejezve</option>
-    </select>   
-   
+  <div class="container">
+    <br />
+    <h3>
+      <b><i>MINDEN ÜGY EGY TÉRKÉPEN</i></b>
+    </h3>
+    <hr />
+    <button
+      type="button"
+      class="collapsible btn btn-light form-control rounded-0"
+    >
+      Részletes keresés
+    </button>
+    <div class="content" id="content">
+      <form action="" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+          <select
+            class="form-select form-control"
+            aria-label="Típus kiválasztása"
+            name="type"
+          >
+            <option selected value="">Válassz a típusok közül!</option>
+            <option>Út és Járda</option>
+            <option>Szemét</option>
+            <option>Közmű</option>
+            <option>Akadálymentesítés</option>
+            <option>Növény</option>
+            <option>Állat</option>
+            <option>Épület</option>
+            <option>Közlekedés</option>
+            <option>Tájékoztatás</option>
+            <option>Műemlék</option>
+          </select>
+
+          <select
+            class="form-select form-control"
+            aria-label="Státusz kiválasztása"
+            name="status"
+          >
+            <option selected value="">Válassz a státuszok közül!</option>
+            <option>Bejelentve</option>
+            <option>Folyamatban</option>
+            <option>Készül</option>
+            <option>Befejezve</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-light form-control rounded-0">
+          Mutasd!
+        </button>
+      </form>
+      <br />
     </div>
-    <button type="submit" class="btn btn-light form-control rounded-0">Mutasd!</button>
-   </form>
-  <br>
+    <br />
+    {% if submission_type%}
+    <p>Kiválasztott ügytípus:<b> {{submission_type}}</b></p>
+    {% endif %} {% if submission_status%}
+    <p>Kiválasztott státusz:<b> {{submission_status}}</b></p>
+    {% endif %}
+
+    <div id="map" style="width: auto; height: 50em;"></div>
+
+    <picture>
+      <source media="(max-width: 465px)"
+      srcset={{url_for('static',filename='site_img/jelmagyarazat_mobil.jpg')}}>
+      <img src={{url_for('static',filename='site_img/jelmagyarazat.png')}}
+      alt="Jelmagyarázat">
+    </picture>
+
+    <hr />
   </div>
-  <br>
-  {% if submission_type%}
-  <p>Kiválasztott ügytípus:<b> {{submission_type}}</b></p>
-  {% endif %}
-  
-  {% if submission_status%}
-  <p>Kiválasztott státusz:<b> {{submission_status}}</b></p>
-  {% endif %}  
-  
-  <div id='map' style='width: auto; height: 50em;'></div>
-  
-  <picture>
-  <source 
-    media="(max-width: 465px)"
-    srcset={{url_for('static',filename='site_img/jelmagyarazat_mobil.jpg')}}>
-  <img 
-    src={{url_for('static',filename='site_img/jelmagyarazat.png')}} 
-    alt="Jelmagyarázat">
-  </picture>  
-  
-  
-  
-  <hr>
-</div>
 
-  
-<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.js'></script>
-<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
-<script id="search-js" defer src="https://api.mapbox.com/search-js/v1.0.0-beta.13/web.js"></script>
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.js"></script>
+  <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
+  <script
+    id="search-js"
+    defer
+    src="https://api.mapbox.com/search-js/v1.0.0-beta.13/web.js"
+  ></script>
 
-<script>
-
-	var status_dict = {
-	'Befejezve': 'befejezve',
-	'Bejelentve': 'bejelentve',
-	'Duplika': 'szurke',
-	'Folyamatban': 'folyamatban',
-	'Hivatal megoldotta': 'szurke',
-	'Inaktív': 'szurke',
-	'Készül': 'keszul',
-	}
-
-	var type_dict = {
-	'Akadálymentesítés': 'akadalymentesites',
-	'Állat': 'allat',
-	'Közlekedés': 'kozlekedes',
-	'Közmű': 'kozmu',
-	'Egyéb': 'egyeb',
-	'Épület': 'epulet',
-	'Növény': 'noveny',
-	'Műemlék': 'muemlek',
-	'Szemét': 'szemet',
-	'Tájékoztatás': 'tajekoztatas',
-	'Utcabútor':'utcabutor',
-	'Út és Járda': 'ut_es_jarda',
-	}
-
-     mapboxgl.accessToken = '{{ACCESS_KEY}}';
-     var map = new mapboxgl.Map({
-       container: 'map',
-       center: [{{lat}}, {{lng}}],
-       zoom: 6.5,
-       language: 'auto',
-       style: 'mapbox://styles/mapbox/streets-v11' //'mapbox://styles/mapbox/navigation-night-v1'
-       }
-      );
-      
-      map.on('load', () => {
-      data = {{ feature_collection | safe}}
-      
-      for (let i = 0; i < data['features'].length; i++) {
-      
-        const submission_title = data['features'][i]['properties']['title']
-        const display_type = data['features'][i]['properties']['type']
-        const submission_status = status_dict[data['features'][i]['properties']['status']]
-        const display_status = data['features'][i]['properties']['status']
-        const submission_type = type_dict[data['features'][i]['properties']['type']]
-        const cover_image = data['features'][i]['properties']['cover_image']
-        const submission_id = data['features'][i]['properties']['id']
-        const lng = data['features'][i]['geometry']['coordinates'][0]
-        const lat = data['features'][i]['geometry']['coordinates'][1]
-        const cover_path = "{{url_for( 'static',filename='upload/')}}" + submission_id + "/" + cover_image
-        
-        if (status === 'szurke'){
-        console.log("ezt nem mutatjuk")
-        console.log(submission_title, submission_status, submission_type)
-        continue;
-        };
-      	
-	const img_path = "{{url_for( 'static',filename='marker/')}}" +
-	                 submission_status +
-	                 "/" +
-	                 submission_type+
-	                 ".png"      	
-
-	map.loadImage(img_path,
-	  (error, image) => {
-	    if (error) throw error;
-	    map.addImage(`custom-marker_${i}`, image);
-	    
-	// Add a GeoJSON source with 2 points
-	map.addSource(`points_${i}`, {
-		 'type': 'geojson',
-		 'data': {
-		 'type': 'FeatureCollection',
-		 'features': [
-		 {
-		 'type': 'Feature',
-		 'properties': {},
-		 'geometry': {
-		 'type': 'Point',
-		 'coordinates': [lng,lat]
-		 }}]}
-		})
-
-	// Add a symbol layer
-	map.addLayer({
-	'id': `point_${i}`,
-	'type': 'symbol',
-	'source': `points_${i}`,
-	'layout': {
-	'icon-image': `custom-marker_${i}`,
-	'icon-allow-overlap': false
-	}
-	});
-	}  
-	); //loadImage
-	      	
-	var popup = new mapboxgl.Popup()
-	  .setHTML(
-	`<div class="" style='padding:0.5em'>` + 
-	`<span><b>${submission_title}</b> | </span>` +
-	`<span>${display_type} | </span>`+
-	`<span>${display_status}</span>` +
-	`<a href=/single_submission/${submission_id}` + 
-                   " target='blank' rel='noopener noreferrer'>" +
-                   "<p>Adatlap</p>" +
-                   `<img height='10' width = 'auto' src=${cover_path}/>` +
-                   "</a>" + 
-        `</div>`
-	  );
-
-	var marker = new mapboxgl.Marker()
-	  .setLngLat([lng,lat])
-	  .addTo(map)
-	  .setPopup(popup);
-      	
-      } //end for
-      
-      for (let i = 0; i < map.getStyle().layers.length; i++){
-        
-      }
-
-      }); //on load
-      
-      map.on('click', 'pint_1', (e) => {
-      console.log(e)
-      console.log(e.features[0].geometry.coordinates)
-      })
-
-       //data = {{ feature_collection | safe}},  
-	
-	map.addControl(
-	new MapboxGeocoder({
-	accessToken: mapboxgl.accessToken,
-	country:'HUN',
-	language:'hu',
-	mapboxgl: mapboxgl
-	})
-	);
-
-	map.addControl(new mapboxgl.NavigationControl());
-	map.addControl(new mapboxgl.FullscreenControl());	
-	     
-</script>
-
-<script>
-  var coll = document.getElementsByClassName("collapsible");
-  coll[0].addEventListener("click", function() {
-    this.classList.toggle("active");
-    var content = this.nextElementSibling;
-    if (content.style.display === "block") {
-      content.style.display = "none";
-    } else {
-      content.style.display = "block";
+  <script>
+    var status_dict = {
+    'Befejezve': 'befejezve',
+    'Bejelentve': 'bejelentve',
+    'Duplika': 'szurke',
+    'Folyamatban': 'folyamatban',
+    'Hivatal megoldotta': 'szurke',
+    'Inaktív': 'szurke',
+    'Készül': 'keszul',
     }
-  });
-</script>
 
+    var type_dict = {
+    'Akadálymentesítés': 'akadalymentesites',
+    'Állat': 'allat',
+    'Közlekedés': 'kozlekedes',
+    'Közmű': 'kozmu',
+    'Egyéb': 'egyeb',
+    'Épület': 'epulet',
+    'Növény': 'noveny',
+    'Műemlék': 'muemlek',
+    'Szemét': 'szemet',
+    'Tájékoztatás': 'tajekoztatas',
+    'Utcabútor':'utcabutor',
+    'Út és Járda': 'ut_es_jarda',
+    }
+
+        mapboxgl.accessToken = '{{ACCESS_KEY}}';
+        var map = new mapboxgl.Map({
+          container: 'map',
+          center: [{{lat}}, {{lng}}],
+          zoom: 6.5,
+          language: 'auto',
+          style: 'mapbox://styles/mapbox/streets-v11' //'mapbox://styles/mapbox/navigation-night-v1'
+          }
+         );
+
+         map.on('load', () => {
+         data = {{ feature_collection | safe}}
+
+         for (let i = 0; i < data['features'].length; i++) {
+
+           const submission_title = data['features'][i]['properties']['title']
+           const display_type = data['features'][i]['properties']['type']
+           const submission_status = status_dict[data['features'][i]['properties']['status']]
+           const display_status = data['features'][i]['properties']['status']
+           const submission_type = type_dict[data['features'][i]['properties']['type']]
+           const cover_image = data['features'][i]['properties']['cover_image']
+           const submission_id = data['features'][i]['properties']['id']
+           const lng = data['features'][i]['geometry']['coordinates'][0]
+           const lat = data['features'][i]['geometry']['coordinates'][1]
+           const cover_path = "{{url_for( 'static',filename='upload/')}}" + submission_id + "/" + cover_image
+
+           if (status === 'szurke'){
+           console.log("ezt nem mutatjuk")
+           console.log(submission_title, submission_status, submission_type)
+           continue;
+           };
+
+    const img_path = "{{url_for( 'static',filename='marker/')}}" +
+                     submission_status +
+                     "/" +
+                     submission_type+
+                     ".png"
+
+    map.loadImage(img_path,
+      (error, image) => {
+        if (error) throw error;
+        map.addImage(`custom-marker_${i}`, image);
+
+    // Add a GeoJSON source with 2 points
+    map.addSource(`points_${i}`, {
+    	 'type': 'geojson',
+    	 'data': {
+    	 'type': 'FeatureCollection',
+    	 'features': [
+    	 {
+    	 'type': 'Feature',
+    	 'properties': {},
+    	 'geometry': {
+    	 'type': 'Point',
+    	 'coordinates': [lng,lat]
+    	 }}]}
+    	})
+
+    // Add a symbol layer
+    map.addLayer({
+    'id': `point_${i}`,
+    'type': 'symbol',
+    'source': `points_${i}`,
+    'layout': {
+    'icon-image': `custom-marker_${i}`,
+    'icon-allow-overlap': false
+    }
+    });
+    }
+    ); //loadImage
+
+    var popup = new mapboxgl.Popup()
+      .setHTML(
+    `<div class="" style='padding:0.5em'>` +
+    `<span><b>${submission_title}</b> | </span>` +
+    `<span>${display_type} | </span>`+
+    `<span>${display_status}</span>` +
+    `<a href=/single_submission/${submission_id}` +
+                      " target='blank' rel='noopener noreferrer'>" +
+                      "<p>Adatlap</p>" +
+                      `<img height='10' width = 'auto' src=${cover_path}/>` +
+                      "</a>" +
+           `</div>`
+      );
+
+    var marker = new mapboxgl.Marker()
+      .setLngLat([lng,lat])
+      .addTo(map)
+      .setPopup(popup);
+
+         } //end for
+
+         for (let i = 0; i < map.getStyle().layers.length; i++){
+
+         }
+
+         }); //on load
+
+         map.on('click', 'pint_1', (e) => {
+         console.log(e)
+         console.log(e.features[0].geometry.coordinates)
+         })
+
+          //data = {{ feature_collection | safe}},
+
+    map.addControl(
+    new MapboxGeocoder({
+    accessToken: mapboxgl.accessToken,
+    country:'HUN',
+    language:'hu',
+    mapboxgl: mapboxgl
+    })
+    );
+
+    map.addControl(new mapboxgl.NavigationControl());
+    map.addControl(new mapboxgl.FullscreenControl());
+  </script>
+
+  <script>
+    var coll = document.getElementsByClassName("collapsible");
+    coll[0].addEventListener("click", function () {
+      this.classList.toggle("active");
+      var content = this.nextElementSibling;
+      if (content.style.display === "block") {
+        content.style.display = "none";
+      } else {
+        content.style.display = "block";
+      }
+    });
+  </script>
 </body>
 
 {% endblock %}
+

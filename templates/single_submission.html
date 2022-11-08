@@ -1,380 +1,456 @@
 <!DOCTYPE HTML>
-{% extends "base.html" %} 
+
+{% extends "base.html" %}
 {% block content %}
- {% block head %}
+
+{% block head %}
   {% set img_url = 'https://rendkivuliugyek.site/static/upload/' + submission[0].id | string + '/' + submission[0].cover_image_full %}
-  <head>
-   <!--MAPBOX-->
-    <link href='https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.css' rel='stylesheet' /> 
-    <link rel="stylesheet" href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.1/mapbox-gl.css" type="text/css" />    
-    <!--LIGHTBOX-->
-    <link href="../static/css/lightbox.css" rel="stylesheet">  
-    <!--META-->
-    <title>{{ submission[0].title }}</title>
-    <meta property="og:site_name" content="Rendkívüli Ügyek Minisztériuma" />  
-    <meta property="og:title" content="{{ submission[0].title }}" />
-    {% if submission[0].solution  %}
+<head>
+  <!--MAPBOX-->
+  <link
+    href="https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.css"
+    rel="stylesheet"
+  />
+  <link
+    rel="stylesheet"
+    href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.1/mapbox-gl.css"
+    type="text/css"
+  />
+  <!--LIGHTBOX-->
+  <link href="../static/css/lightbox.css" rel="stylesheet" />
+  <!--META-->
+  <title>{{ submission[0].title }}</title>
+  <meta property="og:site_name" content="Rendkívüli Ügyek Minisztériuma" />
+  <meta property="og:title" content="{{ submission[0].title }}" />
+  {% if submission[0].solution %}
     <meta property="og:description" content="{{ submission[0].solution }}" />
-    {% else %}
+  {% else %}
     <meta property="og:description" content="{{ submission[0].description }}" />
-    {% endif %}
-    <meta property="og:type" content="article" />
-    <meta property="og:url" content="https://rendkivuliugyek.site/single_submission/{{  submission[0].id  }}" />
-    <meta property="og:image" content="{{ img_url }}" />
-    <meta property="og:locale" content="hu_HU" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    {{ super() }}
+  {% endif %}
+  <meta property="og:type" content="article" />
+  <meta
+    property="og:url"
+    content="https://rendkivuliugyek.site/single_submission/{{  submission[0].id  }}"
+  />
+  <meta property="og:image" content="{{ img_url }}" />
+  <meta property="og:locale" content="hu_HU" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  {{ super() }}
   <style>
-  .submission_solution {
-    display: none; //block 
-    overflow: hidden;
-    }
-  .top_image{
-    width:30em;
-    object-fit: cover;
-   }
+    .submission_solution {
+      display: none; //block
+      overflow: hidden;
+      }
+    .top_image{
+      width:30em;
+      object-fit: cover;
+     }
   </style>
-  </head>
+</head>
+
  {% endblock %}
 <body>
 
-    <div class="container">
-        <hr>
-        <h3><b>{{ submission[0].title }}</b></h3>
-        <hr>
-        <a href={{ url_for('static',filename='upload/' + submission[0].id | string + '/' + submission[0].cover_image_full) }} data-lightbox="roadtrip">
-          <img class="top_image img-thumbnail" src={{url_for( 'static',filename='upload/' + submission[0].id | string + "/" + submission[0].cover_image_full)}}/>
-        </a>
-        <br><br>
-        {%if submission[0].featured == True %}
-         <p><strong> Kiemelt ügy </strong></p>
-        {% endif %}        
-        <p><strong>Leírás:</strong> {{ submission[0].description }}</p>
-        <p><strong>Megoldási javaslat:</strong> {{ submission[0].suggestion }}</p>
-        <p><strong>Státusz:</strong> {{ submission[0].status }}</p>
-        <p><strong>Ebben a státuszban:</strong> {{ submission[0].status_changed_date }}</p>
-        <p><strong>Típus:</strong> {{ submission[0].problem_type }}</p>
-        <p><strong>Bejelentve:</strong> {{ submission[0].created_date }}</p>
-        <p><strong>Megye:</strong> {{ submission[0].county }}</p>
-        <p><strong>Cím:</strong> {{ submission[0].address }}</p>
+  <div class="container">
+  <hr />
+  <h3><b>{{ submission[0].title }}</b></h3>
+  <hr />
+  <a href={{ url_for('static',filename='upload/' + submission[0].id | string + '/' + submission[0].cover_image_full) }} 
+     data-lightbox='roadtrip'>
+    <img class="top_image img-thumbnail" 
+         src={{ url_for( 'static',filename='upload/' + submission[0].id | string + '/' + submission[0].cover_image_full) }}/>
+  </a>
+  <br />
+  <br />
+  {%if submission[0].featured == True %}
+    <p><strong> Kiemelt ügy </strong></p>
+  {% endif %}        
+  <p><strong>Leírás:</strong> {{ submission[0].description }}</p>
+  <p><strong>Megoldási javaslat:</strong> {{ submission[0].suggestion }}</p>
+  <p><strong>Státusz:</strong> {{ submission[0].status }}</p>
+  <p><strong>Ebben a státuszban:</strong> {{ submission[0].status_changed_date }}</p>
+  <p><strong>Típus:</strong> {{ submission[0].problem_type }}</p>
+  <p><strong>Bejelentve:</strong> {{ submission[0].created_date }}</p>
+  <p><strong>Megye:</strong> {{ submission[0].county }}</p>
+  <p><strong>Cím:</strong> {{ submission[0].address }}</p>
 
-        {%if submission[0].owner_email %}
-         <p><strong>Szervező:</strong> {{ submission[0].owner_email }}</p>
-        {% endif %}
+  {%if submission[0].owner_email %}
+    <p><strong>Szervező:</strong> {{ submission[0].owner_email }}</p>
+  {% endif %}
         
-        {%if submission[0].solution %}
-         <p><strong>Záró szöveg:<br>
-         </strong>{{ submission[0].solution }}</p>
-        {% endif %}
+  {%if submission[0].solution %}
+    <p><strong>Záró szöveg:<br>
+    </strong>{{ submission[0].solution }}</p>
+  {% endif %}
          
-        {% if submission[0].status != 'Befejezve' 
-        and submission[0].status != 'Inaktív' 
-        and submission[0].status != 'Duplika'
-        and submission[0].status != 'Hivatal megoldotta'
-        %}
-          <p>Ha szeretnél résztvenni a felújításban, írj nekünk a
-            <a href="mailto: kovacs.gergely@mkkp.hu?subject=Városfelújítós jelentkezés: {{ submission[0].title }} id:{{ submission[0].id }}">
-             <strong>kovacs.gergely@mkkp.hu</strong>
-            </a>-ra!
-          </p>
-        {% endif %}     
+  {% if submission[0].status != 'Befejezve' 
+     and submission[0].status != 'Inaktív' 
+     and submission[0].status != 'Duplika'
+     and submission[0].status != 'Hivatal megoldotta'
+  %}
+    <p>Ha szeretnél résztvenni a felújításban, írj nekünk a
+    <a href="mailto: kovacs.gergely@mkkp.hu?subject=Városfelújítós jelentkezés: {{ submission[0].title }} id:{{ submission[0].id }}">
+     <strong>kovacs.gergely@mkkp.hu</strong>
+    </a>email címre!</p>
+  {% endif %}     
         
-        {% if current_user.email == submission[0].owner_email
-           or role == 'coordinator' 
-           or role == 'admin'
-        %}
+  {% if current_user.email == submission[0].owner_email
+     or role == 'coordinator' 
+     or role == 'admin'
+  %}
         
-        <a href="/change_submission_data/{{submission[0].id}}">
-            <button class="btn btn-light form-control rounded-0">Adatok módosítása</button>
-        </a>
-        <br>
-        <br>
-        {% endif %}      
-        <div id="fb-root"></div>
-	<div class="fb-share-button" 
-	  data-href="https://rendkivuliugyek.site/single_submission/{{  submission[0].id  }}" 
-	  data-layout="button_count">
-	</div>
-        <hr> 
-        
-        <!--ELŐTTE KÉPEK FELTÖLTÉSE-->
-        {% if current_user.email == submission[0].submitter_email
-           or current_user.email == submission[0].owner_email
-           or role == 'coordinator' 
-           or role == 'admin'
-        %}
-        <form action="" method="post" enctype="multipart/form-data">
-            <div class="form-group">
-                <input type="file" id="files" name="files" class="btn rounded-0" multiple="true" required />
-                <button type="submit" id="upload_before_images" name="upload_before_images" class="btn rounded-0">Előtte Képek feltöltése
-                </button>
-            </div>
-        </form>
-
-        <form action="" method="post" enctype="multipart/form-data">
-            <div class="form-group">
-                <input hidden type=text, value={{current_user.user_name}} name="current_user" />
-                <input type="file" id="files" name="files" class="btn rounded-0" multiple="true" required />
-                <button type="submit" id="upload_after_images" name="upload_after_images" class="btn rounded-0">Utána Képek feltöltése
-                </button>
-            </div>
-        </form>
-
-        {% endif %}
-        
-        <form action="" method="post">
-        <!--ELŐTTE KÉPEK MUTATÁSA-->
-        {% if before_img_list.count() >= 1 %}
-          <h4>Előtte képek:</h4>
-        {% endif %}
-        
-        {% for img in before_img_list %}
-        <figure class="figure">
-           {% if submission[0].cover_image != img.thumb_file_name%}
-            <a href={{url_for( 'static',filename='upload/' + submission[0].id | string + '/' + img.file_name)}} data-lightbox="roadtrip">
-                <img height="200px" src={{url_for( 'static',filename='upload/' + submission[0].id | string + "/" + img.thumb_file_name)}}/>
-            </a>
-             {% if current_user.email == submission[0].submitter_email
-                or current_user.email == submission[0].owner_email
-                or role == 'coordinator' 
-                or role == 'admin'
-              %}
-              
-               <figcaption>
-               <label for="thumbnail"> Borító képpé</label>
-               <input type="checkbox" name="new_thumb" value={{img.thumb_file_name}}>
-               <label> Törlés: </label>
-               <a href="/delete_picture/before/{{img.id}}">🗑</a>
-               </figcaption>
-               </figure>
-             {% endif %}
-             {% endif %} <!--End of role check -->
-        </figure>
-        {% endfor %}
-
-        
-        <!--UTÁNA KÉPEK-->
-        {% if after_img_list[0] %}
-        <br>
-        <h4>Utána képek:</h4>
-        <br> 
-        {% endif %}
-        
-        {% for img in after_img_list %}
-         <figure class="figure">
-            <a href={{url_for( 'static',filename='upload/' + submission[0].id | string + "/" + img.file_name)}} data-lightbox="roadtrip">
-                <img height="200px" src={{url_for( 'static',filename='upload/' + submission[0].id | string + "/" + img.thumb_file_name)}}/>
-            </a>
-             {% if current_user.email == submission[0].submitter_email
-                or current_user.email == submission[0].owner_email
-                or role == 'coordinator' 
-                or role == 'admin'
-              %}
-
-                 <figcaption>
-                 <label for="thumbnail"> Borító képpé</label>
-                 <input type="checkbox" name="new_thumb" value={{img.thumb_file_name}}>
-                 <label> Törlés: </label>
-                 <a href="/delete_picture/before/{{img.id}}">🗑</a>
-                 </figcaption>
-             
-            {% endif %}
-         </figure>
-        {% endfor %}
-        
-        {% if current_user.email == submission[0].submitter_email
-           or current_user.email == submission[0].owner_email
-           or role == 'coordinator' 
-           or role == 'admin'
-        %}
-         {% if before_img_list.count() >= 1 %}
-          <br>      
-          <button type="submit" id="change_tumbnail" name="change_tumbnail" class="btn rounded-0">Borítókép módosítása</button> 
-          <br>
-          <br>
-         {% endif %}
-        {% endif %}
-        </form>        
- 
-        {% if comment_list[0] %}
-        <hr>
-        <label for="comment">Korábbi hozzászólások</label>
-        <br>
-        {% endif %}
-        {% for comment in comment_list %}
-        {% if comment.commenter == current_user.user_name or role == 'admin' %}
-        <a href="/delete_comment/{{comment.id}}">
-            <button class="btn btn-danger rounded-0" id="comment-delete" name="comment-delete">törlés</button>
-        </a>
-        {% endif %}
-
-        <p style="color: black; background: MediumSeaGreen; padding:0.3em">
-            <strong>{{ comment.commenter}} | {{ comment.created_date}}</strong>
-        </p>
-        
-        {% if comment.commenter == current_user.user_name or role == 'admin' %}
-        <form action="" method="post">
-        <p>{{ comment.body }}</p>
-            <input class="form-control rounded-0" id="comment" rows="1" name="comment" style="padding:0.2em; word-wrap: break-word;"
-              value='{{ comment.body }}'/>
-
-            <button class="btn btn-warning rounded-0" id="comment-edit" name="comment-edit">szerkesztés mentése</button>
-            <input hidden type=text, value={{comment.id}} name="comment_id" />
-        </form>
-        {% else %}
-        <blockquote disabled class="form-control rounded-0" id="comment" rows="1" name="comment" style="padding:0.2em; word-wrap: break-word;">
-            {{ comment.body }}
-        </blockquote>
-        {% endif %}
-        <br> 
-        {% endfor %} 
-        {% if current_user.is_authenticated %}
-         <form action="" method="post">
-            <input hidden type=text, value='{{current_user.user_name}}' name="current_user" />
-            <label for="comment">Na ehhez hozzászólok én is!</label>
-
-            <input type=text class="form-control rounded-0" id="comment" rows="1" name="comment"/>
-            <br>
-            <button type="submit" id="comment-submit" name="comment-submit" class="btn btn-primary rounded-0">Hozzáaszólás beküldése
-            </button>
-         </form>
-         <hr> 
-        {% endif %}
-        
-         {% if role == 'coordinator' or role == 'admin' %}
-         <a href="/assign/{{submission[0].id}}" rel="noopener noreferrer">
-            <button type="button" class="btn btn-success form-control rounded-0">Szervezőt adok a bejelentéshez!</button>
-         </a>
-         {% endif %}          
-
-        <hr>
-        
-        <div id='map' style='width: auto; height: 30em;'></div>
-
-        <a href="https://www.google.com/maps/@{{submission[0].lat}},{{submission[0].lng}},17z" target="_blank" rel="noopener noreferrer">
-            <p>Mutasd ugyanezt Google térképen!</p>
-        </a>
-
-        {% if current_user.email == submission[0].owner_email or role == 'coordinator' or role == 'admin' %}
-        
-        <br>
-        
-        <a href="/delete_submission/{{submission[0].id}}">
-            <button class="btn btn-danger form-control rounded-0">Bejelentés törlése!</button>
-        </a>
-        {% endif %}
-        <hr>
-        <br>
-        <br>
+    <a href="/change_submission_data/{{ submission[0].id }}">
+      <button class="btn btn-light form-control rounded-0">Adatok módosítása</button>
+    </a>
+    <br />
+    <br />
+  {% endif %}      
+  <div id="fb-root"></div>
+    <div class="fb-share-button" 
+         data-href="https://rendkivuliugyek.site/single_submission/{{  submission[0].id  }}" 
+	 data-layout="button_count">
     </div>
-    
-    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.js'></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>   
-    <script src="../static/js/lightbox.js"></script>
-    
-    <script>
-        mapboxgl.accessToken = '{{ACCESS_KEY}}';
-        var map = new mapboxgl.Map({
-        container: 'map',
-        center: [{{submission[0].lng}}, {{submission[0].lat}}],
-        zoom: 13,
-        minZoom:5,
-        style: 'mapbox://styles/mapbox/streets-v11', //'mapbox://styles/mapbox/navigation-night-v1'
-        });
+    <hr /> 
+        
+    <!--ELŐTTE KÉPEK FELTÖLTÉSE-->
+  {% if current_user.email == submission[0].submitter_email
+     or current_user.email == submission[0].owner_email
+     or role == 'coordinator' 
+     or role == 'admin'
+  %}
+    <form action="" method="post" enctype="multipart/form-data">
+      <div class="form-group">
+        <input type="file" 
+               id="files" 
+               name="files" 
+               class="btn rounded-0" 
+               multiple="true" 
+               required 
+        />
+        <button type="submit" 
+                id="upload_before_images" 
+                name="upload_before_images" 
+                class="btn rounded-0">Előtte Képek feltöltése
+        </button>
+      </div>
+    </form>
 
-	map.on('load', () => {
-	// Add an image to use as a custom marker
-	
-	var status_dict = {
-	'Befejezve': 'befejezve',
-	'Bejelentve': 'bejelentve',
-	'Duplika': 'szurke',
-	'Folyamatban': 'folyamatban',
-	'Hivatal megoldotta': 'szurke',
-	'Inaktív': 'szurke',
-	'Készül': 'keszul',
-	}
+    <form action="" method="post" enctype="multipart/form-data">
+      <div class="form-group">
+        <input hidden 
+               type=text 
+               value={{current_user.user_name}} 
+               name="current_user" 
+        />
+        <input type="file" 
+               id="files" 
+               name="files" 
+               class="btn rounded-0" 
+               multiple="true" 
+               required 
+        />
+        <button type="submit" 
+                id="upload_after_images" 
+                name="upload_after_images" 
+                class="btn rounded-0">Utána Képek feltöltése
+        </button>
+      </div>
+    </form>
+  {% endif %}
+        
+  <form action="" method="post">
+  <!--ELŐTTE KÉPEK MUTATÁSA-->
+    {% if before_img_list.count() >= 1 %}
+      <h4>Előtte képek:</h4>
+      {% for img in before_img_list %}
+        {% if submission[0].cover_image != img.thumb_file_name%}
+          <figure class="figure">
+            <a href={{ url_for( 'static',filename='upload/' + submission[0].id | string + '/' + img.file_name) }} data-lightbox='roadtrip'>
+              <img height="200px" src={{ url_for( 'static',filename='upload/' + submission[0].id | string + "/" + img.thumb_file_name) }}/>
+            </a>
+            {% if current_user.email == submission[0].submitter_email
+               or current_user.email == submission[0].owner_email
+               or role == 'coordinator'
+               or role == 'admin'
+             %}
+              <figcaption>
+                <label for="thumbnail"> Borító képpé</label>
+                <input type="checkbox" 
+                       name="new_thumb" 
+                       value={{ img.thumb_file_name }}>
+                <label> Törlés: </label>
+                <a href="/delete_picture/before/{{img.id}}">🗑</a>
+              </figcaption>
+            {% endif %}
+          </figure>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
 
-	var type_dict = {
-	'Akadálymentesítés': 'akadalymentesites',
-	'Állat': 'allat',
-	'Közlekedés': 'kozlekedes',
-	'Közmű': 'kozmu',
-	'Egyéb': 'egyeb',
-	'Épület': 'epulet',
-	'Növény': 'noveny',
-	'Műemlék': 'muemlek',
-	'Szemét': 'szemet',
-	'Tájékoztatás': 'tajekoztatas',
-	'Utcabútor':'utcabutor',
-	'Út és Járda': 'ut_es_jarda',
-	}	
-	
-	const status = status_dict['{{ submission[0].status }}']
-	const submission_type = type_dict['{{ submission[0].problem_type }}']
-	const img_path = "{{url_for( 'static',filename='marker/')}}" +
+   <!--UTÁNA KÉPEK-->
+   {% if after_img_list[0] %}
+     <br />
+     <h4>Utána képek:</h4>
+     <br /> 
+     {% for img in after_img_list %}
+       <figure class="figure">
+         <a href={{url_for( 'static',filename='upload/' + submission[0].id | string + "/" + img.file_name)}} data-lightbox='roadtrip'>
+           <img height="200px" 
+                src={{url_for( 'static',filename='upload/' + submission[0].id | string + "/" + img.thumb_file_name)}}/>
+         </a>
+         {% if current_user.email == submission[0].submitter_email
+            or current_user.email == submission[0].owner_email
+            or role == 'coordinator' 
+            or role == 'admin'
+         %}
+           <figcaption>
+             <label for="thumbnail"> Borító képpé</label>
+             <input type="checkbox" name="new_thumb" value={{img.thumb_file_name}}>
+             <label> Törlés: </label>
+             <a href="/delete_picture/before/{{img.id}}">🗑</a>
+           </figcaption>  
+         {% endif %}
+       </figure>
+     {% endfor %}
+   {% endif %}
+        
+   {% if current_user.email == submission[0].submitter_email
+      or current_user.email == submission[0].owner_email
+      or role == 'coordinator' 
+      or role == 'admin'
+   %}
+     {% if before_img_list.count() >= 1 
+        or after_img_list.count() >= 1
+     %}
+       <br />
+       <button type="submit" 
+               id="change_tumbnail" 
+               name="change_tumbnail" 
+               class="btn rounded-0">Borítókép módosítása</button> 
+       <br />
+       <br />
+     {% endif %}
+   {% endif %}
+ </form>
+     
+ {% if comment_list[0] %}
+   <hr />
+   <label for="comment">Korábbi hozzászólások</label>
+   <br />
+ {% endif %}
+   {% for comment in comment_list %}
+     {% if comment.commenter == current_user.user_name or role == 'admin' %}
+       <a href="/delete_comment/{{comment.id}}">
+         <button class="btn btn-danger rounded-0" 
+                 id="comment-delete" 
+                 name="comment-delete">törlés</button>
+       </a>
+        {% endif %}
+
+       <p style="color: black; background: MediumSeaGreen; padding:0.3em">
+         <strong>{{ comment.commenter}} | {{ comment.created_date}}</strong>
+       </p>
+        
+       {% if comment.commenter == current_user.user_name or role == 'admin' %}
+         <form action="" method="post">
+           <p>{{ comment.body }}</p>
+           <input class="form-control rounded-0" 
+                  id="comment" 
+                  rows="1" 
+                  name="comment" 
+                  style="padding:0.2em; word-wrap: break-word;"
+                  value='{{ comment.body }}'/>
+
+           <button class="btn btn-warning rounded-0" 
+                    id="comment-edit" 
+                    name="comment-edit">szerkesztés mentése
+           </button>
+           <input hidden type=text 
+                   value={{comment.id}} 
+                   name="comment_id" 
+           />
+         </form>
+         {% else %}
+         <blockquote disabled 
+                     class="form-control rounded-0" 
+                     id="comment" 
+                     rows="1" 
+                     name="comment" 
+                     style="padding:0.2em; word-wrap: break-word;">
+                     {{ comment.body }}
+         </blockquote>
+       {% endif %}
+       <br /> 
+     {% endfor %} 
+     
+     {% if current_user.is_authenticated %}
+       <form action="" method="post">
+         <input hidden type=text 
+                value='{{current_user.user_name}}' 
+                name="current_user" />
+         <label for="comment">Na ehhez hozzászólok én is!</label>
+
+         <input type=text 
+                class="form-control rounded-0" 
+                id="comment" 
+                rows="1" 
+                name="comment"
+         />
+         <br />
+         <button type="submit" 
+                 id="comment-submit" 
+                 name="comment-submit" 
+                 class="btn btn-primary rounded-0">
+                 Hozzáaszólás beküldése
+         </button>
+       </form>
+       <hr /> 
+     {% endif %}
+        
+     {% if role == 'coordinator' or role == 'admin' %}
+       <a href="/assign/{{submission[0].id}}" rel="noopener noreferrer">
+         <button type="button" 
+                 class="btn btn-success form-control rounded-0">
+                 Szervezőt adok a bejelentéshez!
+         </button>
+       </a>
+     {% endif %}
+     
+     <hr />
+        
+     <div id='map' 
+          style='width: auto; height: 30em;'>
+     </div>
+
+     <a href="https://www.google.com/maps/@{{submission[0].lat}},{{submission[0].lng}},17z" 
+        target="_blank" 
+        rel="noopener noreferrer">
+       <p>Mutasd ugyanezt Google térképen!</p>
+     </a>
+
+     {% if current_user.email == submission[0].owner_email 
+        or role == 'coordinator' 
+        or role == 'admin' %}
+        
+     <br />
+        
+     <a href="/delete_submission/{{submission[0].id}}">
+       <button class="btn btn-danger form-control rounded-0">Bejelentés törlése!
+       </button>
+     </a>
+   {% endif %}
+   <hr />
+   <br />
+   <br />
+ </div>
+    
+ <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.js'></script>
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>   
+ <script src="../static/js/lightbox.js"></script>
+    
+ <script>
+   mapboxgl.accessToken = '{{ACCESS_KEY}}';
+   var map = new mapboxgl.Map({
+   container: 'map',
+   center: [{{submission[0].lng}}, {{submission[0].lat}}],
+   zoom: 13,
+   minZoom:5,
+   style: 'mapbox://styles/mapbox/streets-v11',
+   });
+   
+   map.on('load', () => {
+   var status_dict = {
+     'Befejezve': 'befejezve',
+     'Bejelentve': 'bejelentve',
+     'Duplika': 'szurke',
+     'Folyamatban': 'folyamatban',
+     'Hivatal megoldotta': 'szurke',
+     'Inaktív': 'szurke',
+     'Készül': 'keszul'
+     };
+
+   var type_dict = {
+     'Akadálymentesítés': 'akadalymentesites',
+     'Állat': 'allat',
+     'Közlekedés': 'kozlekedes',
+     'Közmű': 'kozmu',
+     'Egyéb': 'egyeb',
+     'Épület': 'epulet',
+     'Növény': 'noveny',
+     'Műemlék': 'muemlek',
+     'Szemét': 'szemet',
+     'Tájékoztatás': 'tajekoztatas',
+     'Utcabútor':'utcabutor',
+     'Út és Járda': 'ut_es_jarda'
+     };
+     
+   const status = status_dict['{{ submission[0].status }}']
+   const submission_type = type_dict['{{ submission[0].problem_type }}']
+   const img_path = "{{url_for( 'static',filename='marker/')}}" +
 	                 status +
 	                 "/" +
 	                 submission_type+
 	                 ".png"
              
-	map.loadImage(img_path,
-	  (error, image) => {
-	    if (error) throw error;
-	    map.addImage('custom-marker', image);
+   map.loadImage(img_path,
+   (error, image) => {
+     if (error) throw error;
+     map.addImage('custom-marker', image);
 	    
-	// Add a GeoJSON source with 2 points
-	map.addSource('points', {
-		 'type': 'geojson',
-		 'data': {
-		 'type': 'FeatureCollection',
-		 'features': [
-		 {
-		 'type': 'Feature',
-		 'properties': {},
-		 'geometry': {
-		 'type': 'Point',
-		 'coordinates': [{{submission[0].lng}}, {{submission[0].lat}}]
-		 }}]}
-		})
+     // Add a GeoJSON source with 2 points
+     map.addSource('points', {
+       'type': 'geojson',
+       'data': {
+         'type': 'FeatureCollection',
+         'features': [{
+         'type': 'Feature',
+          'properties': {},
+          'geometry': {
+            'type': 'Point',
+            'coordinates': [{{submission[0].lng}}, {{submission[0].lat}}]
+          }
+         }
+         ]
+       }
+     }
+     )
 
-	// Add a symbol layer
-	map.addLayer({
-	'id': 'points',
-	'type': 'symbol',
-	'source': 'points',
-	'layout': {
-	'icon-image': 'custom-marker',
-	}
-	});
-	}  
-	); //loadImage
-	});//on load
+     // Add a symbol layer
+     map.addLayer({
+       'id': 'points',
+       'type': 'symbol',
+       'source': 'points',
+       'layout': {
+       'icon-image': 'custom-marker',
+       }
+     })}
+     ) //loadImage
+     });//on load
+
+    map.addControl(new mapboxgl.NavigationControl());
+    map.addControl(new mapboxgl.FullscreenControl());
 	
-	map.addControl(new mapboxgl.NavigationControl());
-	map.addControl(new mapboxgl.FullscreenControl());
-	
-    </script>
+  </script>
     
-    <script>
-    //Facebook share button
-	(function(d, s, id) {
-	  var js, fjs = d.getElementsByTagName(s)[0];
-	  if (d.getElementById(id)) return;
-	  js = d.createElement(s); js.id = id;
-	  js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
-	  fjs.parentNode.insertBefore(js, fjs);
-	  }(document, 'script', 'facebook-jssdk'));
-    </script>
+  <script>
+  //Facebook share button
+  (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
+    fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+  </script>
 
-    <script>
+  <script>
     lightbox.option({
       'resizeDuration': 100,
       'wrapAround': true,
       'alwaysShowNavOnTouchDevices':false,
       'albumLabel':"%1 / %2"
     })
-    </script>
+  </script>
 
 </body>
 

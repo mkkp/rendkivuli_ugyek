@@ -1,390 +1,437 @@
-<!DOCTYPE HTML>
-{% extends "base.html" %}
-{% block content %}
+<!DOCTYPE html>
 
-<html>
+{% extends "base.html" %} {% block content %}
+
 <head>
- <style>
-	/* unvisited link */
-	a:link {
-	  color: black;
-	}
+  <meta property="og:image" content="/static/site_img/kezdo_kep.jpg" />
 
-	/* visited link */
-	a:visited {
-	  color: grey;
-	}
+  <style>
+    /* unvisited link */
+    a:link {
+        color: black;
+    }
 
-	/* mouse over link */
-	a:hover {
-	  text-decoration: none;
-	  font-weight: lighter;
-	  transition: 0.5s;
-	}
+    /* visited link */
+    a:visited {
+        color: grey;
+    }
 
-	.cropped {
-	  width: auto; 
-	  height: 10em; 
-	  object-fit: cover;
-	  object-position: 50% 50%;
-	}
-	
-	.featured_cropped {
-	  width: auto; 
-	  height: 15em; 
-	  object-fit: cover;
-	  object-position: 50% 50%;
-	}	
-	
-	.content {
-	  display: none;
-	  overflow: hidden;
-	  }
-	  	
-	.card {
-	  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
-	  transition: 0.3s;
-	  border-radius: 30px;
-	  margin:0.5em;
-	  display: flex;
-	}
+    /* mouse over link */
+    a:hover {
+        text-decoration: none;
+        font-weight: lighter;
+        transition: 0.5s;
+    }
 
-	.card:hover {
-	  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
-	  font-weight:bold;
-	}
+    .cropped {
+        width: auto;
+        height: 10em;
+        object-fit: cover;
+        object-position: 50% 50%;
+    }
 
-	.card_hr {
-	    width:100%;
-	    margin:0 auto;
-	    border-top: 1px solid #000000;
-	}
+    .featured_cropped {
+        width: auto;
+        height: 15em;
+        object-fit: cover;
+        object-position: 50% 50%;
+    }
 
-	.card_container {
-	  padding: 2px 8px;
-	}
+    .content {
+        display: none;
+        overflow: hidden;
+    }
 
-	.card_head{
-	padding:5px;
-	text-align: left;
-	background-color:#008000;
-	border-top-left-radius: 25px;
-	border-top-right-radius: 25px;
-	color:white;
-	font-weight:bold;
-	}
-	
-	.card_label{
-	padding:5px;
-	}
-	
-	.col-sm-3{
-	padding:0.2em;
-	}
-	.col-sm-6{
-	padding:0.2em;
-	}		
-</style>
+    .card {
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+        transition: 0.3s;
+        border-radius: 30px;
+        margin: 0.5em;
+        display: flex;
+    }
+
+    .card:hover {
+        box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+        font-weight: bold;
+    }
+
+    .card_hr {
+        width: 100%;
+        margin: 0 auto;
+        border-top: 1px solid #000000;
+    }
+
+    .card_container {
+        padding: 2px 8px;
+    }
+
+    .card_head {
+        padding: 5px;
+        text-align: left;
+        background-color: #008000;
+        border-top-left-radius: 25px;
+        border-top-right-radius: 25px;
+        color: white;
+        font-weight: bold;
+    }
+
+    .card_label {
+        padding: 5px;
+    }
+
+    .col-sm-3 {
+        padding: 0.2em;
+    }
+    .col-sm-6 {
+        padding: 0.2em;
+    }
+  </style>
 </head>
- <body>
- 
+<body>
   <div class="container">
-  
-  <br>
-  
-  <h2><i><b>ÖSSZES BEJELENTÉS</b></i></h2>
-  
-  <button type="button" class="collapsible btn btn-light form-control rounded-0">Részletes keresés</button>
-  
-  <div class="content" id="content">
-  
-  <form action="" method="post" enctype="multipart/form-data">
-  
-   <div class="form-group">
-   
-    <label for="type">Státusz</label>
-    <select class="form-select form-control" 
-            aria-label="Státusz kiválasztása" 
-            name="status">
-    <option selected value="">Válassz a státuszok közül!</option>
-    <option>Bejelentve</option>
-    <option>Folyamatban</option>
-    <option>Készül</option>
-    <option>Befejezve</option>
-    </select>
-   
-    <label for="type">Típus</label>
-    <select class="form-select form-control" 
-            aria-label="Típus kiválasztása" 
-            name="type">
-    <option selected value="">Válassz a típusok közül!</option>
-    <option>Út és Járda</option>
-    <option>Szemét</option>
-    <option>Közmű</option>
-    <option>Akadálymentesítés</option>
-    <option>Növény</option>
-    <option>Állat</option>
-    <option>Épület</option>
-    <option>Közlekedés</option>
-    <option>Tájékoztatás</option>
-    <option>Műemlék</option>   
-   </select>
-   
-    <label for="type">Megye</label>
-    <select class="form-select form-control" 
-            aria-label="Megye kiválasztása" 
-            name="county">
-     <option selected value="">Válassz a megyék közül!</option>
-     <option>Budapest</option>
-     <option>Pest</option>
-     <option>Bács-Kiskun</option>
-     <option>Baranya</option>
-     <option>Békés</option>
-     <option>Borsod-Abaúj-Zemplén</option>
-     <option>Csongrád</option>
-     <option>Fejér</option>
-     <option>Győr-Moson-Sopron</option>
-     <option>Hajdú-Bihar</option>
-     <option>Heves</option>
-     <option>Jász-Nagykun-Szolnok</option>
-     <option>Komárom-Esztergom</option>
-     <option>Nógrád</option>
-     <option>Szabolcs-Szatmár-Bereg</option>
-     <option>Tolna</option>
-     <option>Vas</option>
-     <option>Veszprém</option>
-     <option>Zala</option>
-    </select>
-    
-    <label for="type">Szöveges keresés az összes ügy leírásában</label>
-    <input value="" type="text" class="form-control" id="full_text_search" placeholder="" name="full_text_search">
-    
-   </div> <!--detailed_search-->
-   
-    <button type="submit" class="btn btn-dark form-control rounded-0">Mutasd!</button>
-    
-   </form>
-   
-   </div>
+    <br />
 
-   <hr>
-   
-   
-   {% if post_list.page == 1%}
-   
-   <div class="row">
-   
-   {% for row in featured %}
-     <div class="col-sm-6">
-     <a href="/single_submission/{{ row.id }}" rel="noopener noreferrer">
-      <div class="card">
-       {% set status = row.status %}
-       {% if status == 'Bejelentve' %}
-         <div class='card_head' style="background-color:#f45d5f; color:white;">
-          <div class='card_label'>
-           <img src="/static/category/{{row.problem_type}}.png">
-           <label>&nbsp;&nbsp;{{row.problem_type}}</label>
-          </div>
-         </div>
-       {% elif status == 'Folyamatban' %}
-         <div class='card_head' style="background-color:#feb955; color:white;">
-          <div class='card_label'>
-           <img src="/static/category/{{row.problem_type}}.png">
-           <label>&nbsp;&nbsp;{{row.problem_type}}</label>
-          </div>
-         </div>
-       {% elif status == 'Készül' %}
-         <div class='card_head' style="background-color:#22325e; color:white;">
-          <div class='card_label'>
-           <img src="/static/category/{{row.problem_type}}.png">
-           <label>&nbsp;&nbsp;{{row.problem_type}}</label>
-          </div>
-         </div>
-       {% elif status == 'Hivatal megoldotta' %}
-         <div class='card_head' style="background-color:#656d77; color:white;">
-          <div class='card_label'>
-           <img src="/static/category/{{row.problem_type}}.png">
-           <label>&nbsp;&nbsp;{{row.problem_type}}</label>
-          </div>
-         </div>
-       {% elif status == 'Inaktív' %}
-         <div class='card_head' style="background-color:grey; color:white;">
-          <div class='card_label'>
-           <img src="/static/category/{{row.problem_type}}.png">
-           <label>&nbsp;&nbsp;{{row.problem_type}}</label>
-          </div>
-         </div>
-       {% elif status == 'Duplika' %}
-         <div class='card_head' style="background-color:grey; color:white;">
-          <div class='card_label'>
-           <img src="/static/category/{{row.problem_type}}.png">
-           <label>&nbsp;&nbsp;{{row.problem_type}}</label>
-          </div>
-         </div>
-       {% elif status == 'Befejezve' %}
-         <div class='card_head' style="background-color:#35968a; color:white;">
-          <div class='card_label'>
-           <img src="/static/category/{{row.problem_type}}.png">
-           <label>&nbsp;&nbsp;{{row.problem_type}}</label>
-          </div>
-         </div>                                         
-       {% endif%}
-       
-       <img class="featured_cropped" src="/static/upload/{{ row.id }}/{{row.cover_image_full}}" alt={{ row.title }}/>
-         <div class="card_container">
-         <h6><b>{{ row.title | upper}}</b></h6>
-         <i>{{ row.city | upper}}</i>
-         <hr class='card_hr'>
-         {% if row.description %}
-          {% set desc_1 = row.description.split('.') %}
-          <p><i>{{ desc_1[0] }}.</i></p>
-         {% endif %}
-         </div> <!--card_container-->
-       </div> <!--card-->
-       </a>
-     </div> <!--col-sm-3-->
+    <h2>
+      <i><b>ÖSSZES BEJELENTÉS</b></i>
+    </h2>
 
-   {% endfor %}
-   
-   </div>
-   
-   {% endif %}
-   
-   <div class="row">
-   
-    {% for row in post_list.items %}
-    
-    {% if row.featured == False or row.featured == "" %}
-    
-     <div class="col-sm-3">
-     <a href="/single_submission/{{ row.id }}" rel="noopener noreferrer">
-      <div class="card">
-       {% set status = row.status %}
-       {% if status == 'Bejelentve' %}
-         <div class='card_head' style="background-color:#f45d5f; color:white;">
-          <div class='card_label'>
-           <img src="/static/category/{{row.problem_type}}.png">
-           <label>&nbsp;&nbsp;{{row.problem_type}}</label>
+    <button
+      type="button"
+      class="collapsible btn btn-light form-control rounded-0"
+    >
+      Részletes keresés
+    </button>
+
+    <div class="content" id="content">
+      <form action="" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+          <label for="type">Státusz</label>
+          <select
+            class="form-select form-control"
+            aria-label="Státusz kiválasztása"
+            name="status"
+          >
+            <option selected value="">Válassz a státuszok közül!</option>
+            <option>Bejelentve</option>
+            <option>Folyamatban</option>
+            <option>Készül</option>
+            <option>Befejezve</option>
+          </select>
+
+          <label for="type">Típus</label>
+          <select
+            class="form-select form-control"
+            aria-label="Típus kiválasztása"
+            name="type"
+          >
+            <option selected value="">Válassz a típusok közül!</option>
+            <option>Út és Járda</option>
+            <option>Szemét</option>
+            <option>Közmű</option>
+            <option>Akadálymentesítés</option>
+            <option>Növény</option>
+            <option>Állat</option>
+            <option>Épület</option>
+            <option>Közlekedés</option>
+            <option>Tájékoztatás</option>
+            <option>Műemlék</option>
+          </select>
+
+          <label for="type">Megye</label>
+          <select
+            class="form-select form-control"
+            aria-label="Megye kiválasztása"
+            name="county"
+          >
+            <option selected value="">Válassz a megyék közül!</option>
+            <option>Budapest</option>
+            <option>Pest</option>
+            <option>Bács-Kiskun</option>
+            <option>Baranya</option>
+            <option>Békés</option>
+            <option>Borsod-Abaúj-Zemplén</option>
+            <option>Csongrád</option>
+            <option>Fejér</option>
+            <option>Győr-Moson-Sopron</option>
+            <option>Hajdú-Bihar</option>
+            <option>Heves</option>
+            <option>Jász-Nagykun-Szolnok</option>
+            <option>Komárom-Esztergom</option>
+            <option>Nógrád</option>
+            <option>Szabolcs-Szatmár-Bereg</option>
+            <option>Tolna</option>
+            <option>Vas</option>
+            <option>Veszprém</option>
+            <option>Zala</option>
+          </select>
+
+          <label for="type">Szöveges keresés az összes ügy leírásában</label>
+          <input
+            value=""
+            type="text"
+            class="form-control"
+            id="full_text_search"
+            placeholder=""
+            name="full_text_search"
+          />
+        </div>
+        <!--detailed_search-->
+
+        <button type="submit" class="btn btn-dark form-control rounded-0">
+          Mutasd!
+        </button>
+      </form>
+    </div>
+
+    <hr />
+
+    {% if post_list.page == 1%}
+
+    <div class="row">
+      {% for row in featured %}
+      <div class="col-sm-6">
+        <a href="/single_submission/{{ row.id }}" rel="noopener noreferrer">
+          <div class="card">
+            {% set status = row.status %} {% if status == 'Bejelentve' %}
+            <div
+              class="card_head"
+              style="background-color:#f45d5f; color:white;"
+            >
+              <div class="card_label">
+                <img src="/static/category/{{ row.problem_type }}.png" />
+                <label>&nbsp;&nbsp;{{ row.problem_type }}</label>
+              </div>
+            </div>
+            {% elif status == 'Folyamatban' %}
+            <div
+              class="card_head"
+              style="background-color:#feb955; color:white;"
+            >
+              <div class="card_label">
+                <img src="/static/category/{{ row.problem_type }}.png" />
+                <label>&nbsp;&nbsp;{{ row.problem_type }}</label>
+              </div>
+            </div>
+            {% elif status == 'Készül' %}
+            <div
+              class="card_head"
+              style="background-color:#22325e; color:white;"
+            >
+              <div class="card_label">
+                <img src="/static/category/{{ row.problem_type }}.png" />
+                <label>&nbsp;&nbsp;{{ row.problem_type }}</label>
+              </div>
+            </div>
+            {% elif status == 'Hivatal megoldotta' %}
+            <div
+              class="card_head"
+              style="background-color:#656d77; color:white;"
+            >
+              <div class="card_label">
+                <img src="/static/category/{{ row.problem_type }}.png" />
+                <label>&nbsp;&nbsp;{{ row.problem_type }}</label>
+              </div>
+            </div>
+            {% elif status == 'Inaktív' %}
+            <div class="card_head" style="background-color:grey; color:white;">
+              <div class="card_label">
+                <img src="/static/category/{{ row.problem_type }}.png" />
+                <label>&nbsp;&nbsp;{{ row.problem_type }}</label>
+              </div>
+            </div>
+            {% elif status == 'Duplika' %}
+            <div class="card_head" style="background-color:grey; color:white;">
+              <div class="card_label">
+                <img src="/static/category/{{ row.problem_type }}.png" />
+                <label>&nbsp;&nbsp;{{ row.problem_type }}</label>
+              </div>
+            </div>
+            {% elif status == 'Befejezve' %}
+            <div
+              class="card_head"
+              style="background-color:#35968a; color:white;"
+            >
+              <div class="card_label">
+                <img src="/static/category/{{ row.problem_type }}.png" />
+                <label>&nbsp;&nbsp;{{ row.problem_type }}</label>
+              </div>
+            </div>
+            {% endif%}
+
+            <img
+              class="featured_cropped"
+              src="/static/upload/{{ row.id }}/{{ row.cover_image_full }}"
+              alt="{{ row.title }}"
+            />
+            <div class="card_container">
+              <h6><b>{{ row.title | upper}}</b></h6>
+              <i>{{ row.city | upper}}</i>
+              <hr class="card_hr" />
+              {% if row.description %} {% set desc_1 =
+              row.description.split('.') %}
+              <p><i>{{ desc_1[0] }}.</i></p>
+              {% endif %}
+            </div>
+            <!--card_container-->
           </div>
-         </div>
-       {% elif status == 'Folyamatban' %}
-         <div class='card_head' style="background-color:#feb955; color:white;">
-          <div class='card_label'>
-           <img src="/static/category/{{row.problem_type}}.png">
-           <label>&nbsp;&nbsp;{{row.problem_type}}</label>
-          </div>
-         </div>
-       {% elif status == 'Készül' %}
-         <div class='card_head' style="background-color:#22325e; color:white;">
-          <div class='card_label'>
-           <img src="/static/category/{{row.problem_type}}.png">
-           <label>&nbsp;&nbsp;{{row.problem_type}}</label>
-          </div>
-         </div>
-       {% elif status == 'Hivatal megoldotta' %}
-         <div class='card_head' style="background-color:#656d77; color:white;">
-          <div class='card_label'>
-           <img src="/static/category/{{row.problem_type}}.png">
-           <label>&nbsp;&nbsp;{{row.problem_type}}</label>
-          </div>
-         </div>
-       {% elif status == 'Inaktív' %}
-         <div class='card_head' style="background-color:grey; color:white;">
-          <div class='card_label'>
-           <img src="/static/category/{{row.problem_type}}.png">
-           <label>&nbsp;&nbsp;{{row.problem_type}}</label>
-          </div>
-         </div>
-       {% elif status == 'Duplika' %}
-         <div class='card_head' style="background-color:grey; color:white;">
-          <div class='card_label'>
-           <img src="/static/category/{{row.problem_type}}.png">
-           <label>&nbsp;&nbsp;{{row.problem_type}}</label>
-          </div>
-         </div>
-       {% elif status == 'Befejezve' %}
-         <div class='card_head' style="background-color:#35968a; color:white;">
-          <div class='card_label'>
-           <img src="/static/category/{{row.problem_type}}.png">
-           <label>&nbsp;&nbsp;{{row.problem_type}}</label>
-          </div>
-         </div>                                         
-       {% endif%}
-       
-       <img class="cropped" src="/static/upload/{{ row.id }}/{{row.cover_image}}" alt={{ row.title }}/>
-         <div class="card_container">
-         <h6><b>{{ row.title | upper}}</b></h6>
-         <i>{{ row.city | upper}}</i>
-         <hr class='card_hr'>
-         {% if row.description %}
-          {% set desc_1 = row.description.split('.') %}
-          <p><i>{{ desc_1[0] }}.</i></p>
-         {% endif %}
-         </div> <!--card_container-->
-       </div> <!--card-->
-       </a>
-     </div> <!--col-sm-3-->
+          <!--card-->
+        </a>
+      </div>
+      <!--col-sm-3-->
+
+      {% endfor %}
+    </div>
 
     {% endif %}
-    {% endfor %}
-    
-   </div> <!-- row -->
-   <hr>
-   
 
-  <!-- Pagination Links-->
-  <div class="text-right">
-    <a href="{{ url_for('all_submission', page=post_list.prev_num) }}"
-       class="btn btn-outline-dark 
-       {% if post_list.page == 1 %}
-       disabled
-       {% endif %}">
+    <div class="row">
+      {% for row in post_list.items %} {% if row.featured == False or
+      row.featured == "" %}
+
+      <div class="col-sm-3">
+        <a href="/single_submission/{{ row.id }}" rel="noopener noreferrer">
+          <div class="card">
+            {% set status = row.status %} {% if status == 'Bejelentve' %}
+            <div
+              class="card_head"
+              style="background-color:#f45d5f; color:white;"
+            >
+              <div class="card_label">
+                <img src="/static/category/{{ row.problem_type }}.png" />
+                <label>&nbsp;&nbsp;{{ row.problem_type }}</label>
+              </div>
+            </div>
+            {% elif status == 'Folyamatban' %}
+            <div
+              class="card_head"
+              style="background-color:#feb955; color:white;"
+            >
+              <div class="card_label">
+                <img src="/static/category/{{ row.problem_type }}.png" />
+                <label>&nbsp;&nbsp;{{ row.problem_type }}</label>
+              </div>
+            </div>
+            {% elif status == 'Készül' %}
+            <div
+              class="card_head"
+              style="background-color:#22325e; color:white;"
+            >
+              <div class="card_label">
+                <img src="/static/category/{{ row.problem_type }}.png" />
+                <label>&nbsp;&nbsp;{{ row.problem_type }}</label>
+              </div>
+            </div>
+            {% elif status == 'Hivatal megoldotta' %}
+            <div
+              class="card_head"
+              style="background-color:#656d77; color:white;"
+            >
+              <div class="card_label">
+                <img src="/static/category/{{ row.problem_type }}.png" />
+                <label>&nbsp;&nbsp;{{ row.problem_type }}</label>
+              </div>
+            </div>
+            {% elif status == 'Inaktív' %}
+            <div class="card_head" style="background-color:grey; color:white;">
+              <div class="card_label">
+                <img src="/static/category/{{row.problem_type}}.png" />
+                <label>&nbsp;&nbsp;{{ row.problem_type }}</label>
+              </div>
+            </div>
+            {% elif status == 'Duplika' %}
+            <div class="card_head" style="background-color:grey; color:white;">
+              <div class="card_label">
+                <img src="/static/category/{{row.problem_type}}.png" />
+                <label>&nbsp;&nbsp;{{ row.problem_type }}</label>
+              </div>
+            </div>
+            {% elif status == 'Befejezve' %}
+            <div
+              class="card_head"
+              style="background-color:#35968a; color:white;"
+            >
+              <div class="card_label">
+                <img src="/static/category/{{ row.problem_type }}.png" />
+                <label>&nbsp;&nbsp;{{ row.problem_type }}</label>
+              </div>
+            </div>
+            {% endif%}
+
+            <img
+              class="cropped"
+              src="/static/upload/{{ row.id }}/{{row.cover_image}}"
+              alt="{{ row.title}}"
+            />
+            <div class="card_container">
+              <h6><b>{{ row.title | upper }}</b></h6>
+              <i>{{ row.city | upper }}</i>
+              <hr class="card_hr" />
+              {% if row.description %} {% set desc_1 =
+              row.description.split('.') %}
+              <p><i>{{ desc_1[0] }}.</i></p>
+              {% endif %}
+            </div>
+            <!--card_container-->
+          </div>
+          <!--card-->
+        </a>
+      </div>
+      <!--col-sm-3-->
+
+      {% endif %} {% endfor %}
+    </div>
+    <!-- row -->
+    <hr />
+
+    <!-- Pagination Links-->
+    <div class="text-right">
+      <a
+        href="{{ url_for('all_submission', page=post_list.prev_num) }}"
+        class="btn btn-outline-dark {% if post_list.page == 1 %} disabled {% endif %}"
+      >
         &laquo;
-    </a>
-  <!-- Loop through the number of pages to display a link for each-->
-    {% for page_num in post_list.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
-     {% if page_num %}
-     <!-- Check for the active page and set the link to "Active"-->
+      </a>
+      <!-- Loop through the number of pages to display a link for each-->
+      {% for page_num in post_list.iter_pages(left_edge=1, right_edge=1,
+      left_current=1, right_current=2) %} {% if page_num %}
+      <!-- Check for the active page and set the link to "Active"-->
       {% if post_list.page == page_num %}
-       <a href="{{ url_for('all_submission', page=page_num) }}"
-          class="btn btn-dark">
-          {{ page_num }}
-       </a>
+      <a
+        href="{{ url_for('all_submission', page=page_num) }}"
+        class="btn btn-dark"
+      >
+        {{ page_num }}
+      </a>
       {% else %}
-       <a href="{{ url_for('all_submission', page=page_num) }}"
-          class="btn btn-outline-dark">
-          {{ page_num }}
-       </a>
-      {% endif %}
-      {% else %}
-      ...
-      {% endif %}
-    {% endfor %}
-    <a href="{{ url_for('all_submission', page=post_list.next_num) }}"
-       class="btn btn-outline-dark 
-       {% if post_list.page == post_list.pages %}
-       disabled
-       {% endif %}">
+      <a
+        href="{{ url_for('all_submission', page=page_num) }}"
+        class="btn btn-outline-dark"
+      >
+        {{ page_num }}
+      </a>
+      {% endif %} {% else %} ... {% endif %} {% endfor %}
+      <a
+        href="{{ url_for('all_submission', page=post_list.next_num) }}"
+        class="btn btn-outline-dark {% if post_list.page == post_list.pages %} disabled {% endif %}"
+      >
         &raquo;
-    </a>
-   </div>
+      </a>
+    </div>
   </div>
-  
-<script>
-  var coll = document.getElementsByClassName("collapsible");
-  coll[0].addEventListener("click", function() {
-    this.classList.toggle("active");
-    var content = this.nextElementSibling;
-    if (content.style.display === "block") {
-      content.style.display = "none";
-    } else {
-      content.style.display = "block";
-    }
-  });
-</script>
 
- </body>
- 
-</html>
+  <script>
+    var coll = document.getElementsByClassName("collapsible");
+    coll[0].addEventListener("click", function() {
+      this.classList.toggle("active");
+      var content = this.nextElementSibling;
+      if (content.style.display === "block") {
+        content.style.display = "none";
+      } else {
+        content.style.display = "block";
+      }
+    });
+  </script>
+</body>
 
 {% endblock %}
+

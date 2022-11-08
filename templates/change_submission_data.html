@@ -1,196 +1,218 @@
 <!DOCTYPE HTML>
+
 {% extends "base.html" %}
-
 {% block content %}
-<body>
 
+<body>
   <style>
-  .submission_solution {
-    display: none; //block 
-    overflow: hidden;
+    .submission_solution {
+      display: none; //block
+      overflow: hidden;
     }
-    
   </style>
 
-<div class="container">
- <br>
- <h1>Ügy adatainak módosítása</h1>
- <hr>
- 
-         {% if current_user.email == submission.owner_email
-           or role == 'coordinator' 
-           or role == 'admin'
-         %}
+  <div class="container">
+    <br />
+    <h1>Ügy adatainak módosítása</h1>
+    <hr />
 
- 	<form action="" method="post">
- 	    <input hidden type=text, value={{current_user.user_name}} name="current_user" />
- 	    
-            <!--STÁTUSZ MÓDOSÍTÁSA-->
-            <label for="status"><strong>Státusz:</strong></label>
-            <select class="form-select form-control rounded-0" aria-label="Select status" name="status" onchange="detectChange(this)">
-	     <option selected>{{ submission.status }}</option>
-	     <option value="Bejelentve">Bejelentve</option>
-	     <option value="Folyamatban">Folyamatban</option>
-	     <option value="Készül">Készül</option>
-	     <option value="Hivatal megoldotta">Hivatal megoldotta</option>	     
-	     <option value="Inaktív">Inaktív</option>
-	     <option value="Duplika">Duplika</option>
-	     <option value="Befejezve">Befejezve</option>
-	    </select>
-	    <br>
-            <hr>
-           
-            <!--ÜGY BEFEJEZVE SZÖVEG-->
- 	    <div class="submission_solution" id="solution_div">
-             <label><strong>Megoldás</strong></label>
-             <input hidden type=text, value={{current_user.user_name}} name="current_user" />
-             <textarea class="form-control rounded-0" id="solution" rows="3" name="closing_solution"></textarea>
-            <br> 
-            <hr> 
-            </div>
-            
- 	    <!--ÜGY BEJELENTŐJÉNEK EMAIL CÍM MÓDOSÍTÁSA-->
- 	    <p><strong>Bejelentő email címe: </strong> {{ submission.submitter_email }} </p>
- 	    <label>Email módosítása:</label>
- 	    <input type="text" class="form-control rounded-0" id="new_email" name="new_email">
- 	    <br>
- 	    <hr>
- 	    
- 	    <!--ÜGY BEJELENTŐJÉNEK EMAIL CÍM MÓDOSÍTÁSA-->
- 	    <p><strong>Bejelentő telefonszáma: </strong> {{ submission.submitter_phone }} </p>
- 	    <label>Telefonszám módosítása:</label>
- 	    <input type="text" class="form-control rounded-0" id="new_phone" name="new_phone">
- 	    <br>
- 	    <hr> 	   
+    {% if current_user.email == submission.owner_email or role == 'coordinator' or role == 'admin' %}
 
- 	    <!--ÜGY NEVÉNEK MÓDOSÍTÁSA-->
- 	    <p><strong>Ügy megnevezése: </strong> {{ submission.title }} </p>
- 	    <label>Megnevezés módosítása:</label>
- 	    <input type="text" class="form-control rounded-0" id="new_title" name="new_title">
- 	    <br>
- 	    <hr>
- 	    
- 	    <!--ÜGY TÍPUSÁNAK MÓDOSÍTÁSA-->
- 	    <p><strong>Ügy típusa: </strong> {{ submission.problem_type }} </p>
- 	    <label>Típus módosítása:</label>
-            <select class="form-select form-control rounded-0" aria-label="Select type" name="new_type">
-	     <option selected>{{ submission.problem_type }}</option>
-	     <option value="Szemét">Szemét</option>
-	     <option value="Közmű">Közmű</option>
-	     <option value="Út és Járda">Út és Járda</option>
-	     <option value="Akadálymentesítés">Akadálymentesítés</option>
-	     <option value="Növény">Növény</option>
-	     <option value="Épület">Épület</option>
-	     <option value="Közlekedés">Közlekedés</option>
-             <option value="Tájékoztatás">Tájékoztatás</option>
-             <option value="Műemlék">Műemlék</option>
-	    </select>
- 	    <br>
- 	    <hr>
- 	    
- 	    <!--ÜGY LEÍRÁSÁNAK MÓDOSÍTÁSA-->
- 	    <p><strong>Ügy leírása: </strong> {{ submission.description }} </p>
- 	    <label>Leírás módosítása:</label>
- 	    <input type="text" class="form-control rounded-0" id="new_description" name="new_description">
- 	    <br>
- 	    <hr>
- 	    
- 	    <!--ÜGY MEGOLDÁSI JAVASLAT MÓDOSÍTÁSA-->
- 	    <p><strong>Megoldási javaslat: </strong> {{ submission.suggestion}}</p>
- 	    <label>Megoldási javaslat módosítása:</label>
- 	    <input type="text" class="form-control rounded-0" id="new_suggestion" name="new_suggestion">
- 	    <br>
- 	    <hr>
+    <form action="" method="post">
+      <input hidden type="text," value="{{current_user.user_name}}" name="current_user" />
 
-         <!--CÍM KIEGÉSZÍTÉSE-->
-          <p><strong>Cím: </strong>{{ submission.address }}</p>
-          <label><strong>Cím módosítása:</strong></label>
-          <input type="text" class="form-control rounded-0" id="new_address" autocomplete="on" name="new_address">
-          <input hidden type="text" id="lng" name="lng" value=0></p> <!--Ide lehetne valami vicces default értéket adni, pl parlament-->
-          <input hidden type="text" id="lat" name="lat" value=0></p> <!--Ide lehetne valami vicces default értéket adni, pl parlament-->
-          <input hidden type="text" id="city" name="city" value="nem meghatározott"></p>
-          <input hidden type="text" id="county" name="county" value="nem meghatározott"></p>          
-          <button type ="button" 
-                  class="btn btn-light form-control rounded-0" 
-                  id="complete_addr" 
-                  name="complete_addr" 
-                  onclick="complete_address()">Cím ellenőrzése</button>
-          <br>
-          <br>
-          
-          {% if role == 'admin' %}
-           <input 
-           class="form-check-input" 
-           type="checkbox" 
-           id="featured" 
-           name="featured"
-           {% if submission.featured == True %}
-           checked
-           {% endif %}
-           >
-           <label for="checkbox"><strong>Kiemelt bejegyzés </strong></label>
-           <br>
-          {% endif %}
-          
-          <hr>
-          <button type="submit" id="save_changes" name="save_changes" class="btn btn-dark form-control rounded-0">Ment</button>
-          <hr>
-          </form>
-          {% endif %}    
+      <!--STÁTUSZ MÓDOSÍTÁSA-->
+      <label for="status"><strong>Státusz:</strong></label>
+      <select class="form-select form-control rounded-0" 
+              aria-label="Select status" 
+              name="status" 
+              onchange="detectChange(this)">
+        <option selected>{{ submission.status }}</option>
+        <option value="Bejelentve">Bejelentve</option>
+        <option value="Folyamatban">Folyamatban</option>
+        <option value="Készül">Készül</option>
+        <option value="Hivatal megoldotta">Hivatal megoldotta</option>
+        <option value="Inaktív">Inaktív</option>
+        <option value="Duplika">Duplika</option>
+        <option value="Befejezve">Befejezve</option>
+      </select>
+      <br />
+      <hr />
 
-</div>
+      <!--ÜGY BEFEJEZVE SZÖVEG-->
+      <div class="submission_solution" id="solution_div">
+        <label><strong>Megoldás</strong></label>
+        <input hidden type="text," 
+               value="{{current_user.user_name}}" 
+               name="current_user" />
+        <textarea class="form-control rounded-0" 
+                  id="solution" 
+                  rows="3" 
+                  name="closing_solution">
+        </textarea>
+        <br />
+        <hr />
+      </div>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+      <!--ÜGY BEJELENTŐJÉNEK EMAIL CÍM MÓDOSÍTÁSA-->
+      <p><strong>Bejelentő email címe: </strong> {{ submission.submitter_email }}</p>
+      <label>Email módosítása:</label>
+      <input type="text" 
+             class="form-control rounded-0" 
+             id="new_email" 
+             name="new_email" />
+      <br />
+      <hr />
 
-<script>
-function detectChange(status) {
-  var content = document.getElementById("solution_div");
-  if (status.value === "Befejezve") {
-    if (content.style.display === "block") {
-        content.style.display = "none";
-       } else {
-        content.style.display = "block";
-       }       
-     }
-  };
-</script>
+      <!--ÜGY BEJELENTŐJÉNEK EMAIL CÍM MÓDOSÍTÁSA-->
+      <p><strong>Bejelentő telefonszáma: </strong> {{ submission.submitter_phone }}</p>
+      <label>Telefonszám módosítása:</label>
+      <input type="text" 
+             class="form-control rounded-0" 
+             id="new_phone" 
+             name="new_phone" />
+      <br />
+      <hr />
 
-<script>
-  //CÍM KIEGÉSZÍTÉSE
-  function complete_address(){
-  //FW GEOCODING COMPLETION
-  var address_input = document.getElementById("new_address").value;
-  console.log(address_input)
-  url = "https://api.mapbox.com/geocoding/v5/mapbox.places/" + 
-  address_input +
-  ".json?country=hu" +
-  "&proximity=-73.990593%2C40.740121" +
-  "&types=place%2Cpostcode%2Caddress" +
-  "&language=hu" +
-  "&access_token={{ACCESS_KEY}}"
-  $.get(url, function (data) {
-    var location_center = data.features[0].center;
-    var lat = data.features[0].center[1]
-    var lng = data.features[0].center[0]
-    var address = data.features[0]['place_name']
-    var city = address.split(",")[0].trim()
-  
-    if (city == "Budapest"){ 
-      var county = "Budapest"
-    } else {
-      var county = address.split(",")[3].trim()
-    };
-  
-    var county = county.replace(" megye", "")
-    
-    document.getElementById("new_address").value = address
-    document.getElementById("city").value = city
-    document.getElementById("county").value = county
-    document.getElementById("lng").value = lng
-    document.getElementById("lat").value = lat
-   
-})};
-</script>
+      <!--ÜGY NEVÉNEK MÓDOSÍTÁSA-->
+      <p><strong>Ügy megnevezése: </strong> {{ submission.title }}</p>
+      <label>Megnevezés módosítása:</label>
+      <input type="text" 
+             class="form-control rounded-0" 
+             id="new_title" 
+             name="new_title" />
+      <br />
+      <hr />
 
+      <!--ÜGY TÍPUSÁNAK MÓDOSÍTÁSA-->
+      <p><strong>Ügy típusa: </strong> {{ submission.problem_type }}</p>
+      <label>Típus módosítása:</label>
+      <select class="form-select form-control rounded-0" 
+              aria-label="Select type" 
+              name="new_type">
+        <option selected>{{ submission.problem_type }}</option>
+        <option value="Szemét">Szemét</option>
+        <option value="Közmű">Közmű</option>
+        <option value="Út és Járda">Út és Járda</option>
+        <option value="Akadálymentesítés">Akadálymentesítés</option>
+        <option value="Növény">Növény</option>
+        <option value="Épület">Épület</option>
+        <option value="Közlekedés">Közlekedés</option>
+        <option value="Tájékoztatás">Tájékoztatás</option>
+        <option value="Műemlék">Műemlék</option>
+      </select>
+      <br />
+      <hr />
+
+      <!--ÜGY LEÍRÁSÁNAK MÓDOSÍTÁSA-->
+      <p><strong>Ügy leírása: </strong> {{ submission.description }}</p>
+      <label>Leírás módosítása:</label>
+      <input type="text" 
+             class="form-control rounded-0" 
+             id="new_description" 
+             name="new_description" />
+      <br />
+      <hr />
+
+      <!--ÜGY MEGOLDÁSI JAVASLAT MÓDOSÍTÁSA-->
+      <p><strong>Megoldási javaslat: </strong> {{ submission.suggestion}}</p>
+      <label>Megoldási javaslat módosítása:</label>
+      <input type="text" 
+             class="form-control rounded-0" 
+             id="new_suggestion" 
+             name="new_suggestion" />
+      <br />
+      <hr />
+
+      <!--CÍM KIEGÉSZÍTÉSE-->
+      <p><strong>Cím: </strong>{{ submission.address }}</p>
+      <label><strong>Cím módosítása:</strong></label>
+      <input type="text" class="form-control rounded-0" id="new_address" autocomplete="on" name="new_address" />
+      <input hidden type="text" id="lng" name="lng" value="0" />
+      <input hidden type="text" id="lat" name="lat" value="0" />
+      <input hidden type="text" id="city" name="city" value="nem meghatározott" />
+      <input hidden type="text" id="county" name="county" value="nem meghatározott" />
+      <button type="button" 
+              class="btn btn-light form-control rounded-0" 
+              id="complete_addr" 
+              name="complete_addr" 
+              onclick="complete_address()">Cím ellenőrzése
+      </button>
+      <br />
+      <br />
+
+      {% if role == 'admin' %} 
+      <input class="form-check-input" 
+             type="checkbox" 
+             id="featured" 
+             name="featured" 
+             {% if submission.featured == True %} checked {% endif %}/>
+      <label for="checkbox"><strong>Kiemelt bejegyzés</strong></label>
+      <br />
+      {% endif %}
+
+      <hr />
+      <button type="submit" 
+              id="save_changes" 
+              name="save_changes" 
+              class="btn btn-dark form-control rounded-0">Ment
+      </button>
+      <hr />
+    </form>
+    {% endif %}
+  </div>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+  <script>
+    function detectChange(status) {
+      var content = document.getElementById("solution_div");
+      if (status.value === "Befejezve") {
+        if (content.style.display === "block") {
+          content.style.display = "none";
+        } else {
+          content.style.display = "block";
+        }
+      }
+    }
+  </script>
+
+  <script>
+    //CÍM KIEGÉSZÍTÉSE
+    function complete_address() {
+      //FW GEOCODING COMPLETION
+      var address_input = document.getElementById("new_address").value;
+      console.log(address_input);
+      url = "https://api.mapbox.com/geocoding/v5/mapbox.places/" + 
+      address_input +
+      ".json?country=hu" + 
+      "&proximity=-73.990593%2C40.740121" + 
+      "&types=place%2Cpostcode%2Caddress" + 
+      "&language=hu" + 
+      "&access_token={{ACCESS_KEY}}";
+      $.get(url, function (data) {
+        var location_center = data.features[0].center;
+        var lat = data.features[0].center[1];
+        var lng = data.features[0].center[0];
+        var address = data.features[0]["place_name"];
+        var city = address.split(",")[0].trim();
+
+        if (city == "Budapest") {
+          var county = "Budapest";
+        } else {
+          var county = address.split(",")[3].trim();
+        }
+
+        var county = county.replace(" megye", "");
+
+        document.getElementById("new_address").value = address;
+        document.getElementById("city").value = city;
+        document.getElementById("county").value = county;
+        document.getElementById("lng").value = lng;
+        document.getElementById("lat").value = lat;
+      });
+    }
+  </script>
 </body>
+
 {% endblock %}

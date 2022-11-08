@@ -1,176 +1,205 @@
-<!DOCTYPE HTML>
-{% extends "base.html" %}
+<!DOCTYPE html>
 
+{% extends "base.html" %}
 {% block content %}
+
 <html>
 
 <head>
     <link href='https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.css' rel='stylesheet' />
     <link rel="stylesheet" href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.1/mapbox-gl.css" type="text/css" />
     <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" type="text/css">
-    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
   <style>
-  .hidden_file_upload {
-    display: none; //block 
-    overflow: hidden;
-    }
+    .hidden_file_upload {
+      display: none; //block 
+      overflow: hidden;
+      }
     
-   #loading {  
-   width: 50%;
-   height: auto;
-   display: block;
-   margin-left: auto;
-   margin-right: auto;   
-   } 
+     #loading {  
+     width: 50%;
+     height: auto;
+     display: block;
+     margin-left: auto;
+     margin-right: auto;   
+     } 
   </style>    
-    
 </head>
 
 <body>
-    <div class="container">
-        <br>
-        <h2><b><i>PROBLÉMA BEJELENTÉSE</i></b></h2>
-        <p>[folyamat ismertetése szöveg vagy piktogram]</p>
-        <hr>
-        <form action="" method="post" enctype="multipart/form-data" id="form" class="needs-validation" novalidate>
-            <div class="form-group">
-                <strong><label for="megnevezes">Probléma megnevezése <label style="color:red">*</label></label></strong>
-                <input value="" type="text" 
-                       class="form-control" 
-                       id="megnevezes"
-                       placeholder=""
-                       name="title" 
-                       autofocus 
-                       required                       
-                       \>
-              <div class="invalid-feedback">Ha nem tudod megnevezni, akkor az nem probléma.</div>
-              </div>
-
-            <br>
-            <div class="form-group">
-                <strong><label for="tipus">Típus <label style="color:red">*</label></label></strong>
-                <select class="form-select form-control rounded-0" aria-label="Select Problem Type" name="type" required>
-	         <option value="" selected>Válassz a típusok közül!</option>
-	         <option value="Szemét">Szemét</option>
-	         <option value="Közmű">Közmű</option>
-	         <option value="Út és Járda">Út és Járda</option>
-	         <option value="Akadálymentesítés">Akadálymentesítés</option>
-	         <option value="Növény">Növény</option>
-	         <option value="Állat">Állat</option>
-	         <option value="Épület">Épület</option>
-	         <option value="Közlekedés">Közlekedés</option>
-                 <option value="Tájékoztatás">Tájékoztatás</option>
-                 <option value="Műemlék">Műemlék</option>
-	  </select>
-	      <div class="valid-feedback"></div>
-              <div class="invalid-feedback">Tök széles a választék, bökj rá egyre!</div>
-            </div>
-            <br>
-            <div class="form-group">
-                <strong><label for="reszletes_leiras">Részletes leírás <label style="color:red">*</label></label></strong>
-                <textarea class="form-control rounded-0" id="reszletes" rows="3" name="description" required></textarea>
-                <div class="invalid-feedback">Nem baj, ha nem töltöd ki. Tényleg. Csináld csak! Semmi baj. Nem haragszunk. Azt csinálsz, amit akarsz.</div>
-            </div>
-            <br>
-            <div class="form-group">
-                <strong><label for="megoldas">Megoldási javaslat</label></strong>
-                <textarea class="form-control rounded-0" id="megoldas" rows="3" name="suggestion"></textarea>
-            </div>
-            <br>
-            <div class="form-group">
-                <strong><label for="files" style=>Képek feltöltése <label style="color:red">*</label></label></strong>
-                <small>maximum 50 megabyte</small>
-                <input type="file" 
-                       id="files" 
-                       name="files" 
-                       class="btn btn-secondary form-control rounded-0 border border-dark" 
-                       multiple="true" 
-                       required
-                       accept="image/x-png, image/jpeg"
-                       onchange="show_additional_file_input()"
-                       />
-            <div class="invalid-feedback">Ellopták a képfájlt. Próbáld újra!</div>
-            </div>
-            
-            <div class="hidden_file_upload" id="hidden_file_upload">
-            <strong><label for="additional_files" style=>További képek feltöltése</label></strong>
-                <input type="file" 
-                       id="additional_files" 
-                       name="additional_files" 
-                       class="btn btn-secondary form-control rounded-0 border border-dark" 
-                       multiple="true"
-                       accept="image/x-png, image/jpeg"
-                       />
-            </div>
-            <br>
-            <div class="form-group">
-                <strong><label for="email">Email cím <label style="color:red">*</label></label></strong>
-                <input type="text" 
-                       inputmode="email" 
-                       class="form-control" 
-                       id="email" 
-                       autocomplete="on" 
-                       name="email"
-                       {% if current_user.is_authenticated %}
-                        value={{current_user.email}}
-                       {% endif %}
-                       required>
-            <div class="invalid-feedback">A PIN-kódod jól jönne, de inkább írd be ide a mailed.</div>
-            </div>
-            <br>
-            <div class="form-group">
-                <strong><label for="email">Telefon</label></strong>
-                <input type="tel" 
-                       inputmode="tel" 
-                       class="form-control" 
-                       id="phone" 
-                       autocomplete="off" 
-                       name="phone">
-            </div>            
-            
-            <div class="form-check">
-             <input class="form-check-input" type="checkbox" id="accept_toc" name="accept_toc" required>
-             <a href="/user_data_info" target="_blank">Adatkezelési szabályzat elfogadása <label style="color:red">*</label></a></label>
-             <div class="invalid-feedback">Haladjunk, kérem, haladjunk.</div>
-            </div>
-            <br>
-            <div class="form-group">
-                <strong><label for="address">Cím <label style="color:red">*</label></label></strong> 
-                <br> 
-                <input type="text" 
-                       class="form-control" 
-                       id="address" 
-                       name="address" 
-                       placeholder="Klikk a térképre!"
-                       onkeyup="getLocation()"
-                       required/>
-                <input hidden type="text" id="lng" name="lng" value=0></p> <!--Ide lehetne valami vicces default értéket adni, pl parlament-->
-                <input hidden type="text" id="lat" name="lat" value=0></p> <!--Ide lehetne valami vicces default értéket adni, pl parlament-->
-                <input hidden type="text" id="city" name="city" value="nem meghatározott"></p>
-                <input hidden type="text" id="county" name="county" value="nem meghatározott"></p>
-                <button type="button" class="btn btn-light form-control rounded-0 border border-dark" onclick="complete_address()">Cím ellenőrzése</button>
-                <div class="invalid-feedback">Sajnos pontosan meg kell mondanod, hogy hol van mi, merre, miként.</div>
-            </div>
-            <br>
-            
-            <div id="loading" style="display:none;">
-            <img src="/static/site_img/loading.gif" id="loading">
-            <label>Kis türelem, már dolgozunk rajta!</label>
-            <br>
-            </div>
-            
-            <div id='map' style='width: auto; height: 30em;'></div>
-            <hr>
-            
-            <button type="submit" class="btn btn-success form-control rounded-0 border border-dark" onclick="$('#loading').show();"><h3>Bejelent</h3></button>
-            <hr>
-        </form>
-        <br>
-        <br>
+  <div class="container">
+  <br />
+  <h2><b><i>PROBLÉMA BEJELENTÉSE</i></b></h2>
+  <p>[folyamat ismertetése szöveg vagy piktogram]</p>
+  <hr />
+  <form action="" method="post" enctype="multipart/form-data" id="form" class="needs-validation" novalidate>
+  <div class="form-group">
+  <strong><label for="megnevezes">Probléma megnevezése <label style="color:red">*</label></label></strong>
+  <input value="" 
+         type="text" 
+         class="form-control" 
+         id="megnevezes"
+         placeholder=""
+         name="title"
+         required
+         autofocus     
+  />
+  <div class="invalid-feedback">Ha nem tudod megnevezni, akkor az nem probléma.
+  </div>
+  </div>
+  <br />
+  <div class="form-group">
+    <strong><label for="tipus">Típus <label style="color:red">*</label></label></strong>
+    <select class="form-select form-control rounded-0" aria-label="Select Problem Type" name="type" required>
+      <option value="" selected>Válassz a típusok közül!</option>
+      <option value="Szemét">Szemét</option>
+      <option value="Közmű">Közmű</option>
+      <option value="Út és Járda">Út és Járda</option>
+      <option value="Akadálymentesítés">Akadálymentesítés</option>
+      <option value="Növény">Növény</option>
+      <option value="Állat">Állat</option>
+      <option value="Épület">Épület</option>
+      <option value="Közlekedés">Közlekedés</option>
+      <option value="Tájékoztatás">Tájékoztatás</option>
+      <option value="Műemlék">Műemlék</option>
+    </select>
+    <div class="valid-feedback">
     </div>
-</body>
-
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <div class="invalid-feedback">Tök széles a választék, bökj rá egyre!</div>
+    </div>
+    <br />
+    <div class="form-group">
+    <strong><label for="reszletes_leiras">Részletes leírás <label style="color:red">*</label></label></strong>
+    <textarea class="form-control rounded-0" 
+              id="reszletes" 
+              rows="3" 
+              name="description" 
+              required>
+    </textarea>
+    <div class="invalid-feedback">Nem baj, ha nem töltöd ki. Tényleg. Csináld csak! Semmi baj. Nem haragszunk. Azt csinálsz, amit akarsz.
+    </div>
+    </div>
+    <br />
+    <div class="form-group">
+    <strong><label for="megoldas">Megoldási javaslat</label></strong>
+    <textarea class="form-control rounded-0" 
+              id="megoldas" 
+              rows="3" 
+              name="suggestion">
+    </textarea>
+    </div>
+    <br />
+    <div class="form-group">
+    <strong><label for="files" style=>Képek feltöltése <label style="color:red">*</label></label></strong>
+    <small>maximum 50 megabyte</small>
+    <input type="file" 
+           id="files" 
+           name="files" 
+           class="btn btn-secondary form-control rounded-0 border border-dark" 
+           multiple="true" 
+           required
+           accept="image/x-png, image/jpeg"
+           onchange="show_additional_file_input()"
+   />
+   <div class="invalid-feedback">Ellopták a képfájlt. Próbáld újra!</div>
+   </div>
+   <div class="hidden_file_upload" 
+        id="hidden_file_upload">
+     <strong><label for="additional_files" style=>További képek feltöltése</label></strong>
+     <input type="file" 
+            id="additional_files" 
+            name="additional_files" 
+            class="btn btn-secondary form-control rounded-0 border border-dark" 
+            multiple="true"
+            accept="image/x-png, image/jpeg"
+     />
+   </div>
+   <br />
+   <div class="form-group">
+     <strong><label for="email">Email cím <label style="color:red">*</label></label></strong>
+     <input type="text" 
+            inputmode="email" 
+            class="form-control" 
+            id="email" 
+            autocomplete="off" 
+            name="email"
+            {% if current_user.is_authenticated %}
+              value={{current_user.email}}
+            {% endif %}
+            required
+     />
+     <div class="invalid-feedback">A PIN-kódod jól jönne, de inkább írd be ide a mailed.
+     </div>
+   </div>
+   <br />
+   <div class="form-group">
+     <strong><label for="email">Telefon</label></strong>
+     <input type="tel" 
+            inputmode="tel" 
+            class="form-control" 
+            id="phone" 
+            autocomplete="off" 
+            name="phone"
+     />
+   </div>            
+   <div class="form-check">
+     <input class="form-check-input" 
+            type="checkbox" 
+            id="accept_toc" 
+            name="accept_toc" 
+            required
+     />
+     <a href="/user_data_info" 
+        target="_blank">Adatkezelési szabályzat elfogadása <label style="color:red">*</label></a></label>
+     <div class="invalid-feedback">Haladjunk, kérem, haladjunk.
+     </div>
+   </div>
+   <br />
+   <div class="form-group">
+     <strong><label for="address">Cím <label style="color:red">*</label></label></strong> 
+     <br /> 
+     <input type="text" 
+            class="form-control" 
+            id="address" 
+            name="address" 
+            placeholder="Klikk a térképre!"
+            onkeyup="getLocation()"
+            required
+     />
+     <input hidden type="text" id="lng" name="lng" value=0></p> <!--Ide lehetne valami vicces default értéket adni, pl parlament-->
+     <input hidden type="text" id="lat" name="lat" value=0></p> <!--Ide lehetne valami vicces default értéket adni, pl parlament-->
+     <input hidden type="text" id="city" name="city" value="nem meghatározott"></p>
+     <input hidden type="text" id="county" name="county" value="nem meghatározott"></p>
+     <button type="button" 
+             class="btn btn-light form-control rounded-0 border border-dark" 
+             onclick="complete_address()">Cím ellenőrzése
+     </button>
+     <div class="invalid-feedback">Sajnos pontosan meg kell mondanod, hogy hol van mi, merre, miként.
+     </div>
+   </div>
+   <br />
+            
+   <div id="loading" style="display:none;">
+     <img src="/static/site_img/loading.gif" id="loading">
+     <label>Kis türelem, már dolgozunk rajta!</label>
+     <br />
+   </div>
+            
+   <div id='map' 
+        style='width: auto; height: 30em;'>
+   </div>
+   <hr />
+    
+   <button type="submit" 
+           class="btn btn-success form-control rounded-0 border border-dark" 
+           onclick="$('#loading').show();"><h3>Bejelent</h3>
+   </button>
+   <hr />
+ </form>
+ <br />
+ <br />
+ </div>
 
 <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
 <script id="search-js" defer src="https://api.mapbox.com/search-js/v1.0.0-beta.13/web.js"></script>
@@ -178,163 +207,164 @@
 
 <script>
 function show_additional_file_input(){
-    var content = document.getElementById("hidden_file_upload");
-    if (content.style.display === "block") {
-        content.style.display = "none";
-       } else {
-        content.style.display = "block";
-       }       
-     }
+  var content = document.getElementById("hidden_file_upload");
+  if (content.style.display === "block") {
+    content.style.display = "none";
+  } else {
+    content.style.display = "block";
+  }       
+}
 </script>
 
 <script>
 //getCurrentPosition
-window.onload = function getGPSLocation() {
+  window.onload = function getGPSLocation() {
 
-  let details = navigator.userAgent;
-  let regexp = /android|iphone|kindle|ipad/i;
-  let isMobileDevice = regexp.test(details);
+    let details = navigator.userAgent;
+    let regexp = /android|iphone|kindle|ipad/i;
+    let isMobileDevice = regexp.test(details);
 
-  if (isMobileDevice){
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(showPosition, showError);
-      }
+    if (isMobileDevice){
+      if (navigator.geolocation) {
+           navigator.geolocation.getCurrentPosition(showPosition, showError);
+        }
 
-  function showPosition(position) {
-    var lat = position.coords.latitude
-    var lng = position.coords.longitude 
-    const url = "https://api.mapbox.com/geocoding/v5/mapbox.places/" +
-    lng +
-    "," +
-    lat +
-    ".json?access_token=" + mapboxgl.accessToken +
-    "&language=hu" +
-    "&types=address"
+    function showPosition(position) {
+      var lat = position.coords.latitude
+      var lng = position.coords.longitude 
+      const url = "https://api.mapbox.com/geocoding/v5/mapbox.places/" +
+      lng +
+      "," +
+      lat +
+      ".json?access_token=" + mapboxgl.accessToken +
+      "&language=hu" +
+      "&types=address"
     
     //FORWARD GEOCODING 1
-    $.get(url, function (data) {
-      var address = data.features[0].place_name;
-      var city = address.split(",")[0].trim()
-      var street = address.split(",")[1].trim()
-      var postal_code = address.split(",")[2].trim()
-      var lng = position.coords.longitude
-      var lat = position.coords.latitude
+      $.get(url, function (data) {
+        var address = data.features[0].place_name;
+        var city = address.split(",")[0].trim()
+        var street = address.split(",")[1].trim()
+        var postal_code = address.split(",")[2].trim()
+        var lng = position.coords.longitude
+        var lat = position.coords.latitude
       
-      if (city == "Budapest"){
-        var county = "Budapest"
-      } else {
-        var county = address.split(",")[3].trim()
-      }
+        if (city == "Budapest"){
+          var county = "Budapest"
+        } else {
+          var county = address.split(",")[3].trim()
+        }
     
-      var county = county.replace("County", "").trim()
+        var county = county.replace("County", "").trim()
 
-      document.getElementById("city").value = city
-      document.getElementById("county").value = county
-      document.getElementById("address").value = address
-      document.getElementById("lng").value = lng
-      document.getElementById("lat").value = lat
+        document.getElementById("city").value = city
+        document.getElementById("county").value = county
+        document.getElementById("address").value = address
+        document.getElementById("lng").value = lng
+        document.getElementById("lat").value = lat
       
-      map.flyTo({center: [lng, lat], zoom:12});
-      deletePopup();
-      addPopup(lng, lat, address);
-      deleteLayer();
-      deleteSource();
-      addSource(lng,lat);
-      addLayer();
-      });//get
-  }//showPosition onLoad
-  }
-}//onload
+        map.flyTo({center: [lng, lat], zoom:12});
+        deletePopup();
+        addPopup(lng, lat, address);
+        deleteLayer();
+        deleteSource();
+        addSource(lng,lat);
+        addLayer();
+        });//get
+    }//showPosition onLoad
+    }
+  }//onload
 </script>
 
 <script>
 //CREATE MAP
-    mapboxgl.accessToken = '{{ACCESS_KEY}}';
-    var map = new mapboxgl.Map({
-      container: 'map',
-      center: [{{lat}}, {{lng}}],
-      zoom: 6,
-      style: 'mapbox://styles/mapbox/streets-v11'
-    });
+  mapboxgl.accessToken = '{{ACCESS_KEY}}';
+  var map = new mapboxgl.Map({
+    container: 'map',
+    center: [{{lat}}, {{lng}}],
+    zoom: 6,
+    style: 'mapbox://styles/mapbox/streets-v11'
+  });
     
-    map.addControl(
-      new MapboxGeocoder({
-      accessToken: mapboxgl.accessToken,
-      country:'HUN',
-      language:'hu',
-      mapboxgl: mapboxgl
-      })
-      );
+  map.addControl(
+    new MapboxGeocoder({
+    accessToken: mapboxgl.accessToken,
+    country:'HUN',
+    language:'hu',
+    mapboxgl: mapboxgl
+    })
+  );
       
-    map.addControl(new mapboxgl.NavigationControl());
-    map.addControl(new mapboxgl.FullscreenControl());      
+  map.addControl(new mapboxgl.NavigationControl());
+  map.addControl(new mapboxgl.FullscreenControl());      
     
 //ON CLICK
-    map.on("click", (e) => {
-    coordinates = e.lngLat;
+  map.on("click", (e) => {
+  coordinates = e.lngLat;
     
-    var lng = coordinates.lng
-    var lat = coordinates.lat
+  var lng = coordinates.lng
+  var lat = coordinates.lat
     
-    const url = "https://api.mapbox.com/geocoding/v5/mapbox.places/" +
+  const url = "https://api.mapbox.com/geocoding/v5/mapbox.places/" +
     lng + "," + lat +
     ".json?access_token=" + mapboxgl.accessToken +
     "&language=hu" +
     "&types=address";
     
     //FORWARD GEOCODING 2
-    $.get(url, function (data) {
-      try {
+  $.get(url, function (data) {
+    try {
       var address = data.features[0].place_name;
-      }
-      catch(err) {
-        document.getElementById("address").value = "Sajnos nem találtuk meg a címet!"
-        return;
-      }
-      var city = address.split(",")[0].trim()
-      var street = address.split(",")[1].trim()
-      var postal_code = address.split(",")[2].trim()
+    }
+    catch(err) {
+      document.getElementById("address").value = "Sajnos nem találtunk címet!"
+      return;
+    }
+    var city = address.split(",")[0].trim()
+    var street = address.split(",")[1].trim()
+    var postal_code = address.split(",")[2].trim()
     
-      if (city == "Budapest"){
-        var county = "Budapest"
-      } else {
-        var county = address.split(",")[3].trim()
-      };
+    if (city == "Budapest"){
+      var county = "Budapest"
+    } else {
+      var county = address.split(",")[3].trim()
+    };
     
-      var county = county.replace("megye", "").trim()
+    var county = county.replace("megye", "").trim()
     
-      document.getElementById("city").value = city
-      document.getElementById("county").value = county
-      document.getElementById("address").value = address
-      document.getElementById("lng").value = lng
-      document.getElementById("lat").value = lat
+    document.getElementById("city").value = city
+    document.getElementById("county").value = county
+    document.getElementById("address").value = address
+    document.getElementById("lng").value = lng
+    document.getElementById("lat").value = lat
     
-      map.flyTo({center: [lng,lat], zoom:12});
-      deletePopup();
-      addPopup(lng, lat, address);
-      deleteLayer();
-      deleteSource();
-      addSource(lng,lat);
-      addLayer();
+    map.flyTo({center: [lng,lat], zoom:12});
+    deletePopup();
+    addPopup(lng, lat, address);
+    deleteLayer();
+    deleteSource();
+    addSource(lng,lat);
+    addLayer();
     });
   });// map onClick
 </script>
 
 <script>
 //CÍM KIEGÉSZÍTÉSE
-function complete_address(){
-  //FW GEOCODING COMPLETION
-  var address_input = document.getElementById("address").value;
-  url = "https://api.mapbox.com/geocoding/v5/mapbox.places/" + 
-  address_input +
-  ".json?country=hu" +
-  "&proximity=-73.990593%2C40.740121" +
-  "&types=place%2Cpostcode%2Caddress" +
-  "&language=hu" +
-  "&access_token={{ACCESS_KEY}}"
-  $.get(url, function (data) {
-    try {
-      var address = data.features[0].place_name;
+  function complete_address(){
+    //FW GEOCODING COMPLETION
+    var address_input = document.getElementById("address").value;
+    url = "https://api.mapbox.com/geocoding/v5/mapbox.places/" + 
+    address_input +
+    ".json?country=hu" +
+    "&proximity=-73.990593%2C40.740121" +
+    "&types=place%2Cpostcode%2Caddress" +
+    "&language=hu" +
+    "&access_token={{ACCESS_KEY}}"
+    
+    $.get(url, function (data) {
+      try {
+        var address = data.features[0].place_name;
       }
       catch(err) {
         document.getElementById("address").value = "Sajnos nem találtunk címet!"
@@ -367,13 +397,14 @@ function complete_address(){
     addLayer();
     map.flyTo({center: [lng,lat], zoom:12});
   
-})};
+  })
+};
 </script>
 
 <script>
 //FOWRARD GEOCODING 
 //when SPACE hit on address
-function getLocation(){
+  function getLocation(){
     if (event.keyCode == 32) { //32 = space
       var address_input = document.getElementById("address").value;
       url = "https://api.mapbox.com/geocoding/v5/mapbox.places/" + 
@@ -397,7 +428,6 @@ function getLocation(){
         var lat = location_center[0]
         var lng = location_center[1]
         
-        
         map.flyTo({center: [lat,lng], zoom:12});
         deleteLayer();
         deleteSource();     
@@ -410,19 +440,19 @@ function getLocation(){
 
 <script>
 //UTILS
-function deleteSource(){
+  function deleteSource(){
     if (map.getSource('points')) {
       map.removeSource('points')
     }
-};
+  };
 
-function deleteLayer(){
+  function deleteLayer(){
     if (map.getLayer('circle')) {
       map.removeLayer('circle')
     }
-};
+  };
 
-function addSource(lng,lat){
+  function addSource(lng,lat){
     map.addSource('points', {
     'type': 'geojson',
     'data': {
@@ -434,44 +464,44 @@ function addSource(lng,lat){
         'geometry': {
           'type': 'Point',
           'coordinates': [lng,lat]
-          }
         }
-      ]
+        }
+    ]
     }
-    });
-};
+  });
+  };
 
-function addLayer(){
-	map.addLayer({
-	    'id': 'circle',
-	    'type': 'circle',
-	    'source': 'points', //refers to first parameter of addSource
-	    'paint': {
-	      'circle-color': '#ff0000',
-	      'circle-radius': 10,
-	      'circle-stroke-width': 2,
-	      'circle-stroke-color': '#000000',
-	      'circle-opacity' : 0.5
-	    }})    
-};
+  function addLayer(){
+    map.addLayer({
+      'id': 'circle',
+      'type': 'circle',
+      'source': 'points', //refers to first parameter of addSource
+      'paint': {
+        'circle-color': '#ff0000',
+        'circle-radius': 10,
+        'circle-stroke-width': 2,
+        'circle-opacity' : 0.5
+       }
+    })    
+  };
 
 //DELETE POPUP
-function deletePopup(){
-  const popups = document.getElementsByClassName("mapboxgl-popup");
-  if (popups.length) { 
-    popups[0].remove() 
+  function deletePopup(){
+    const popups = document.getElementsByClassName("mapboxgl-popup");
+    if (popups.length) { 
+      popups[0].remove() 
     }
-};
+  };
 
 //ADD POPUP
-function addPopup(lng, lat, address){
+  function addPopup(lng, lat, address){
     const popup = new mapboxgl.Popup({ closeOnClick: false })
     .setLngLat([lng,lat])
     .setHTML(`<p>${address}</p>`)
     .addTo(map);
 }
 
-function showError(error) {
+  function showError(error) {
     switch(error.code) {
       case error.PERMISSION_DENIED:
         alert("Ajjaj... A helyhozzáférés nincsen engedélyezve. Ha szeretnéd, hogy robokutyi töltse ki helyetted a címet, akkor kérlek engedélyezd.")
@@ -493,26 +523,26 @@ function showError(error) {
 
 <script>
 //FORM VALIDATION
-(function () {
-  'use strict'
-
-  // Fetch forms
-  var forms = document.querySelectorAll('.needs-validation')
-
-  Array.prototype.slice.call(forms)
+  function () {
+    'use strict'
+    // Fetch forms
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms)
     .forEach(function (form) {
       form.addEventListener('submit', function (event) {
-        if (!form.checkValidity()) {
-          event.preventDefault()
-          event.stopPropagation()
-          document.getElementById("loading").style.display = "none";
-          document.getElementById("form").scrollIntoView({behavior: 'smooth'});
-        }
-        form.classList.add('was-validated')
+      if (!form.checkValidity()) {
+        event.preventDefault()
+        event.stopPropagation()
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("form").scrollIntoView({behavior: 'smooth'});
+      }
+      form.classList.add('was-validated')
       }, false)
     })
-})()
+})
 </script>
+
+</body>
 
 </html>
 

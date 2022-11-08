@@ -1,53 +1,55 @@
 <!DOCTYPE HTML>
+
 {% extends "base.html" %}
 {% block content %}
 
 <body>
+  <div class="container">
+    <br />
+    <h3>Felhasználó adatainak módosítása</h3>
+    <hr />
+    <form action="" method="post">
+      <input hidden id="user_id" 
+             name="user_id" 
+             type="text" 
+             value="{{current_user.id}}" />
 
-<div class="container">
- <br>
- <h3>Felhasználó adatainak módosítása</h3>
- <hr>
- <form action="" method="post">
- <input hidden id="user_id" name="user_id" type="text" value={{current_user.id}}>
- 
-  <label>Felhasználónév módosítása:</label>
-  <input type="text" 
-  class="form-control rounded-0" 
-  id="new_user_name" 
-  name="new_user_name"
-  placeholder='jelenlegi: {{ current_user.user_name }}'
-  > 
-  <br>
-  <hr>
-  
-  <label>Email módosítása:</label>
-  <input type="text" 
-  class="form-control rounded-0" 
-  id="new_email" 
-  name="new_email"
-  placeholder='jelenlegi: {{ current_user.email }}'
-  > 
-  <br>
-  <hr>
-  
-  <label>Telefonszám módosítása:</label>
-  <input type="tel" class="form-control rounded-0" 
-  id="new_phone" 
-  name="new_phone" 
-  placeholder='jelenlegi: {{ current_user.phone }}'
-  > 
-  <br>
-  <hr>
-  
-  
-  <button type="submit" id="save_changes" name="save_changes" class="btn btn-dark form-control rounded-0">Ment</button>
-  <hr>
-  
- </form>
- 
-</div>
+      <label>Felhasználónév módosítása:</label>
+      <input type="text" 
+             class="form-control rounded-0" 
+             id="new_user_name" 
+             name="new_user_name" 
+             placeholder="jelenlegi: {{ current_user.user_name }}" />
+      <br />
+      <hr />
 
+      <label>Email módosítása:</label>
+      <input type="text" 
+             class="form-control rounded-0" 
+             id="new_email" 
+             name="new_email" 
+             placeholder="jelenlegi: {{ current_user.email }}" />
+      <br />
+      <hr />
+
+      <label>Telefonszám módosítása:</label>
+      <input type="tel" 
+             class="form-control rounded-0" 
+             id="new_phone" 
+             name="new_phone" 
+             placeholder="jelenlegi: {{ current_user.phone }}" />
+      <br />
+      <hr />
+
+      <button type="submit" 
+              class="btn btn-dark form-control rounded-0"
+              id="save_changes" 
+              name="save_changes">
+              Ment
+      </button>
+      <hr />
+    </form>
+  </div>
 </body>
 
 {% endblock %}

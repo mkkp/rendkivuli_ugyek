@@ -15,16 +15,19 @@ from flask_sqlalchemy import SQLAlchemy
 login = LoginManager()
 db = SQLAlchemy()
 
+
 @login.user_loader
 def load_user(id):
     "#"
     return UserModel.query.get(int(id))
 
+
 class UserModel(UserMixin, db.Model):
     """
     table schema for users
     """
-    __tablename__ = 'user'
+
+    __tablename__ = "user"
 
     id = db.Column(db.Integer, primary_key=True)
     create = db.Column(db.Boolean())
@@ -33,19 +36,21 @@ class UserModel(UserMixin, db.Model):
     delete = db.Column(db.Boolean())
     active = db.Column(db.Boolean())
     role = db.Column(db.String(10))
-    created_date = db.Column(db.String(10)) #2022-09-01
-    email = db.Column(db.String(80), unique=True) #GDPR
-    inactive_date = db.Column(db.String(10)) #2022-09-01
-    last_login = db.Column(db.String(10)) #2022-09-01
-    phone = db.Column(db.String(20)) #GDPR
+    created_date = db.Column(db.String(10))  # 2022-09-01
+    email = db.Column(db.String(80), unique=True)  # GDPR
+    inactive_date = db.Column(db.String(10))  # 2022-09-01
+    last_login = db.Column(db.String(10))  # 2022-09-01
+    phone = db.Column(db.String(20))  # GDPR
     user_name = db.Column(db.String(100), unique=True)
     verified = db.Column(db.Boolean())
+
 
 class SubmissionModel(db.Model):
     """
     table schema for submitted cases
     """
-    __tablename__ = 'submission'
+
+    __tablename__ = "submission"
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String())
@@ -67,7 +72,7 @@ class SubmissionModel(db.Model):
     cover_image_full = db.Column(db.String())
     featured = db.Column(db.Boolean())
     status = db.Column(db.String())
-    status_changed_date = db.Column(db.String()) #2022-09-01
+    status_changed_date = db.Column(db.String())  # 2022-09-01
     status_changed_by = db.Column(db.String())
 
 
@@ -75,7 +80,8 @@ class featuredModel(db.Model):
     """
     table schema for featured submissions
     """
-    __tablename__ = 'featured'
+
+    __tablename__ = "featured"
     id = db.Column(db.Integer, primary_key=True)
     created_date = db.Column(db.String(10))
     parent_id = db.Column(db.Integer, db.ForeignKey("submission.id"))
@@ -85,7 +91,8 @@ class CommentModel(db.Model):
     """
     table schema for comments
     """
-    __tablename__ = 'comment'
+
+    __tablename__ = "comment"
 
     id = db.Column(db.Integer, primary_key=True)
     commenter = db.Column(db.String(120))
@@ -98,7 +105,8 @@ class ImageBeforeModel(db.Model):
     """
     table schema for images before fix
     """
-    __tablename__ = 'image_before'
+
+    __tablename__ = "image_before"
 
     id = db.Column(db.Integer, primary_key=True)
     file_name = db.Column(db.String(80))
@@ -111,7 +119,8 @@ class ImageAfterModel(db.Model):
     """
     table schema for images afer fix
     """
-    __tablename__ = 'image_after'
+
+    __tablename__ = "image_after"
 
     id = db.Column(db.Integer, primary_key=True)
     file_name = db.Column(db.String(80))
