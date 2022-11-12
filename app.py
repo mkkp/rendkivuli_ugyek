@@ -294,10 +294,10 @@ def change_submission_data(submission_id):
         except Exception as e:
             submission.featured = False
             db.session.commit()
-            flash("Az ügy mostmár nem kiemelt.", "success")
 
         if request.form["status"] != submission.status:
             new_status = request.form["status"]
+            print(new_status)
             changed_by = request.form["current_user"]
 
             submission.status = new_status
@@ -306,9 +306,7 @@ def change_submission_data(submission_id):
             db.session.commit()
 
             if submission.owner_email != "":
-                print("SZERVEZŐnek levél!")
                 status_change_mail = create_status_change_mail(submission, FROM_MAIL)
-                print(status_change_mail)
                 mailjet.send.create(data=status_change_mail)
                 flash(
                     f"Sikeresen módosítottad az ügy státuszát erre: {new_status}. A szervezőnek ment levél.",
@@ -325,19 +323,16 @@ def change_submission_data(submission_id):
                 solution_mail_to_submitter = create_solution_mail(submission, FROM_MAIL)
                 mailjet.send.create(data=solution_mail_to_submitter)
 
-        if request.form["closing_solution"] != "":
+        if request.form["closing_solution"].strip() != "":
             closing_solution = request.form["closing_solution"]
             changed_by = request.form["current_user"]
-
             submission.solution = closing_solution
-            submission.status = "Befejezve"
             submission.status_changed_date = get_date()
             submission.status_changed_by = changed_by
             db.session.commit()
 
             flash(
-                """Sikeresen hozzáadtad a bejelentés zárószövegét!
-            Az ügy innentől kezdve befejezettnek minősül.""",
+                "Sikeresen hozzáadtad a bejelentés zárószövegét!",
                 "success",
             )
 
@@ -937,7 +932,20 @@ def page_not_found():
 def page_not_found():
     "#"
     return render_template("404.html")
-
+    
+# EASTER EGG
+@app.route("/kutyi", methods=["GET"])
+def easter_egg():
+    "#"
+    try:
+        import requests
+        response = requests.get("https://dog.ceo/api/breeds/image/random")
+        resp_json = response.json()
+        kutyi_pic = resp_json["message"]
+        return render_template("easter_egg.html",
+                                kutyi_pic=kutyi_pic)        
+    except Exception as e:
+        pass
 
 # APP RUN
 if __name__ == "__main__":

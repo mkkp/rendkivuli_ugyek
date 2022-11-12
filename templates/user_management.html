@@ -4,80 +4,86 @@
 {% block content %}
 
 <body>
-    <div class="container">
-        {% if role == 'admin' %}
-        <br />
-        <h3>Felhasználók kezelése</h3>
-        <br />
-        <input type="text" class="form-control rounded-0" id="myInput" onkeyup="TableFilter()" placeholder="tudod-e az email címét?" />
-        <br />
-        <table id="user_table" class="table table-light">
-            <thead class="thead">
-                <th scope="col">
-                    <p>Felhasználó</p>
-                </th>
-                <th scope="col">
-                    <p>email</p>
-                </th>
-                <th scope="col">
-                    <p>telefon</p>
-                </th>
-                <th scope="col">
-                    <p>felhasználói szint</p>
-                </th>
-                <th scope="col">
-                    <p>létrehozva</p>
-                </th>
-                <th scope="col">
-                    <p>utoljára itt</p>
-                </th>
-            </thead>
-            <tbody>
-                {% for user in user_list %}
-                <tr>
-                    <td><a href="user_manage/{{ user.id }}">{{ user.user_name }}</a></td>
-                    <td>{{ user.email }}</td>
-                    {% if user.phone is not none%}
-                    <td>{{ user.phone }}</td>
-                    {% else %}
-                    <td>-</td>
-                    {% endif %}
-                    <td>{{ user.role }}</td>
-                    <td>{{ user.created_date }}</td>
-                    <td>{{ user.last_login }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    <script>
-        function TableFilter() {
-            // Declare variables
-            var input, filter, table, tr, td, i, txtValue;
-            input = document.getElementById("myInput");
-            filter = input.value.toUpperCase();
-            table = document.getElementById("user_table");
-            tr = table.getElementsByTagName("tr");
+  <div class="container">
+    {% if role == 'admin' %}
+      <br />
+      <h3>Felhasználók kezelése</h3>
+      <br />
+      <input type="text" 
+             class="form-control rounded-0" 
+             id="myInput" 
+             onkeyup="TableFilter()" 
+             placeholder="tudod-e az email címét?" 
+      />
+      <br />
+      <table id="user_table" 
+             class="table table-light">
+        <thead class="thead">
+          <th scope="col">
+            <p>Felhasználó</p>
+          </th>
+          <th scope="col">
+            <p>email</p>
+          </th>
+          <th scope="col">
+            <p>telefon</p>
+          </th>
+          <th scope="col">
+            <p>felhasználói szint</p>
+          </th>
+          <th scope="col">
+            <p>létrehozva</p>
+          </th>
+          <th scope="col">
+            <p>utoljára itt</p>
+          </th>
+        </thead>
+        <tbody>
+        {% for user in user_list %}
+          <tr>
+            <td>
+              <a href="user_manage/{{ user.id }}">{{ user.user_name }}</a>
+            </td>
+            <td>{{ user.email }}</td>
+            {% if user.phone is not none%}
+              <td>{{ user.phone }}</td>
+            {% else %}
+              <td>-</td>
+            {% endif %}
+            <td>{{ user.role }}</td>
+            <td>{{ user.created_date }}</td>
+            <td>{{ user.last_login }}</td>
+          </tr>
+       {% endfor %}
+     </tbody>
+   </table>
+  </div>
+  <script>
+  function TableFilter() {
+    // Declare variables
+    var input, filter, table, tr, td, i, txtValue;
+    input = document.getElementById("myInput");
+    filter = input.value.toUpperCase();
+    table = document.getElementById("user_table");
+    tr = table.getElementsByTagName("tr");
 
-            // Loop through all table rows, and hide those who don't match the search query
-            for (i = 0; i < tr.length; i++) {
-                td = tr[i].getElementsByTagName("td")[1];
-                if (td) {
-                    txtValue = td.textContent || td.innerText;
-                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                        tr[i].style.display = "";
-                    } else {
-                        tr[i].style.display = "none";
-                    }
-                }
+    // Loop through all table rows, and hide those who don't match the search query
+    for (i = 0; i < tr.length; i++) {
+        td = tr[i].getElementsByTagName("td")[1];
+        if (td) {
+            txtValue = td.textContent || td.innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
             }
         }
-    </script>
-    {% else %}
+    }
+  }
+  </script>
+  {% else %}
     <p>Csak admin láthatja</p>
-    {% endif %}
+  {% endif %}
 </body>
 
-    
 {% endblock %}
-

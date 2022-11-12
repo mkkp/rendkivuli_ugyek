@@ -1,75 +1,96 @@
 {% extends "base.html" %}
 {% block content %}
-<body>
-{% if role == 'coordinator' or role == 'admin' %}
-    <div class="container">
-        <h2>{{submission.title}}</h2>
-	<h3>Szervező hozzáadása az ügyhöz</h3>
-	<form action="" method = "POST">
-	<input type="text" class="form-control rounded-0" id="myInput" onkeyup="TableFilter()" placeholder="tudod-e az email címét?">
-	<br>
-	<table id="user_table" class="table table-light">
-         <thead class="thead">          
-          <th scope="col">
-           <p>kijelöl</p>
-          </th>         
-          <th scope="col">
-           <p>email</p>
-          </th>
-          <th scope="col">
-           <p>felhasználó</p>
-          </th>          
-          <th scope="col">
-           <p>telefon</p>
-          </th>                       
-         </thead>
-         <tbody>
-          {% for user in user_list %}
-           <tr>
-            <td><input type="checkbox" name="email" value={{ user.email }}></td>
-            <td>{{ user.email }}</td>
-            <td>{{ user.user_name }}</td>
-            {% if user.phone is not none%}
-            <td>{{ user.phone }}</td>
-            {% else %}
-            <td>-</td>
-            {% endif %}
-            <td><input hidden type="text" name="username" value={{ user.user_name }}></td>
-          </tr>
-         {% endfor %}
-         </tbody>
-	</table>
-        <small>Egy bejelentéshez csak egy szervezőt lehet hozzáadni.</small>
-        <br>
-        <input type = "submit" class="btn btn-success" value = "Hozzáadom!" />
-	</form>
-	<div>
-	</div>
-     </div>
-<script>
-  function TableFilter() {
-    // Declare variables
-    var input, filter, table, tr, td, i, txtValue;
-    input = document.getElementById("myInput");
-    filter = input.value.toUpperCase();
-    table = document.getElementById("user_table");
-    tr = table.getElementsByTagName("tr");
 
-    // Loop through all table rows, and hide those who don't match the search query
-    for (i = 0; i < tr.length; i++) {
-      td = tr[i].getElementsByTagName("td")[1];
-      if (td) {
-        txtValue = td.textContent || td.innerText;
-        if (txtValue.toUpperCase().indexOf(filter) > -1) {
-          tr[i].style.display = "";
-        } else {
-          tr[i].style.display = "none";
+<body>
+
+  {% if role == 'coordinator' or role == 'admin' %}
+    <div class="container">
+      <h2>{{submission.title}}</h2>
+      <h3>Szervező hozzáadása az ügyhöz</h3>
+      <form action="" method = "POST">
+        <input type="text" 
+               class="form-control rounded-0" 
+               id="myInput"
+               placeholder="tudod-e az email címét?"
+               onkeyup="TableFilter()"
+        />
+        <br />
+	<table id="user_table" 
+	       class="table table-light">
+          <thead class="thead">          
+            <th scope="col">
+              <p>kijelöl</p>
+            </th>         
+            <th scope="col">
+              <p>email</p>
+            </th>
+            <th scope="col">
+              <p>felhasználó</p>
+            </th>          
+            <th scope="col">
+              <p>telefon</p>
+            </th>                       
+          </thead>
+          <tbody>
+            {% for user in user_list %}
+             <tr>
+               <td>
+                 <input type="checkbox" 
+                        name="email" 
+                        value={{ user.email }}>
+                 </td>
+               <td>{{ user.email }}</td>
+               <td>{{ user.user_name }}</td>
+                 {% if user.phone is not none%}
+               <td>{{ user.phone }}</td>
+               {% else %}
+                 <td>-</td>
+               {% endif %}
+               <td><input hidden 
+                          type="text" 
+                          name="username" 
+                          value={{ user.user_name }}>
+               </td>
+             </tr>
+           {% endfor %}
+         </tbody>
+       </table>
+      <small>Egy bejelentéshez csak egy szervezőt lehet hozzáadni.</small>
+      <br />
+      <input type="submit" 
+             class="btn btn-success" 
+             value = "Hozzáadom!" 
+      />
+      </form>
+    </div>
+    
+  <script>
+    function TableFilter() {
+      // Declare variables
+      var input, filter, table, tr, td, i, txtValue;
+      input = document.getElementById("myInput");
+      filter = input.value.toUpperCase();
+      table = document.getElementById("user_table");
+      tr = table.getElementsByTagName("tr");
+
+      // Loop through all table rows, and hide those who don't match the search query
+      for (i = 0; i < tr.length; i++) {
+        td = tr[i].getElementsByTagName("td")[1];
+        if (td) {
+          txtValue = td.textContent || td.innerText;
+          if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            tr[i].style.display = "";
+          } else {
+            tr[i].style.display = "none";
+          }
         }
       }
     }
-  }
-</script>
-{% endif %}	
+  </script>
+  
+  {% endif %}
+  	
 </body>
+
 {% endblock %}
 

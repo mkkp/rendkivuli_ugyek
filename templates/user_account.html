@@ -4,62 +4,69 @@
 {% block content %}
 
 <body>
-    <div class="container">
-        <div class="panel panel-default">
-            <br />
-            <h3>Felhasználói fiók beállítások</h3>
-        </div>
-        <hr />
-        <br />
-        <p><strong>Felhasználónév: </strong>{{current_user.user_name}}</p>
-        <p><strong>Email cím: </strong>{{current_user.email}}</p>
-        <p><strong>Telefon szám: </strong>{{current_user.phone}}</p>
-        <p><strong>Létrehozva: </strong>{{current_user.created_date}}</p>
-        <p><strong>Felhasználói szint: </strong> {{ role }}</p>
-        <hr />
-        <a href="/change_user_data/{{current_user.id}}">
-            <button class="btn btn-light form-control rounded-0">Adatok módosítása</button>
-        </a>
-        <hr />
-        <form action="" method="post">
-            <input hidden id="user_id" name="user_id" type="text" value="{{current_user.id}}" />
-            <button class="btn btn-info" name="own_submissions">Ügyeim listája</button>
-            <br />
-            {% if post_list is defined%}
-            <p><strong>Bejelentve általam:</strong></p>
-            <ul class="list-group">
-                {% for row in post_list %} {% if row.title %}
-                <li class="list-group-item">
-                    <a href="/single_submission/{{row.id}}">{{ row.title }}</a>
-                </li>
-                {% endif %} {% endfor %}
-            </ul>
-            {% endif%}
-            <br />
-            {% if owner_list is defined %}
-            <p><strong>Szervező vagyok:</strong></p>
-            <ul class="list-group">
-                {% for row in owner_list %} {% if row.title %}
-                <li class="list-group-item">
-                    <a href="/single_submission/{{row.id}}">{{ row.title }}</a>
-                </li>
-                {% endif %} {% endfor %}
-            </ul>
-            {% endif%}
-        </form>
-
-        {% if role == 'coordinator' or role == 'admin' %}
-        <hr />
-        <a href="/download">
-            <button class="btn btn-info" name="">Összes bejelentés letöltése csv-ben</button>
-        </a>
-        <br />
-        {% endif %}
-
-        <hr />
-
-        <a href="/user_data_info" target="_blank">Adatkezelési szabályzat</a>
+  <div class="container">
+    <div class="panel panel-default">
+      <br />
+      <h3>Felhasználói fiók beállítások</h3>
     </div>
+    <hr />
+    <br />
+    <p><strong>Felhasználónév: </strong>{{current_user.user_name}}</p>
+    <p><strong>Email cím: </strong>{{current_user.email}}</p>
+    <p><strong>Telefon szám: </strong>{{current_user.phone}}</p>
+    <p><strong>Létrehozva: </strong>{{current_user.created_date}}</p>
+    <p><strong>Felhasználói szint: </strong> {{ role }}</p>
+    <hr />
+    <a href="/change_user_data/{{current_user.id}}">
+      <button class="btn btn-light form-control rounded-0">Adatok módosítása</button>
+    </a>
+    <hr />
+    <form action="" method="post">
+    <input hidden 
+           id="user_id" 
+           name="user_id" 
+           type="text" 
+           value="{{current_user.id}}" 
+    />
+    <button class="btn btn-info" name="own_submissions">Ügyeim listája</button>
+    <br />
+    {% if post_list is defined%}
+      <p><strong>Bejelentve általam:</strong></p>
+      <ul class="list-group">
+      {% for row in post_list %} 
+        {% if row.title %}
+          <li class="list-group-item">
+            <a href="/single_submission/{{row.id}}">{{ row.title }}</a>
+          </li>
+        {% endif %} 
+      {% endfor %}
+      </ul>
+    {% endif%}
+    <br />
+    {% if owner_list is defined %}
+      <p><strong>Szervező vagyok:</strong></p>
+      <ul class="list-group">
+        {% for row in owner_list %} 
+          {% if row.title %}
+            <li class="list-group-item">
+              <a href="/single_submission/{{row.id}}">{{ row.title }}</a>
+            </li>
+          {% endif %} 
+        {% endfor %}
+      </ul>
+    {% endif%}
+  </form>
+  {% if role == 'coordinator' 
+     or role == 'admin' %}
+    <hr />
+    <a href="/download">
+      <button class="btn btn-info" name="">Összes bejelentés letöltése csv-ben</button>
+    </a>
+    <br />
+  {% endif %}
+  <hr />
+  <a href="/user_data_info" target="_blank">Adatkezelési szabályzat</a>
+  </div>
 </body>
 
 {% endblock %}

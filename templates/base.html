@@ -11,12 +11,12 @@
      _\  /_ 
     |  \/  |
   -->
-<title>Városfelújítós</title>
+  
 <html lang="hu">
+  <title>Városfelújítós</title>
   <meta charset="UTF-8" />
   <meta name="author" content="prof_of_duplo" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta property="og:image" content="/static/site_img/kezdo_kep.jpg" />
   <link rel="icon" type="image/x-icon" href="/static/logo/favicon.ico" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" 
                          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" 
@@ -51,22 +51,22 @@
         color: #81c000;
       }
 
-      /*
+/*
   .navbar-dark .navbar-nav .nav-link:hover{
    color:#fff;
    animation: glow 1s ease-in-out infinite alternate;   
   }
   
 
-@-webkit-keyframes glow {
-  from {
-    text-shadow: 0 0 1px #fff, 0 0 1px #fff, 0 0 1px #fff, 0 0 1px #fff, 0 0 1px #fff, 0 0 1px #fff, 0 0 1px #fff;
-  }
+  @-webkit-keyframes glow {
+    from {
+      text-shadow: 0 0 1px #fff, 0 0 1px #fff, 0 0 1px #fff, 0 0 1px #fff, 0 0 1px #fff, 0 0 1px #fff, 0 0 1px #fff;
+    }
   
-  to {
-    text-shadow: 0 0 2px #fff, 0 0 3px #fff, 0 0 4px #fff, 0 0 5px #fff, 0 0 5px #fff, 0 0 5px #fff, 0 0 5px #fff;
-  }
-}  
+    to {
+      text-shadow: 0 0 2px #fff, 0 0 3px #fff, 0 0 4px #fff, 0 0 5px #fff, 0 0 5px #fff, 0 0 5px #fff, 0 0 5px #fff;
+    }
+  }  
 */
     </style>
   </head>
@@ -74,8 +74,17 @@
 
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
-      <a class="navbar-brand" href="/" class="pull-left"><img src= {{url_for('static',filename='logo/rum_logo.png')}} alt="logo"></a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <a class="navbar-brand pull-left" href="/">
+        <img src={{url_for('static',filename='logo/rum_logo.png')}} 
+             alt="logo">
+      </a>
+      <button class="navbar-toggler" 
+              type="button" 
+              data-toggle="collapse" 
+              data-target="#navbarSupportedContent" 
+              aria-controls="navbarSupportedContent" 
+              aria-expanded="false" 
+              aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
 
@@ -115,7 +124,11 @@
         </ul>
         <ul class="navbar-nav ml-auto">
           <li class="nav-item">
-            <a class="nav-link btn btn-dark submission_button" style="color: white;" href="/submission"><b>PROBLÉMA BEJELENTÉSE</b></a>
+            <a class="nav-link btn btn-dark submission_button" 
+               style="color: white;" 
+               href="/submission">
+              <b>PROBLÉMA BEJELENTÉSE</b>
+            </a>
           </li>
         </ul>
       </div>
@@ -123,15 +136,20 @@
   </nav>
 
   {% with messages = get_flashed_messages(with_categories=true) %}
-  <!-- Categories: success (green), info (blue), warning (yellow), danger (red) -->
-  {% if messages %} {% for category, message in messages %}
-  <div class="alert alert-{{ category }} alert-dismissible" role="alert">
-    <button type="button" class="close" data-dismiss="alert" aria- label="Close"><span aria-hidden="true">&times;</span></button>
-    <!-- <strong>Title</strong> -->
-    {{ message }}
-  </div>
-  {% endfor %} 
-  {% endif %}
+
+    {% if messages %} 
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible" 
+             role="alert">
+          <button type="button" 
+                  class="close" 
+                  data-dismiss="alert" 
+                  aria-label="Close"><span aria-hidden="true">&times;</span>
+          </button>
+          {{ message }}
+        </div>
+      {% endfor %} 
+    {% endif %}
   {% endwith %}
 
   <div id="content">
@@ -139,6 +157,7 @@
     {% endblock %}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" 
             integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" 
-            crossorigin="anonymous"></script>              
+            crossorigin="anonymous">
+    </script>           
   </div>
 </html>

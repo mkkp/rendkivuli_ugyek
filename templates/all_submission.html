@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 
-{% extends "base.html" %} {% block content %}
+<meta property="og:image" content="/static/site_img/bejelentesek_post_thumbnail.jpg" />
+
+{% extends "base.html" %} 
+{% block content %}
 
 <head>
-  <meta property="og:image" content="/static/site_img/kezdo_kep.jpg" />
 
   <style>
     /* unvisited link */
@@ -190,7 +192,8 @@
     <div class="row">
       {% for row in featured %}
       <div class="col-sm-6">
-        <a href="/single_submission/{{ row.id }}" rel="noopener noreferrer">
+        <a href="/single_submission/{{ row.id }}" 
+           rel="noopener noreferrer">
           <div class="card">
             {% set status = row.status %} {% if status == 'Bejelentve' %}
             <div
@@ -264,7 +267,9 @@
               alt="{{ row.title }}"
             />
             <div class="card_container">
-              <h6><b>{{ row.title | upper}}</b></h6>
+              <h6>
+                <b>{{ row.title | upper}}</b>
+              </h6>
               <i>{{ row.city | upper}}</i>
               <hr class="card_hr" />
               {% if row.description %} {% set desc_1 =
@@ -281,7 +286,6 @@
 
       {% endfor %}
     </div>
-
     {% endif %}
 
     <div class="row">
@@ -378,7 +382,8 @@
       </div>
       <!--col-sm-3-->
 
-      {% endif %} {% endfor %}
+      {% endif %} 
+    {% endfor %}
     </div>
     <!-- row -->
     <hr />
@@ -431,6 +436,7 @@
       }
     });
   </script>
+  
 </body>
 
 {% endblock %}

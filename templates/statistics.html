@@ -3,37 +3,33 @@
 {% block content %}
 
 <html>
-    <head></head>
-    <body>
+  <body>
     <div class="container">
-        <br>
-	<h3><b><i>STATISZTIKÁK</i></b></h3>
-	<hr>
-	<div>
-	<h3>Bejelentések száma státusz szerint</h3>
-        <canvas id="status_chart"></canvas>
-        <hr>
-        <br>
-        <h3>Bejelentések megoszlása megye szerint</h3>
-        <canvas id="city_chart"></canvas>
-        </div>
-        <hr>
-        <h3>További hasznos statisztikák</h3>
-	<p><strong>Kényelmetlen fehérneműk száma a Parlamentben: </strong>199</p>
-	<p><strong>Összes statisztika az oldalon: </strong>11.5</p>
-	<p><strong>Főispánok száma Magyarországon: </strong>19</p>
-	<p><strong>Összes bejelentés a honlapon: </strong>{{post_count}}</p>
-	<p><strong>Összes bolygó száma a Naprendszerben: </strong>8</p>
-	<p><strong>Összes regisztrált felhasználó: </strong>{{user_count}}</p>	
-	<p><strong>Magyarországon található települések száma:</strong> 3155</p>
-	<p><strong>Ételautomaták által évente megölt emberek száma átlagosan a világon: </strong>10</p>        
-        <hr>
-        <br>
-    </div>
-    
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
-    <script>
+      <br />
+      <h3><b><i>STATISZTIKÁK</i></b></h3>
+      <hr />
+      <h3>Bejelentések száma státusz szerint</h3>
+      <canvas id="status_chart"></canvas>
+      <hr />
+      <br />
+      <h3>Bejelentések megoszlása megye szerint</h3>
+      <canvas id="city_chart"></canvas>
+      <hr />
+      <h3>További hasznos statisztikák</h3>
+      <p><strong>Kényelmetlen fehérneműk száma a Parlamentben: </strong>199</p>
+      <p><strong>Összes statisztika az oldalon: </strong>11.5</p>
+      <p><strong>Főispánok száma Magyarországon: </strong>19</p>
+      <p><strong>Összes bejelentés a honlapon: </strong>{{post_count}}</p>
+      <p><strong>Összes bolygó száma a Naprendszerben: </strong>8</p>
+      <p><strong>Összes regisztrált felhasználó: </strong>{{user_count}}</p>	
+      <p><strong>Magyarországon található települések száma:</strong> 3155</p>
+      <p><strong>Ételautomaták által évente megölt emberek száma átlagosan a világon: </strong>10</p>        
+      <hr />
+      <br />
+    </div>  
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <script>
     //városok szerinti bontás
     county_count = {{ county_count_dict | safe}}
     
@@ -118,7 +114,10 @@
     var myChart = new Chart(
     document.getElementById('status_chart'),
     config); 
-</script>
-    </body>
+  </script>
+  
+  </body>
+  
 </html>
+
 {% endblock %}

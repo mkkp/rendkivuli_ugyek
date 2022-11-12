@@ -6,7 +6,7 @@
 <body>
   <style>
     .submission_solution {
-      display: none; //block
+      display: none;
       overflow: hidden;
     }
   </style>
@@ -16,15 +16,20 @@
     <h1>Ügy adatainak módosítása</h1>
     <hr />
 
-    {% if current_user.email == submission.owner_email or role == 'coordinator' or role == 'admin' %}
+    {% if current_user.email == submission.owner_email 
+       or role == 'coordinator' 
+       or role == 'admin' 
+    %}
 
     <form action="" method="post">
-      <input hidden type="text," value="{{current_user.user_name}}" name="current_user" />
+      <input hidden type="text," 
+             value="{{current_user.user_name}}" 
+             name="current_user"
+      />
 
       <!--STÁTUSZ MÓDOSÍTÁSA-->
       <label for="status"><strong>Státusz:</strong></label>
       <select class="form-select form-control rounded-0" 
-              aria-label="Select status" 
               name="status" 
               onchange="detectChange(this)">
         <option selected>{{ submission.status }}</option>
@@ -40,16 +45,16 @@
       <hr />
 
       <!--ÜGY BEFEJEZVE SZÖVEG-->
-      <div class="submission_solution" id="solution_div">
+      <div class="submission_solution" 
+           id="solution_div">         
         <label><strong>Megoldás</strong></label>
         <input hidden type="text," 
                value="{{current_user.user_name}}" 
                name="current_user" />
         <textarea class="form-control rounded-0" 
-                  id="solution" 
+                  id="solution"
                   rows="3" 
-                  name="closing_solution">
-        </textarea>
+                  name="closing_solution"></textarea>
         <br />
         <hr />
       </div>

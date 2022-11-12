@@ -35,9 +35,7 @@ lml==0.1.0
 mailjet-rest==1.3.4
 Mako==1.2.3
 MarkupSafe==2.1.1
-numpy==1.23.2
 openpyxl==3.0.10
-pandas==1.5.0
 Pillow==9.2.0
 pycparser==2.21
 pyexcel==0.7.0
@@ -53,4 +51,3 @@ texttable==1.6.4
 urllib3==1.26.11
 visitor==0.1.3
 Werkzeug==2.2.2
-WTForms==3.0.1
