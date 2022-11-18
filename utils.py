@@ -4,7 +4,9 @@ General utility functions for MKKP városfelújítós
 import os
 import re
 import uuid
+import requests
 
+from dotenv import load_dotenv
 from datetime import datetime as dt
 from pathlib import Path
 from random import randint
@@ -13,14 +15,18 @@ from PIL import Image
 from PIL import ImageOps
 from PIL import UnidentifiedImageError
 
-from config import THUMBNAIL_SIZE
-from config import FULL_SIZE
-
 from models import db
 from models import SubmissionModel
 from models import ImageBeforeModel
 from models import ImageAfterModel
 
+if load_dotenv():
+    print("loading env...")
+else:
+    print("---env was not found---")
+    
+THUMBNAIL_SIZE = (1000,1000)
+FULL_SIZE = (1200,2400)
 
 def valid_email(email: str) -> bool:
     """
@@ -73,10 +79,7 @@ def save_picture(pictures, upload_folder, tag, submission_id):
         upload_path = os.path.join(picture_dir, new_filename)
 
         # SAVE ORIGINAL
-        try:
-            picture = Image.open(picture)
-        except UnidentifiedImageError:
-            return "not allowed extension"
+        picture = Image.open(picture)
         fixed_image = ImageOps.exif_transpose(picture)
         fixed_image.save(upload_path)
 

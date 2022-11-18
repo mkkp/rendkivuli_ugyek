@@ -9,15 +9,19 @@ MKKP városfelújítós alkalmazás
 import os
 import shutil
 from random import randint
+import pathlib
 
 # THIRD PARTY MODULES
-# Mailjet mail provider
-from mailjet_rest import Client
+from dotenv import load_dotenv
+import flask_excel as excel
+import boto3
+from botocore.exceptions import ClientError
+
 from geojson import Feature
 from geojson import Point
 from geojson import FeatureCollection
 from geojson import dumps as gj_dump
-import flask_excel as excel
+#import requests
 
 # Flask
 from flask import Flask
@@ -59,36 +63,51 @@ from utils import save_picture
 from utils import get_random_name
 
 # MAIL TEMPLATES
-from mail_template import create_submission_mail
-from mail_template import create_status_change_mail
-from mail_template import create_solution_mail
-from mail_template import create_organiser_mail
+
+from mail_template import create_submission_mail_SES
+from mail_template import create_status_change_mail_SES
+from mail_template import create_solution_mail_SES
+from mail_template import create_organiser_mail_SES
 
 # -------------------------------
 # ---------C O N F I G-----------
 # -------------------------------
 
+if load_dotenv():
+    print("loading env...")
+else:
+    print("---env was not found---")
+
+#APP
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static/upload')
+
+DEBUG_MODE = os.environ['DEBUG_MODE']
+PORT = os.environ['PORT']
+APP_SECRET_KEY = os.environ['APP_SECRET_KEY']
+ROWS_PER_PAGE = int(os.environ['ROWS_PER_PAGE'])
+
 ##MAP
-from config import MAP_KEY
-from config import INIT_LAT
-from config import INIT_LNG
+MAP_KEY = os.environ['MAP_KEY']
+INIT_LAT = os.environ['INIT_LAT']
+INIT_LNG = os.environ['INIT_LNG']
 
-##MAIL
-from config import M_KEY
-from config import M_SECRET
-from config import FROM_MAIL
+#AWS
+SENDER = os.environ['SENDER']
+CHARSET = os.environ['CHARSET']
+AWS_REGION = os.environ['AWS_REGION']
+AWS_ACC_ID = os.environ['AWS_ACC_ID']
+AWS_SECRET = os.environ['AWS_SECRET']
 
-##MISC
-from config import DB_NAME
-from config import BASE_DIR
-from config import UPLOAD_FOLDER
-from config import APP_SECRET_KEY
-from config import ROWS_PER_PAGE
+##DB
+DB_NAME = os.environ['DB_NAME']
+DB_PATH = os.path.join(BASE_DIR, "db", DB_NAME)
+print(DB_PATH)
 
 # AUTH0
-from config import AUTH0_CLIENT_ID
-from config import AUTH0_CLIENT_SECRET
-from config import AUTH0_DOMAIN
+AUTH0_CLIENT_ID = os.environ['AUTH0_CLIENT_ID']
+AUTH0_CLIENT_SECRET = os.environ['AUTH0_CLIENT_SECRET']
+AUTH0_DOMAIN = os.environ['AUTH0_DOMAIN']
 
 ##APP
 app = Flask(__name__)
@@ -111,9 +130,9 @@ oauth.register(
 db.init_app(app)
 
 # APP CONFIG
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(BASE_DIR, DB_NAME)
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.secret_key = APP_SECRET_KEY
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + DB_PATH
 
 # CORS
 # https://flask-cors.readthedocs.io/en/latest/
@@ -128,8 +147,12 @@ paranoid.redirect_view = "/"
 login.init_app(app)
 login.login_view = "login"
 
-# MAIL
-mailjet = Client(auth=(M_KEY, M_SECRET), version="v3.1")
+# AWS SES
+client = boto3.client('ses',
+                       region_name=AWS_REGION,
+                       aws_access_key_id=AWS_ACC_ID,
+                       aws_secret_access_key=AWS_SECRET
+                       )
 
 
 # -------------------------------
@@ -176,6 +199,16 @@ def add_submission():
             return render_template(
                 "submission.html", ACCESS_KEY=MAP_KEY, lat=INIT_LAT, lng=INIT_LNG
             )
+            
+        #validate images for extension
+        allowed_extensions = ["jpg","jpeg","png"]
+        for picture in request.files.getlist("files"):
+            extension = picture.filename.split(".")[1]
+            if extension.lower() not in allowed_extensions:
+                flash("Nem megengedett file kiterjesztés (csak jpg,jpeg és png lehet)","danger")
+                return render_template(
+                "submission.html", ACCESS_KEY=MAP_KEY, lat=INIT_LAT, lng=INIT_LNG
+            )
 
         submission = SubmissionModel(
             title=request.form["title"],
@@ -207,9 +240,6 @@ def add_submission():
         if additional_pictures[0].filename != "":
             pictures = pictures + additional_pictures
 
-        for p in pictures:
-            print(type(p))
-
         tag = "before"
 
         result = save_picture(
@@ -220,13 +250,27 @@ def add_submission():
         )
 
         if result == "not allowed extension":
+            print("nem megengedett")
+            #submission.delete()
+            #db.session.commit()
             flash("Nem megengedett file kiterjesztés.", "danger")
             return render_template(
                 "submission.html", ACCESS_KEY=MAP_KEY, lat=INIT_LAT, lng=INIT_LNG
             )
-        to_mail = request.form["email"]
-        submission_mail = create_submission_mail(submission, FROM_MAIL, to_mail)
-        mailjet.send.create(data=submission_mail)
+           
+        #SEND EMAIL 
+        SUBJECT = "Sikeres városmódosító bejelentés!"
+        BODY_HTML = create_submission_mail_SES(submission)
+        RECIPIENT = request.form["email"]
+
+        response = client.send_email(
+        Destination={'ToAddresses': [RECIPIENT]},
+        Message={'Subject': {'Charset': CHARSET, 'Data': SUBJECT},
+        'Body': {'Html': {'Charset': CHARSET, 'Data': BODY_HTML}}},
+        Source=SENDER
+        )
+        
+        
         flash("Sikeres bejelentés! Küldtünk egy levelet is!", "success")
         return redirect(f"/single_submission/{submission.id}")
 
@@ -296,18 +340,29 @@ def change_submission_data(submission_id):
             db.session.commit()
 
         if request.form["status"] != submission.status:
+
             new_status = request.form["status"]
-            print(new_status)
             changed_by = request.form["current_user"]
 
             submission.status = new_status
             submission.status_changed_date = get_date()
             submission.status_changed_by = changed_by
             db.session.commit()
-
+            
+            #MAIL TO SZERVEZŐ
             if submission.owner_email != "":
-                status_change_mail = create_status_change_mail(submission, FROM_MAIL)
-                mailjet.send.create(data=status_change_mail)
+            
+                SUBJECT = f"Státusz változás: {submission.title}"
+                BODY_HTML = create_status_change_mail_SES(submission)
+                RECIPIENT = submission.owner_email
+
+                client.send_email(
+                Destination={'ToAddresses': [RECIPIENT]},
+                Message={'Subject': {'Charset': CHARSET, 'Data': SUBJECT},
+                'Body': {'Html': {'Charset': CHARSET, 'Data': BODY_HTML}}},
+                Source=SENDER
+                )
+                
                 flash(
                     f"Sikeresen módosítottad az ügy státuszát erre: {new_status}. A szervezőnek ment levél.",
                     "success",
@@ -320,8 +375,17 @@ def change_submission_data(submission_id):
                 )
 
             if new_status == "Befejezve":
-                solution_mail_to_submitter = create_solution_mail(submission, FROM_MAIL)
-                mailjet.send.create(data=solution_mail_to_submitter)
+
+                SUBJECT = f"RÜM befejezett ügy: {submission.title}"
+                BODY_HTML = create_solution_mail_SES(submission)
+                RECIPIENT = submission.submitter_email
+
+                client.send_email(
+                Destination={'ToAddresses': [RECIPIENT]},
+                Message={'Subject': {'Charset': CHARSET, 'Data': SUBJECT},
+                'Body': {'Html': {'Charset': CHARSET, 'Data': BODY_HTML}}},
+                Source=SENDER
+                )
 
         if request.form["closing_solution"].strip() != "":
             closing_solution = request.form["closing_solution"]
@@ -420,8 +484,16 @@ def single_submission(id):
             submission.status_changed_by = changed_by
             db.session.commit()
             # send mail
-            solution_mail_to_submitter = create_solution_mail(submission, FROM_MAIL)
-            mailjet.send.create(data=solution_mail_to_submitter)
+            SUBJECT = f"RÜM befejezett ügy: {submission.title}"
+            BODY_HTML = create_solution_mail_SES(submission)
+            RECIPIENT = submission.submitter_email
+
+            client.send_email(
+            Destination={'ToAddresses': [RECIPIENT]},
+            Message={'Subject': {'Charset': CHARSET, 'Data': SUBJECT},
+            'Body': {'Html': {'Charset': CHARSET, 'Data': BODY_HTML}}},
+            Source=SENDER
+            )
 
     submission = SubmissionModel.query.filter_by(id=submission_id)
     before_img_list = ImageBeforeModel.query.filter_by(parent_id=submission_id)
@@ -515,10 +587,18 @@ def assign(id):
         submission.status = "Folyamatban"
         db.session.commit()
 
-        to_mail = request.form["email"]
-        organiser_mail = create_organiser_mail(submission, FROM_MAIL, to_mail)
-        mailjet.send.create(data=organiser_mail)
+        #send mail
+        SUBJECT = f"RÜM szervező lettél!"
+        BODY_HTML = create_organiser_mail_SES(submission)
+        RECIPIENT = request.form["email"]
 
+        client.send_email(
+        Destination={'ToAddresses': [RECIPIENT]},
+        Message={'Subject': {'Charset': CHARSET, 'Data': SUBJECT},
+        'Body': {'Html': {'Charset': CHARSET, 'Data': BODY_HTML}}},
+        Source=SENDER
+        )        
+        
         flash("Szervező sikeresen hozzáadva!", "success")
         return redirect(f"/single_submission/{id}")
 
@@ -610,7 +690,6 @@ def statistics():
             county=i.county
         ).count()
     county_dump = gj_dump(county_count_dict, sort_keys=True)
-    print(county_dump)
 
     return render_template(
         "statistics.html",
@@ -913,6 +992,21 @@ def logout():
     return redirect("/")
 
 
+# EASTER EGG
+@app.route("/kutyi", methods=["GET"])
+def easter_egg():
+    "#"
+    try:
+        import requests
+        response = requests.get("https://dog.ceo/api/breeds/image/random")
+        resp_json = response.json()
+        kutyi_pic = resp_json["message"]
+        return render_template("easter_egg.html",
+                                kutyi_pic=kutyi_pic)        
+    except Exception as e:
+        pass
+        
+        
 # ADATVÉDELMI TÁJÉKOZTATÓ
 @app.route("/user_data_info", methods=["GET"])
 def user_data_info():
@@ -933,21 +1027,8 @@ def page_not_found():
     "#"
     return render_template("404.html")
     
-# EASTER EGG
-@app.route("/kutyi", methods=["GET"])
-def easter_egg():
-    "#"
-    try:
-        import requests
-        response = requests.get("https://dog.ceo/api/breeds/image/random")
-        resp_json = response.json()
-        kutyi_pic = resp_json["message"]
-        return render_template("easter_egg.html",
-                                kutyi_pic=kutyi_pic)        
-    except Exception as e:
-        pass
 
 # APP RUN
 if __name__ == "__main__":
-    app.run(host="localhost", port=5000, debug=True)
+    app.run(host="localhost", port=PORT, debug=DEBUG_MODE)
 

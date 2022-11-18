@@ -2,6 +2,7 @@ app.db
 config.py
 static/upload
 archive
+db
 migrations
 
 # Byte-compiled / optimized / DLL files
