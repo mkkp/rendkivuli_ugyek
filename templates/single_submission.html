@@ -28,10 +28,7 @@
     <meta property="og:description" content="{{ submission[0].description }}" />
   {% endif %}
   <meta property="og:type" content="article" />
-  <meta
-    property="og:url"
-    content="https://rendkivuliugyek.site/single_submission/{{  submission[0].id  }}"
-  />
+  <meta property="og:url" content="https://rendkivuliugyek.site/single_submission/{{  submission[0].id  }}"/>
   <meta property="og:image" content="{{ img_url }}" />
   <meta property="og:locale" content="hu_HU" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -219,8 +216,8 @@
       or role == 'coordinator' 
       or role == 'admin'
    %}
-     {% if before_img_list.count() >= 1 
-        or after_img_list.count() >= 1
+     {% if before_img_list.count() > 1 
+        or after_img_list.count() > 1
      %}
        <br />
        <button type="submit" 

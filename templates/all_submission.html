@@ -405,7 +405,9 @@
         href="{{ url_for('all_submission', page=page_num) }}"
         class="btn btn-dark"
       >
-        {{ page_num }}
+        <span style="color:yellow">
+          {{ page_num }}
+        </span>
       </a>
       {% else %}
       <a
@@ -422,6 +424,7 @@
         &raquo;
       </a>
     </div>
+    <br />
   </div>
 
   <script>

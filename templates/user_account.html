@@ -29,7 +29,7 @@
            value="{{current_user.id}}" 
     />
     <button class="btn btn-info" name="own_submissions">Ügyeim listája</button>
-    <br />
+    
     {% if post_list is defined%}
       <p><strong>Bejelentve általam:</strong></p>
       <ul class="list-group">
@@ -63,9 +63,20 @@
       <button class="btn btn-info" name="">Összes bejelentés letöltése csv-ben</button>
     </a>
     <br />
+    <hr />
   {% endif %}
-  <hr />
-  <a href="/user_data_info" target="_blank">Adatkezelési szabályzat</a>
+  {% if role == 'coordinator' 
+     or role == 'admin' %}
+    <a href="https://drive.google.com/drive/folders/1UOZ2Hhkbx_BJcnWon-641U0I1h00DL2j" target="_blank">
+      <p>Dokumentáció és egyéb anyagok</p>
+    </a>     
+    <a href="https://github.com/xngst/rendkivuli_ugyek"  target="_blank">
+      <p>Github oldal</p>
+    </a>
+  {% endif %}  
+  <a href="/user_data_info" target="_blank">
+    <p>Adatkezelési szabályzat</p>
+  </a>
   </div>
 </body>
 

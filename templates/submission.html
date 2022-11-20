@@ -31,7 +31,6 @@
   <div class="container">
   <br />
   <h2><b><i>PROBLÉMA BEJELENTÉSE</i></b></h2>
-  <p>[folyamat ismertetése szöveg vagy piktogram]</p>
   <hr />
   <form action="" method="post" enctype="multipart/form-data" id="form" class="needs-validation" novalidate>
   <div class="form-group">
@@ -89,12 +88,14 @@
     </div>
     <br />
     <div class="form-group">
+    
     <strong><label for="files" style=>Képek feltöltése <label style="color:red">*</label></label></strong>
     <small>maximum 50 megabyte</small>
+    
     <input type="file" 
            id="files" 
            name="files" 
-           class="btn btn-secondary form-control rounded-0 border border-dark" 
+           class="btn btn-secondary form-control rounded-0 border border-light" 
            multiple="true" 
            required
            accept="image/x-png, image/jpeg"
@@ -202,6 +203,7 @@
 <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
 <script id="search-js" defer src="https://api.mapbox.com/search-js/v1.0.0-beta.13/web.js"></script>
 <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.js'></script>
+
 
 <script>
 function show_additional_file_input(){

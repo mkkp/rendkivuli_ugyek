@@ -12,16 +12,18 @@ from random import randint
 import pathlib
 
 # THIRD PARTY MODULES
-from dotenv import load_dotenv
-import flask_excel as excel
-import boto3
+import boto3 #AWS 
 from botocore.exceptions import ClientError
 
+from dotenv import load_dotenv
+import flask_excel as excel
+import flask_monitoringdashboard as dashboard
+
+# Geojson
 from geojson import Feature
 from geojson import Point
 from geojson import FeatureCollection
 from geojson import dumps as gj_dump
-#import requests
 
 # Flask
 from flask import Flask
@@ -102,7 +104,6 @@ AWS_SECRET = os.environ['AWS_SECRET']
 ##DB
 DB_NAME = os.environ['DB_NAME']
 DB_PATH = os.path.join(BASE_DIR, "db", DB_NAME)
-print(DB_PATH)
 
 # AUTH0
 AUTH0_CLIENT_ID = os.environ['AUTH0_CLIENT_ID']
@@ -133,6 +134,9 @@ db.init_app(app)
 app.secret_key = APP_SECRET_KEY
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + DB_PATH
+
+#DASHBOARD
+dashboard.bind(app)
 
 # CORS
 # https://flask-cors.readthedocs.io/en/latest/
@@ -249,15 +253,6 @@ def add_submission():
             submission_id=str(submission.id),
         )
 
-        if result == "not allowed extension":
-            print("nem megengedett")
-            #submission.delete()
-            #db.session.commit()
-            flash("Nem megengedett file kiterjesztés.", "danger")
-            return render_template(
-                "submission.html", ACCESS_KEY=MAP_KEY, lat=INIT_LAT, lng=INIT_LNG
-            )
-           
         #SEND EMAIL 
         SUBJECT = "Sikeres városmódosító bejelentés!"
         BODY_HTML = create_submission_mail_SES(submission)

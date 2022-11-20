@@ -1,9 +1,11 @@
-app.db
-config.py
-static/upload
 archive
+config.py
 db
+db/app.db
 migrations
+static/upload
+.env
+flask_monitoringdashboard.db
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
