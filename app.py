@@ -78,7 +78,7 @@ from mail_template import create_organiser_mail_SES
 if load_dotenv():
     print("loading env...")
 else:
-    print("---env was not found---")
+    print("---internal .env was not found---")
 
 #APP
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))

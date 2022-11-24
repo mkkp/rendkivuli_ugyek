@@ -15,7 +15,6 @@ from flask_sqlalchemy import SQLAlchemy
 login = LoginManager()
 db = SQLAlchemy()
 
-
 @login.user_loader
 def load_user(id):
     "#"

@@ -23,7 +23,7 @@ from models import ImageAfterModel
 if load_dotenv():
     print("loading env...")
 else:
-    print("---env was not found---")
+    print("---internal .env was not found---")
     
 THUMBNAIL_SIZE = (1000,1000)
 FULL_SIZE = (1200,2400)
