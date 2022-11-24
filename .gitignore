@@ -1,9 +1,8 @@
 archive
 config.py
-db
 db/app.db
 migrations
-static/upload
+static/upload/
 .env
 flask_monitoringdashboard.db
 
