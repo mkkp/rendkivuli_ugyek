@@ -10,7 +10,7 @@ def create_submission_mail_SES(submission):
                  4000 mérnökünk és 3600 menyétünk elkezdett dolgozni rajta.<br>Hamarosan megoldjuk, vagy nem.
               </p>
               <p>Keresünk majd, amint kitaláltuk, hogy mit csináljunk a dologgal.<br>
-              Addig is itt tudod nyomonkövetni, hogyan állunk vele: https://rendkivuliugyek.site/single_submission/{submission.id}</p>
+              Addig is itt tudod nyomonkövetni, hogyan állunk vele: https://rendkivuliugyek.com/single_submission/{submission.id}</p>
               <p><b>Rendkívüli Ügyek Minisztériuma</b></p>                            
            """
  
@@ -21,7 +21,7 @@ def create_status_change_mail_SES(submission):
     return f"""<h3>Szia!</h3>
 	       <p>A {submission.title} ügy státusza megváltozott a következőre: {submission.status}</p>
 	       <p>Az ügy adatlapját itt találod:</p>
-	       <p>https://rendkivuliugyek.site/single_submission/{submission.id}</p>
+	       <p>https://rendkivuliugyek.com/single_submission/{submission.id}</p>
 	       <p><b>Rendkívüli Ügyek Minisztériuma</b></p>
 	    """
 
@@ -31,7 +31,7 @@ def create_solution_mail_SES(submission):
     """
     return f"""<h3>Szia!</h3>
                <p>Jó hír: sikerült megoldanunk a problémát, amit bejelentettél: {submission.title}</p>
-               <p>Itt tudod megnézni, hogy mire jutottunk: https://rendkivuliugyek.site/single_submission/{submission.id}</p>
+               <p>Itt tudod megnézni, hogy mire jutottunk: https://rendkivuliugyek.com/single_submission/{submission.id}</p>
                <p><b>Rendkívüli Ügyek Minisztériuma</b></p>
             """
 	
@@ -44,6 +44,6 @@ def create_organiser_mail_SES(submission):
                a Rendkívüli Ügyek Minisztériumának következő bejelentésénél:
                </h3>
                <p>{submission.title}</p>
-               <p>https://rendkivuliugyek.site/single_submission/{submission.id}</p>
+               <p>https://rendkivuliugyek.com/single_submission/{submission.id}</p>
                <p><b>Rendkívüli Ügyek Minisztériuma</b></p>
            """

@@ -12,13 +12,16 @@ COPY . .
 
 # install app dependencies
 RUN apt-get update && apt-get install -y \
+    git \
     python3 \
     sqlite3 \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/*    
 
 RUN python3 -m pip install --upgrade pip
-   
 RUN pip install -r requirements.txt
+
+# Clone from GIT
+RUN git clone https://github.com/xngst/rendkivuli_ugyek.git .
 
 VOLUME /usr/src/app/db/app.db
 VOLUME /usr/src/app/static/upload

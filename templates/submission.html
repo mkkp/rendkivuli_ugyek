@@ -52,16 +52,18 @@
     <strong><label for="tipus">Típus <label style="color:red">*</label></label></strong>
     <select class="form-select form-control rounded-0" aria-label="Select Problem Type" name="type" required>
       <option value="" selected>Válassz a típusok közül!</option>
-      <option value="Szemét">Szemét</option>
-      <option value="Közmű">Közmű</option>
       <option value="Út és Járda">Út és Járda</option>
       <option value="Akadálymentesítés">Akadálymentesítés</option>
+      <option value="Közlekedés">Közlekedés</option>
+      <option value="Tájékoztatás">Tájékoztatás</option>
+      <option value="Utcabútor">Utcabútor</option>
+      <option value="Szemét">Szemét</option>
+      <option value="Közmű">Közmű</option>
       <option value="Növény">Növény</option>
       <option value="Állat">Állat</option>
       <option value="Épület">Épület</option>
-      <option value="Közlekedés">Közlekedés</option>
-      <option value="Tájékoztatás">Tájékoztatás</option>
       <option value="Műemlék">Műemlék</option>
+      <option value="Egyéb">Egyéb</option>
     </select>
     <div class="valid-feedback">
     </div>
@@ -172,8 +174,7 @@
      <input hidden type="text" id="county" name="county" value="nem meghatározott"></p>
      <button type="button" 
              class="btn btn-light form-control rounded-0 border border-dark" 
-             onclick="complete_address()">Cím ellenőrzése
-     </button>
+             onclick="complete_address()">Cím ellenőrzése</button>
      <div class="invalid-feedback">Sajnos pontosan meg kell mondanod, hogy hol van mi, merre, miként.
      </div>
    </div>
