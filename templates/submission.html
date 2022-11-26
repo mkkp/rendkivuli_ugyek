@@ -101,8 +101,7 @@
            multiple="true" 
            required
            accept="image/x-png, image/jpeg"
-           onchange="show_additional_file_input()"
-   />
+           onchange="show_additional_file_input()">
    <div class="invalid-feedback">Ellopták a képfájlt. Próbáld újra!</div>
    </div>
    <div class="hidden_file_upload" 
@@ -113,8 +112,7 @@
             name="additional_files" 
             class="btn btn-secondary form-control rounded-0 border border-dark" 
             multiple="true"
-            accept="image/x-png, image/jpeg"
-     />
+            accept="image/x-png, image/jpeg">
    </div>
    <br />
    <div class="form-group">
@@ -128,8 +126,7 @@
             {% if current_user.is_authenticated %}
               value={{current_user.email}}
             {% endif %}
-            required
-     />
+            required>
      <div class="invalid-feedback">A PIN-kódod jól jönne, de inkább írd be ide a mailed.
      </div>
    </div>
@@ -141,16 +138,14 @@
             class="form-control" 
             id="phone" 
             autocomplete="off" 
-            name="phone"
-     />
+            name="phone">
    </div>            
    <div class="form-check">
      <input class="form-check-input" 
             type="checkbox" 
             id="accept_toc" 
             name="accept_toc" 
-            required
-     />
+            required>
      <a href="/user_data_info" 
         target="_blank">Adatkezelési szabályzat elfogadása <label style="color:red">*</label></a></label>
      <div class="invalid-feedback">Haladjunk, kérem, haladjunk.
@@ -166,8 +161,7 @@
             name="address" 
             placeholder="Klikk a térképre!"
             onkeyup="getLocation()"
-            required
-     />
+            required>
      <input hidden type="text" id="lng" name="lng" value=0></p> <!--Ide lehetne valami vicces default értéket adni, pl parlament-->
      <input hidden type="text" id="lat" name="lat" value=0></p> <!--Ide lehetne valami vicces default értéket adni, pl parlament-->
      <input hidden type="text" id="city" name="city" value="nem meghatározott"></p>
@@ -193,7 +187,7 @@
     
    <button type="submit" 
            class="btn btn-success form-control rounded-0 border border-dark" 
-           onclick="$('#loading').show();"><h3>Bejelent</h3>
+           onclick="validate(); $('#loading').show()"><h3>Bejelent</h3>
    </button>
    <hr />
  </form>
@@ -524,7 +518,7 @@ function show_additional_file_input(){
 
 <script>
 //FORM VALIDATION
-  function () {
+  function validate () {
     'use strict'
     // Fetch forms
     var forms = document.querySelectorAll('.needs-validation')
@@ -540,7 +534,7 @@ function show_additional_file_input(){
       form.classList.add('was-validated')
       }, false)
     })
-})
+}
 </script>
 
 </body>
