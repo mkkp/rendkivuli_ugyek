@@ -206,13 +206,19 @@ def add_submission():
             
         #validate images for extension
         allowed_extensions = ["jpg","jpeg","png"]
-        for picture in request.files.getlist("files"):
-            extension = picture.filename.split(".")[1]
-            if extension.lower() not in allowed_extensions:
-                flash("Nem megengedett file kiterjesztés (csak jpg,jpeg és png lehet)","danger")
-                return render_template(
-                "submission.html", ACCESS_KEY=MAP_KEY, lat=INIT_LAT, lng=INIT_LNG
-            )
+        files = request.files.getlist("files")
+        print("----")
+        print(dir(files))
+        print(len(files))
+        print("----")
+        if request.files.getlist("files"):
+            for picture in request.files.getlist("files"):
+                extension = picture.filename.split(".")[1]
+                if extension.lower() not in allowed_extensions:
+                    flash("Nem megengedett file kiterjesztés (csak jpg,jpeg és png lehet)","danger")
+                    return render_template(
+                    "submission.html", ACCESS_KEY=MAP_KEY, lat=INIT_LAT, lng=INIT_LNG
+                    )
 
         submission = SubmissionModel(
             title=request.form["title"],
@@ -546,6 +552,7 @@ def all_submission():
                 .order_by(SubmissionModel.created_date.desc())
                 .paginate(page=page, per_page=ROWS_PER_PAGE)
             )
+            
             return render_template("all_submission.html", post_list=filtered_list)
 
         # merge dicts
@@ -935,7 +942,7 @@ def register():
 def site_login():
     "#"
     return oauth.auth0.authorize_redirect(
-        redirect_uri=url_for("callback", _external=True)
+        redirect_uri=url_for("callback", _external=True, _scheme="https")
     )
 
 
