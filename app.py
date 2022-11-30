@@ -453,20 +453,6 @@ def single_submission(id):
             db.session.commit()
             flash(f"Komment szerkesztve", "success")
 
-        if "change_tumbnail" in request.form:
-            new_thumbnail = request.form["new_thumb"]
-            submission = SubmissionModel.query.filter_by(id=submission_id).first()
-            submission.cover_image_full = new_thumbnail
-            db.session.commit()
-            flash(
-                """A borítókép cserélési eljárás
-                   előkészítését elindítottuk.
-                   Ügyintézőnk egy héten belül jelentkezik.
-                   Kérjük, addig ne mozduljon a készüléke mellől!
-                 """,
-                "success",
-            )
-
         if "upload_before_images" in request.form:
             tag = "before"
             pictures = request.files.getlist("files")
