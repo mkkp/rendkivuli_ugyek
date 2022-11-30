@@ -456,14 +456,14 @@ def single_submission(id):
         if "change_tumbnail" in request.form:
             new_thumbnail = request.form["new_thumb"]
             submission = SubmissionModel.query.filter_by(id=submission_id).first()
-            submission.cover_image = new_thumbnail
+            submission.cover_image_full = new_thumbnail
             db.session.commit()
             flash(
                 """A borítókép cserélési eljárás
-                      előkészítését elindítottuk.
-                      Ügyintézőnk egy héten belül jelentkezik.
-                      Kérjük, addig ne mozduljon a készüléke mellől!
-                      """,
+                   előkészítését elindítottuk.
+                   Ügyintézőnk egy héten belül jelentkezik.
+                   Kérjük, addig ne mozduljon a készüléke mellől!
+                 """,
                 "success",
             )
 
@@ -471,6 +471,7 @@ def single_submission(id):
             tag = "before"
             pictures = request.files.getlist("files")
             save_picture(pictures, UPLOAD_FOLDER, tag, submission_id)
+            flash(f"Kép sikeresen hozzáadva!", "success")
 
         if "upload_after_images" in request.form:
             tag = "after"
@@ -627,26 +628,38 @@ def delete_picture(status_type, id):
     "#"
     if status_type == "before":
         picture = ImageBeforeModel.query.filter_by(id=id)
-        submission_id = picture.first().parent_id
-        picture_total = ImageBeforeModel.query.filter_by(
-            parent_id=submission_id
-        ).count()
-        if picture_total == 1:
-            flash(f"Egy képnek maradnia kell", "danger")
-            return redirect(f"/single_submission/{submission_id}")
-
     if status_type == "after":
         picture = ImageAfterModel.query.filter_by(id=id)
-        submission_id = picture.first().parent_id
-        picture_total = ImageAfterModel.query.filter_by(parent_id=submission_id).count()
-        if picture_total == 1:
-            flash(f"Egy képnek maradnia kell", "danger")
-            return redirect(f"/single_submission/{submission_id}")
 
     submission_id = picture.first().parent_id
     picture.delete()
     db.session.commit()
     flash("A képet sikeresen töröltük!", "success")
+    return redirect(f"/single_submission/{submission_id}")
+    
+ 
+# BORÍTÓKÉP MÓDOSÍTÁSA
+@app.route("/change_cover/<status_type>/<id>", methods=["GET"])
+@login_required
+def change_cover(status_type, id):
+    "#"
+    if status_type == "before":
+        picture = ImageBeforeModel.query.filter_by(id=id)
+    if status_type == "after":
+        picture = ImageAfterModel.query.filter_by(id=id)
+
+    submission_id = picture.first().parent_id
+    submission = SubmissionModel.query.filter_by(id=submission_id).first()
+    submission.cover_image = picture.first().thumb_file_name
+    submission.cover_image_full = picture.first().file_name
+    
+    db.session.commit()
+    
+    flash("""A borítókép cserélési eljárás
+             előkészítését elindítottuk.
+             Ügyintézőnk egy héten belül jelentkezik.
+             Kérjük, addig ne mozduljon a készüléke mellől!
+         ""","success")
     return redirect(f"/single_submission/{submission_id}")
 
 

@@ -171,12 +171,10 @@
                or role == 'admin'
              %}
               <figcaption>
-                <label for="thumbnail"> Borító képpé</label>
-                <input type="checkbox" 
-                       name="new_thumb" 
-                       value={{ img.thumb_file_name }}>
-                <label> Törlés: </label>
-                <a href="/delete_picture/before/{{img.id}}">🗑</a>
+                <label for="thumbnail">Borítóképpé</label>
+                  <a style="text-decoration: none;" href="/change_cover/before/{{img.id}}">🖼</a>
+                <label> Törlés </label>
+                <a style="text-decoration: none;" href="/delete_picture/before/{{img.id}}">🗑</a>
               </figcaption>
             {% endif %}
           </figure>
@@ -190,6 +188,7 @@
      <h4>Utána képek:</h4>
      <br /> 
      {% for img in after_img_list %}
+     {% if submission[0].cover_image != img.thumb_file_name%}
        <figure class="figure">
          <a href={{url_for( 'static',filename='upload/' + submission[0].id | string + "/" + img.file_name)}} data-lightbox='roadtrip'>
            <img height="200px" 
@@ -201,33 +200,17 @@
             or role == 'admin'
          %}
            <figcaption>
-             <label for="thumbnail"> Borító képpé</label>
-             <input type="checkbox" name="new_thumb" value={{img.thumb_file_name}}>
-             <label> Törlés: </label>
-             <a href="/delete_picture/before/{{img.id}}">🗑</a>
+           <label for="thumbnail">Borítóképpé</label>
+             <a style="text-decoration: none;" href="/change_cover/after/{{img.id}}">🖼</a>
+             <label>Törlés</label>
+             <a style="text-decoration: none;" href="/delete_picture/after/{{img.id}}">🗑</a>
            </figcaption>  
          {% endif %}
        </figure>
+       {% endif %}
      {% endfor %}
    {% endif %}
         
-   {% if current_user.email == submission[0].submitter_email
-      or current_user.email == submission[0].owner_email
-      or role == 'coordinator' 
-      or role == 'admin'
-   %}
-     {% if before_img_list.count() > 1 
-        or after_img_list.count() > 1
-     %}
-       <br />
-       <button type="submit" 
-               id="change_tumbnail" 
-               name="change_tumbnail" 
-               class="btn rounded-0">Borítókép módosítása</button> 
-       <br />
-       <br />
-     {% endif %}
-   {% endif %}
  </form>
      
  {% if comment_list[0] %}
