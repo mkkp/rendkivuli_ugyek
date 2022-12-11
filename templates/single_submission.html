@@ -4,7 +4,7 @@
 {% block content %}
 
 {% block head %}
-  {% set img_url = 'https://rendkivuliugyek.site/static/upload/' + submission[0].id | string + '/' + submission[0].cover_image_full %}
+  {% set img_url = 'https://rendkivuliugyek.com/static/upload/' + submission[0].id | string + '/' + submission[0].cover_image_full %}
 <head>
   <!--MAPBOX-->
   <link
@@ -28,7 +28,7 @@
     <meta property="og:description" content="{{ submission[0].description }}" />
   {% endif %}
   <meta property="og:type" content="article" />
-  <meta property="og:url" content="https://rendkivuliugyek.site/single_submission/{{  submission[0].id  }}"/>
+  <meta property="og:url" content="https://rendkivuliugyek.com/single_submission/{{  submission[0].id  }}"/>
   <meta property="og:image" content="{{ img_url }}" />
   <meta property="og:locale" content="hu_HU" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -104,7 +104,7 @@
   {% endif %}      
   <div id="fb-root"></div>
     <div class="fb-share-button" 
-         data-href="https://rendkivuliugyek.site/single_submission/{{  submission[0].id  }}" 
+         data-href="https://rendkivuliugyek.com/single_submission/{{  submission[0].id  }}" 
 	 data-layout="button_count">
     </div>
     <hr /> 
@@ -281,7 +281,7 @@
                  id="comment-submit" 
                  name="comment-submit" 
                  class="btn btn-primary rounded-0">
-                 Hozzáaszólás beküldése
+                 Hozzászólás beküldése
          </button>
        </form>
        <hr /> 

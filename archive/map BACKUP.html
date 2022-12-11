@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block content %}
+
+<head>
+ <link href='https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.css' rel='stylesheet' />
+ <link rel="stylesheet" href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.1/mapbox-gl.css" type="text/css" />
+</head>
+
+<body>
+<div class="container">
+  <br>
+  <h3><b><i>MINDEN ÜGY EGY TÉRKÉPEN</i></b></h3>
+  <hr>
+  <div id='map' style='width: auto; height: 50em;'></div>
+  <hr>
+  
+<script>
+
+//https://docs.mapbox.com/mapbox-gl-js/example/cluster/
+
+     mapboxgl.accessToken = '{{ACCESS_KEY}}';
+     var map = new mapboxgl.Map({
+       container: 'map',
+       center: [{{lat}}, {{lng}}],
+       zoom: 10,
+       language: 'auto',
+       style: 'mapbox://styles/mapbox/streets-v11' //'mapbox://styles/mapbox/navigation-night-v1'
+       }
+      );
+      
+      map.addControl(new mapboxgl.FullscreenControl());
+      map.addControl(new mapboxgl.NavigationControl());
+      
+      map.on('load', () => {
+      {% for submission in post_list %}
+        map.addSource('{{submission.id}}', {
+          'type': 'geojson',
+          'cluster': true,
+          'data': {
+          'type': 'FeatureCollection',
+          'features': [
+             {
+              'type': 'Feature',
+              'properties': {},
+              'geometry': {
+              'type': 'Point',
+
+              'coordinates': [{{ submission.lng }}, {{ submission.lat }}]
+              }
+             }
+            ]
+           }
+          }
+         );
+        	
+        var popup = new mapboxgl.Popup({ closeOnClick: false })
+          .setLngLat([{{ submission.lng }},{{ submission.lat }}])
+           .setHTML("<a href='/single_submission/{{ submission.id }}'" + 
+                   "target='blank' rel='noopener noreferrer'>" + 
+                   "<p>{{ submission.title }}</p>" +
+                   "</a>")
+            .addTo(map);
+        	
+        map.addLayer({
+        	'id': '{{submission.id}}',
+        	'type': 'circle',
+        	'source': '{{submission.id}}', //refers to first parameter of addSource
+        	'paint': {
+        	'circle-color': '#ff0000',
+        	'circle-radius': 5,
+        	'circle-stroke-width': 2,
+        	'circle-stroke-color': '#000000'
+        	}});
+      {% endfor %}
+         
+      })
+     
+</script>
+</div>
+</body>
+
+{% endblock %}

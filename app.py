@@ -264,13 +264,16 @@ def add_submission():
         BODY_HTML = create_submission_mail_SES(submission)
         RECIPIENT = request.form["email"]
 
-        response = client.send_email(
-        Destination={'ToAddresses': [RECIPIENT]},
-        Message={'Subject': {'Charset': CHARSET, 'Data': SUBJECT},
-        'Body': {'Html': {'Charset': CHARSET, 'Data': BODY_HTML}}},
-        Source=SENDER
-        )
-        
+	try:
+            response = client.send_email(
+            Destination={'ToAddresses': [RECIPIENT]},
+            Message={'Subject': {'Charset': CHARSET, 'Data': SUBJECT},
+            'Body': {'Html': {'Charset': CHARSET, 'Data': BODY_HTML}}},
+            Source=SENDER
+            )
+        except Exception as err:
+            print(err)
+            pass
         
         flash("Sikeres bejelentés! Küldtünk egy levelet is!", "success")
         return redirect(f"/single_submission/{submission.id}")
@@ -657,7 +660,7 @@ def delete_submission(id):
     submission = SubmissionModel.query.filter_by(id=id)
     submission.delete()
 
-    images_before = ImageBeforeModel.query.filter_by(parent_id=id)
+    images_before = ImageBeforeModel.query.	filter_by(parent_id=id)
     images_after = ImageAfterModel.query.filter_by(parent_id=id)
     comments = CommentModel.query.filter_by(parent_id=id)
 
