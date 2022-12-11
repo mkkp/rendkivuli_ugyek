@@ -1,6 +1,0 @@
-id,create,read,update,delete,active,role,created_date,email,inactive_date,last_login,phone,user_name,verified
-1,,,,,1,admin,2022-10-04,feher.aron@gmail.com,,2022-10-07,,"Eznemazénnevem",
-2,,,,,1,admin,2022-10-05,ketfarkukutya@gmail.com,,2022-10-07,,"Pocok Lipót 997",
-3,,,,,1,registered,2022-10-05,kovacs.david1101@gmail.com,,2022-10-05,,"Hugó Dugó 762",
-4,,,,,1,registered,2022-10-05,kovacs.gergely@mkkp.hu,,2022-10-05,,"Ásító Sárkány 150",
-5,,,,,1,registered,2022-10-06,irwincrocodyl@gmail.com,,2022-10-06,,"Béka Réka 800",
