@@ -38,7 +38,7 @@ from flask import url_for
 from flask_migrate import Migrate
 
 # Flask Login
-# from flask_login import current_user
+from flask_login import current_user
 from flask_login import login_required
 from flask_login import login_user
 from flask_login import logout_user
@@ -207,10 +207,6 @@ def add_submission():
         #validate images for extension
         allowed_extensions = ["jpg","jpeg","png"]
         files = request.files.getlist("files")
-        print("----")
-        print(dir(files))
-        print(len(files))
-        print("----")
         if request.files.getlist("files"):
             for picture in request.files.getlist("files"):
                 extension = picture.filename.split(".")[1]
@@ -264,7 +260,7 @@ def add_submission():
         BODY_HTML = create_submission_mail_SES(submission)
         RECIPIENT = request.form["email"]
 
-	try:
+        try:
             response = client.send_email(
             Destination={'ToAddresses': [RECIPIENT]},
             Message={'Subject': {'Charset': CHARSET, 'Data': SUBJECT},
@@ -272,7 +268,6 @@ def add_submission():
             Source=SENDER
             )
         except Exception as err:
-            print(err)
             pass
         
         flash("Sikeres bejelentés! Küldtünk egy levelet is!", "success")
@@ -378,7 +373,7 @@ def change_submission_data(submission_id):
                     "success",
                 )
 
-            if new_status == "Befejezve":
+            if new_status == "Megoldva":
 
                 SUBJECT = f"RÜM befejezett ügy: {submission.title}"
                 BODY_HTML = create_solution_mail_SES(submission)
@@ -470,7 +465,7 @@ def single_submission(id):
             # Ha kerül fel egy bejelentéshez utána kép, akkor szerintem átállhatna magától a bejelentés státusza befejezettre
             changed_by = request.form["current_user"]
             submission = SubmissionModel.query.filter_by(id=submission_id).first()
-            submission.status = "Befejezve"
+            submission.status = "Megoldva"
             submission.status_changed_date = get_date()
             submission.status_changed_by = changed_by
             db.session.commit()
@@ -602,6 +597,7 @@ def assign(id):
 @login_required
 def delete_comment(id):
     "#"
+    
     comment = CommentModel.query.filter_by(id=id)
     submission_id = comment.first().parent_id
     comment.delete()
@@ -657,6 +653,11 @@ def change_cover(status_type, id):
 @login_required
 def delete_submission(id):
     "#"
+    
+    if not current_user.role == "admin" or not current_user.role == "coordinator":
+        flash("Bejelentést csak admin vagy kordinátor törölhet!", "danger")
+        return render_template("index.html")
+    
     submission = SubmissionModel.query.filter_by(id=id)
     submission.delete()
 
@@ -685,7 +686,8 @@ def statistics():
     submitted_count = SubmissionModel.query.filter_by(status="Bejelentve").count()
     wip_count = SubmissionModel.query.filter_by(status="Folyamatban").count()
     progress_count = SubmissionModel.query.filter_by(status="Készül").count()
-    completed_count = SubmissionModel.query.filter_by(status="Befejezve").count()
+    completed_count = SubmissionModel.query.filter_by(status="Megoldva").count()
+    awareness_count = SubmissionModel.query.filter_by(status="Figyelemfelhívás").count()
 
     grouped = SubmissionModel.query.group_by("county").all()
     county_count_dict = {}
@@ -703,6 +705,7 @@ def statistics():
         wip_count=wip_count,
         progress_count=progress_count,
         completed_count=completed_count,
+        awareness_count=awareness_count,
         county_count_dict=county_dump,
     )
 
@@ -798,14 +801,6 @@ def user_account():
     "#"
     if request.method == "POST":
 
-        if "new_user_name" in request.form:
-            user_id = int(request.form["user_id"])
-            new_user_name = request.form["new_user_name"]
-            user = UserModel.query.filter_by(id=user_id).first()
-            user.user_name = new_user_name
-            db.session.commit()
-            flash("Mostantól így hívunk.", "success")
-
         if "own_submissions" in request.form:
             user_id = int(request.form["user_id"])
             user = UserModel.query.filter_by(id=user_id).first()
@@ -853,6 +848,11 @@ def change_user_data(user_id):
 @login_required
 def user_management():
     "#"
+    
+    if not current_user.role == "admin":
+        flash("Ide csak admin léphet!","danger")
+        return render_template("index.html")
+    
     if request.method == "POST":
         pass
     user_list = UserModel.query.all()
@@ -877,9 +877,14 @@ def user_manage(id):
 
 
 # ÜGYEK TÁBLÁZATOS LETÖLTÉSE
-@login_required
 @app.route("/download", methods=["GET"])
+@login_required
 def download_data():
+    
+    if not current_user.role == "admin" or not current_user.role == "coordinator":
+        flash("Csak admin vagy kordinátor tölthet le!","danger")
+        return render_template("index.html")
+
     submissions = SubmissionModel.query.all()
 
     title = [submission.title for submission in submissions]
@@ -944,7 +949,9 @@ def register():
 def site_login():
     "#"
     return oauth.auth0.authorize_redirect(
-        redirect_uri=url_for("callback", _external=True, _scheme="https")
+        redirect_uri=url_for("callback", _external=True, _scheme="https"
+        #redirect_uri=url_for("callback", _external=True, _scheme="http"
+        )
     )
 
 
@@ -1029,7 +1036,7 @@ def page_not_found():
 @app.errorhandler(502)
 def page_not_found():
     "#"
-    return render_template("404.html")
+    return render_template("502.html")
     
 
 # APP RUN

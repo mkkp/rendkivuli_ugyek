@@ -34,12 +34,13 @@
               onchange="detectChange(this)">
         <option selected>{{ submission.status }}</option>
         <option value="Bejelentve">Bejelentve</option>
+        <option value="Megoldva">Megoldva</option>
+        <option value="Figyelemfelhívás">Figyelemfelhívás</option>
         <option value="Folyamatban">Folyamatban</option>
         <option value="Készül">Készül</option>
         <option value="Hivatal megoldotta">Hivatal megoldotta</option>
         <option value="Inaktív">Inaktív</option>
         <option value="Duplika">Duplika</option>
-        <option value="Befejezve">Befejezve</option>
       </select>
       <br />
       <hr />
@@ -176,7 +177,7 @@
   <script>
     function detectChange(status) {
       var content = document.getElementById("solution_div");
-      if (status.value === "Befejezve") {
+      if (status.value === "Megoldva") {
         if (content.style.display === "block") {
           content.style.display = "none";
         } else {

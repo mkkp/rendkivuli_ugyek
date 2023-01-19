@@ -85,10 +85,10 @@
             name="status"
           >
             <option selected value="">Válassz a státuszok közül!</option>
-            <option>Bejelentve</option>
+            <option>Megoldva</option>
+            <option>Figyelemfelhívás</option>
             <option>Folyamatban</option>
             <option>Készül</option>
-            <option>Befejezve</option>
           </select>
         </div>
         <button type="submit" class="btn btn-light form-control rounded-0">
@@ -108,8 +108,8 @@
 
     <picture>
       <source media="(max-width: 465px)"
-      srcset={{url_for('static',filename='site_img/jelmagyarazat_mobil.jpg')}}>
-      <img src={{url_for('static',filename='site_img/jelmagyarazat.png')}}
+      srcset={{url_for('static',filename='site_img/jelmagyarazat_mobil.webp')}}>
+      <img src={{url_for('static',filename='site_img/jelmagyarazat.webp')}}
       alt="Jelmagyarázat">
     </picture>
 
@@ -126,7 +126,8 @@
 
   <script>
     var status_dict = {
-    'Befejezve': 'befejezve',
+    'Megoldva': 'megoldva',
+    'Figyelemfelhívás': 'figyelemfelhivas',
     'Bejelentve': 'bejelentve',
     'Duplika': 'szurke',
     'Folyamatban': 'folyamatban',

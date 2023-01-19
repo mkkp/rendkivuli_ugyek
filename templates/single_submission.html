@@ -19,7 +19,7 @@
   <!--LIGHTBOX-->
   <link href="../static/css/lightbox.css" rel="stylesheet" />
   <!--META-->
-  <title>{{ submission[0].title }}</title>
+  <title>Rendkívüli Ügyek Minisztériuma</title>
   <meta property="og:site_name" content="Rendkívüli Ügyek Minisztériuma" />
   <meta property="og:title" content="{{ submission[0].title }}" />
   {% if submission[0].solution %}
@@ -80,14 +80,15 @@
     </strong>{{ submission[0].solution }}</p>
   {% endif %}
          
-  {% if submission[0].status != 'Befejezve' 
-     and submission[0].status != 'Inaktív' 
+  {% if submission[0].status != 'Megoldva' 
+     and submission[0].status != 'Inaktív'
+     and submission[0].status != 'Figyelemfelhívás' 
      and submission[0].status != 'Duplika'
      and submission[0].status != 'Hivatal megoldotta'
   %}
     <p>Ha szeretnél részt venni a felújításban, írj nekünk a
-    <a href="mailto: kovacs.gergely@mkkp.hu?subject=Városfelújítós jelentkezés: {{ submission[0].title }} id:{{ submission[0].id }}">
-     <strong>kovacs.gergely@mkkp.hu</strong>
+    <a href="mailto: rendkivuliugyek@mkkp.hu?subject=Városfelújítós jelentkezés: {{ submission[0].title }} id:{{ submission[0].id }}">
+     <strong>rendkivuliugyek@mkkp.hu</strong>
     </a>email címre!</p>
   {% endif %}     
         
@@ -308,9 +309,9 @@
        <p>Mutasd ugyanezt Google térképen!</p>
      </a>
 
-     {% if current_user.email == submission[0].owner_email 
-        or role == 'coordinator' 
-        or role == 'admin' %}
+     {% if role == 'coordinator' 
+        or role == 'admin' 
+     %}
         
      <br />
         
@@ -339,15 +340,16 @@
    });
    
    map.on('load', () => {
-   var status_dict = {
-     'Befejezve': 'befejezve',
-     'Bejelentve': 'bejelentve',
-     'Duplika': 'szurke',
-     'Folyamatban': 'folyamatban',
-     'Hivatal megoldotta': 'szurke',
-     'Inaktív': 'szurke',
-     'Készül': 'keszul'
-     };
+    var status_dict = {
+    'Megoldva': 'megoldva',
+    'Figyelemfelhívás': 'figyelemfelhivas',
+    'Bejelentve': 'bejelentve',
+    'Duplika': 'szurke',
+    'Folyamatban': 'folyamatban',
+    'Hivatal megoldotta': 'szurke',
+    'Inaktív': 'szurke',
+    'Készül': 'keszul',
+    }
 
    var type_dict = {
      'Akadálymentesítés': 'akadalymentesites',

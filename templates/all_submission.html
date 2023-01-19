@@ -117,7 +117,8 @@
             <option>Bejelentve</option>
             <option>Folyamatban</option>
             <option>Készül</option>
-            <option>Befejezve</option>
+            <option>Megoldva</option>
+            <option>Figyelemfelhívás</option>
           </select>
 
           <label for="type">Típus</label>
@@ -251,7 +252,7 @@
                 <label>&nbsp;&nbsp;{{ row.problem_type }}</label>
               </div>
             </div>
-            {% elif status == 'Befejezve' %}
+            {% elif status == 'Megoldva' %}
             <div
               class="card_head"
               style="background-color:#35968a; color:white;"
@@ -261,6 +262,16 @@
                 <label>&nbsp;&nbsp;{{ row.problem_type }}</label>
               </div>
             </div>
+            {% elif status == 'Figyelemfelhívás' %}
+            <div
+              class="card_head"
+              style="background-color:#3be0c8; color:white;"
+            >
+              <div class="card_label">
+                <img src="/static/category/{{ row.problem_type }}.png" />
+                <label>&nbsp;&nbsp;{{ row.problem_type }}</label>
+              </div>
+            </div> 
             {% endif%}
 
             <img
@@ -351,7 +362,7 @@
                 <label>&nbsp;&nbsp;{{ row.problem_type }}</label>
               </div>
             </div>
-            {% elif status == 'Befejezve' %}
+            {% elif status == 'Megoldva' %}
             <div
               class="card_head"
               style="background-color:#35968a; color:white;"
@@ -361,6 +372,16 @@
                 <label>&nbsp;&nbsp;{{ row.problem_type }}</label>
               </div>
             </div>
+            {% elif status == 'Figyelemfelhívás' %}
+            <div
+              class="card_head"
+              style="background-color:#3be0c8; color:white;"
+            >
+              <div class="card_label">
+                <img src="/static/category/{{ row.problem_type }}.png" />
+                <label>&nbsp;&nbsp;{{ row.problem_type }}</label>
+              </div>
+            </div>            
             {% endif%}
 
             <img
