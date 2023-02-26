@@ -654,7 +654,7 @@ def change_cover(status_type, id):
 def delete_submission(id):
     "#"
     
-    if not current_user.role == "admin" or not current_user.role == "coordinator":
+    if current_user.role != "admin" and current_user.role != "coordinator":
         flash("Bejelentést csak admin vagy kordinátor törölhet!", "danger")
         return render_template("index.html")
     
@@ -881,7 +881,7 @@ def user_manage(id):
 @login_required
 def download_data():
     
-    if not current_user.role == "admin" or not current_user.role == "coordinator":
+    if current_user.role != "admin" and current_user.role != "coordinator":
         flash("Csak admin vagy kordinátor tölthet le!","danger")
         return render_template("index.html")
 

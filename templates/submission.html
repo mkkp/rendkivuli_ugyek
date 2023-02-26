@@ -250,7 +250,8 @@ function show_additional_file_input(){
           var county = address.split(",")[3].trim()
         }
     
-        var county = county.replace("County", "").trim()
+        var county = county.replace("vármegye", "").trim()
+        var county = county.replace("megye", "").trim()
 
         document.getElementById("city").value = city
         document.getElementById("county").value = county
@@ -325,6 +326,7 @@ function show_additional_file_input(){
       var county = address.split(",")[3].trim()
     };
     
+    var county = county.replace("vármegye", "").trim()
     var county = county.replace("megye", "").trim()
     
     document.getElementById("city").value = city
@@ -376,6 +378,7 @@ function show_additional_file_input(){
       var county = address.split(",")[3].trim()
     };
   
+    var county = county.replace("vármegye", "").trim()
     var county = county.replace("megye", "").trim()
 
     document.getElementById("address").value = address

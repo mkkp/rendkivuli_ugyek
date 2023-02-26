@@ -213,7 +213,8 @@
           var county = address.split(",")[3].trim();
         }
 
-        var county = county.replace(" megye", "");
+        var county = county.replace("vármegye", "").trim()
+        var county = county.replace("megye", "").trim()
 
         document.getElementById("new_address").value = address;
         document.getElementById("city").value = city;
