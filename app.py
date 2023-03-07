@@ -501,14 +501,15 @@ def single_submission(id):
 def all_submission():
     "#"
     page = request.args.get("page", 1, type=int)
+    
     post_list = SubmissionModel.query.order_by(
         SubmissionModel.created_date.desc()
-    ).paginate(page=page, per_page=ROWS_PER_PAGE)
+        ).paginate(page=page, per_page=ROWS_PER_PAGE)
 
     featured = SubmissionModel.query.filter_by(featured=True).all()
 
     if request.method == "POST":
-
+    
         county = request.form["county"]
         problem_type = request.form["type"]
         status = request.form["status"]
@@ -538,22 +539,52 @@ def all_submission():
                 .paginate(page=page, per_page=ROWS_PER_PAGE)
             )
             
+            # A szöveges kereső még nincs integrálva a többi keresőopcióval, 
+            #ezért vagy-vagy alapon lehet használni
             return render_template("all_submission.html", post_list=filtered_list)
 
         # merge dicts
         query_dict = county_dict | problem_type_dict | status_dict
+        
+        #store dict in session cookie
+        session['filter'] = query_dict
 
-        filtered_list = (
-            SubmissionModel.query.filter_by(**query_dict)
-            .order_by(SubmissionModel.created_date.desc())
-            .paginate(page=page, per_page=ROWS_PER_PAGE)
-        )
-
+        try:
+            filtered_list = (
+                SubmissionModel.query.filter_by(**query_dict)
+                .order_by(SubmissionModel.created_date.desc())
+                .paginate(page=1, per_page=ROWS_PER_PAGE)
+            )
+        except Exception as e:
+            flash("Nincs találati eredmény", "danger")
+            return render_template(
+                "all_submission.html", post_list=post_list
+            )
+        
         return render_template(
             "all_submission.html",
             post_list=filtered_list,
+            filters=query_dict
         )
-
+        
+    #GET
+    try:
+        if 'filter' in session.keys():
+            query_dict = session['filter']
+            filtered_list = (
+                SubmissionModel.query.filter_by(**query_dict)
+                .order_by(SubmissionModel.created_date.desc())
+                .paginate(page=page, per_page=ROWS_PER_PAGE)
+            )
+            return render_template(
+                "all_submission.html",
+                post_list=filtered_list,
+                featured=featured,
+                filters=query_dict
+            )
+    except Exception as err:
+        pass
+    
     return render_template(
         "all_submission.html", post_list=post_list, featured=featured
     )

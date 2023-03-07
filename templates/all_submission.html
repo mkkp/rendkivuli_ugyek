@@ -96,6 +96,25 @@
     <h2>
       <i><b>ÖSSZES BEJELENTÉS</b></i>
     </h2>
+    
+    {% if filters %}
+      <hr>
+      <form action="" method="post" enctype="multipart/form-data">
+      <p>Aktív filterek:</p>
+      {% for key, value in filters.items() %}
+      <p> ▸ {{value}}</p>
+      {% endfor %}
+      <input type="hidden" name="status" value="">
+      <input type="hidden" name="type" value="">
+      <input type="hidden" name="county" value="">
+      <input type="hidden" name="full_text_search" value="">
+      <br>
+      <button type="submit" class="btn btn-warning form-control rounded-0">
+          Filterek törlése
+      </button>
+      <hr>
+    {% endif %}
+    </form>
 
     <button
       type="button"
@@ -184,7 +203,7 @@
         <!--detailed_search-->
 
         <button type="submit" class="btn btn-dark form-control rounded-0">
-          Mutasd!
+          Mutasd! 🔎
         </button>
       </form>
     </div>
@@ -422,25 +441,29 @@
       </a>
       <!-- Loop through the number of pages to display a link for each-->
       {% for page_num in post_list.iter_pages(left_edge=1, right_edge=1,
-      left_current=1, right_current=2) %} {% if page_num %}
-      <!-- Check for the active page and set the link to "Active"-->
-      {% if post_list.page == page_num %}
-      <a
-        href="{{ url_for('all_submission', page=page_num) }}"
-        class="btn btn-dark"
-      >
-        <span style="color:yellow">
+      left_current=1, right_current=2) %} 
+        {% if page_num %}
+        <!-- Check for the active page and set the link to "Active"-->
+          {% if post_list.page == page_num %}
+          <a
+            href="{{ url_for('all_submission', page=page_num) }}"
+            class="btn btn-dark"
+          >
+            <span style="color:yellow">
+            {{ page_num }}
+            </span>
+          </a>
+          {% else %}
+          <a
+            href="{{ url_for('all_submission', page=page_num) }}"
+            class="btn btn-outline-dark"
+          >
           {{ page_num }}
-        </span>
-      </a>
-      {% else %}
-      <a
-        href="{{ url_for('all_submission', page=page_num) }}"
-        class="btn btn-outline-dark"
-      >
-        {{ page_num }}
-      </a>
-      {% endif %} {% else %} ... {% endif %} {% endfor %}
+          </a>
+          {% endif %} 
+        {% else %} ... 
+        {% endif %} 
+      {% endfor %}
       <a
         href="{{ url_for('all_submission', page=post_list.next_num) }}"
         class="btn btn-outline-dark {% if post_list.page == post_list.pages %} disabled {% endif %}"
