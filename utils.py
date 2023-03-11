@@ -4,7 +4,6 @@ General utility functions for MKKP városfelújítós
 import os
 import re
 import uuid
-import requests
 
 from dotenv import load_dotenv
 from datetime import datetime as dt
@@ -13,7 +12,6 @@ from random import randint
 
 from PIL import Image
 from PIL import ImageOps
-from PIL import UnidentifiedImageError
 
 from models import db
 from models import SubmissionModel
@@ -147,4 +145,11 @@ def get_random_name():
     with open(in_dir / file_name, "r", encoding="UTF-8") as file:
         name_list = [name.strip() for name in file.readlines()]
     return name_list[randint(1, len(name_list))]
+
+def write_log(base_dir, current_user, event):
+    ts = dt.now().strftime("%Y-%m-%d %H:%M")
+    with open(Path(base_dir)/f"sec_log.txt","a") as f:
+        f.write(f"\n{ts},{current_user.email},{event}")
+    return
+
 

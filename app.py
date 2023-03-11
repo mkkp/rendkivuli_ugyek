@@ -63,6 +63,7 @@ from utils import valid_email
 from utils import get_date
 from utils import save_picture
 from utils import get_random_name
+from utils import write_log
 
 # MAIL TEMPLATES
 
@@ -685,6 +686,8 @@ def change_cover(status_type, id):
 def delete_submission(id):
     "#"
     
+    write_log(BASE_DIR,current_user,f"delete submission_{id}")
+    
     if current_user.role != "admin" and current_user.role != "coordinator":
         flash("Bejelentést csak admin vagy kordinátor törölhet!", "danger")
         return render_template("index.html")
@@ -712,6 +715,7 @@ def delete_submission(id):
 @app.route("/statistics", methods=["POST", "GET"])
 def statistics():
     "#"
+    
     post_count = SubmissionModel.query.count()
     user_count = UserModel.query.count()
     submitted_count = SubmissionModel.query.filter_by(status="Bejelentve").count()
@@ -915,9 +919,13 @@ def download_data():
     if current_user.role != "admin" and current_user.role != "coordinator":
         flash("Csak admin vagy kordinátor tölthet le!","danger")
         return render_template("index.html")
+        
+    #write download log
+    
+    write_log(BASE_DIR,current_user,"download all data")
 
     submissions = SubmissionModel.query.all()
-
+    
     title = [submission.title for submission in submissions]
     problem_type = [submission.problem_type for submission in submissions]
     problem_type = [submission.problem_type for submission in submissions]
