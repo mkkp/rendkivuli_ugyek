@@ -141,7 +141,7 @@ dashboard.bind(app)
 
 # CORS
 # https://flask-cors.readthedocs.io/en/latest/
-CORS(app, resources={r"/*": {"origins": "*"}})
+CORS(app)
 
 # Paranoid
 # https://pypi.org/project/Flask-Paranoid/
@@ -191,21 +191,21 @@ def add_submission():
     Bejelentkezés nem szükséges
     """
     if request.method == "POST":
-        # email validaiton
+        # Email validaiton
         if not valid_email(request.form["email"]):
             flash("A Kutya mindenit de fura ez az email cím!", "danger")
             return render_template(
                 "submission.html", ACCESS_KEY=MAP_KEY, lat=INIT_LAT, lng=INIT_LNG
             )
 
-        # validate text for embedded links
+        #Embedded link validation
         if "http" in request.form["title"]:
             flash("A szöveg nem tartalmazhat linket!", "danger")
             return render_template(
                 "submission.html", ACCESS_KEY=MAP_KEY, lat=INIT_LAT, lng=INIT_LNG
             )
             
-        #validate images for extension
+        #Image extension validation
         allowed_extensions = ["jpg","jpeg","png"]
         files = request.files.getlist("files")
         if request.files.getlist("files"):
@@ -216,7 +216,26 @@ def add_submission():
                     return render_template(
                     "submission.html", ACCESS_KEY=MAP_KEY, lat=INIT_LAT, lng=INIT_LNG
                     )
+                    
+        #Naive XSS validation                
+        if "<" in request.form["title"] or ">" in request.form["title"]:
+            flash("Nem megengedett karakter.","danger")
+            return render_template(
+                "submission.html", ACCESS_KEY=MAP_KEY, lat=INIT_LAT, lng=INIT_LNG
+                )
+                
+        if "<" in request.form["type"] or ">" in request.form["type"]:
+            flash("Nem megengedett karakter.","danger")
+            return render_template(
+                "submission.html", ACCESS_KEY=MAP_KEY, lat=INIT_LAT, lng=INIT_LNG
+                )
 
+        if "<" in request.form["address"] or ">" in request.form["address"]:
+            flash("Nem megengedett karakter.","danger")
+            return render_template(
+                "submission.html", ACCESS_KEY=MAP_KEY, lat=INIT_LAT, lng=INIT_LNG
+                )
+                        
         submission = SubmissionModel(
             title=request.form["title"],
             problem_type=request.form["type"],
