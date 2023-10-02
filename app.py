@@ -4,6 +4,7 @@ MKKP városfelújítós alkalmazás
 # -------------------------------
 # ---------I M P O R T S---------
 # -------------------------------
+#
 
 # BUILTINS
 import os
