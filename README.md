@@ -1,5 +1,5 @@
 # Rendkívüli Ügyek Minisztériuma
-MKKP Rendkívüli Ügyek Minisztériuma python implementáció
+MKKP Rendkívüli Ügyek Minisztériuma python implementáci
 
 Honlap: rendkivuliugyek.com
 
