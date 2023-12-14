@@ -11,4 +11,4 @@ A Rendkívüli Ügyek Minisztériuma webes alkalmazás a következő funkciókat
 (levelek, kommentek, elérhetőségek)  
 * Bejelentések megjelenítése 
 (kártyaként és térképen) 
-* Kapcsolattartás biztosítása a Ganümédeszen állomásozó űrhajókkal
+* Kapcsolattartás biztosítása a Ganümédeszen állomásozó űrhajókka
