@@ -111,3 +111,63 @@ Rendkívüli Ügyek Minisztériuma*
 
 Ha sikeres a feltöltés, a bejelentés oldal az ügy adatlapjára továbbítja a bejelentő böngészőjét.  
 
+### 3. Ügy adatlap
+Az ügy adatlapja minden jogosultsági szintnek elérhető, viszont a felhasználók a különböző jogosultsági szintektől függően más-más honlap elemeket látnak.  
+A **regisztrálatlan felhasználó** jogosultági szint a következő elemeket látja az adatlapon:  
+- Borítókép  
+- A borítóképre rá lehet kattintani, ekkor megjelenik a bejelentés összes képét (borítókép-előtte-utána) tartalmazó galéria.  
+- A borítókép teljes felbontásban jelenik meg.  
+
+
+Ügy Adatlap:  
+- Ha az ügy kiemelt ügy, akkor ez az információ megjelenik az adatlap első sorában  
+- Leírás  
+- Státusz  
+- Ebben a státuszban  
+- Típus  
+- Bejelentve  
+- Megye  
+- Cím  
+- Zárószöveg (csak akkor ha megoldott sátuszú az ügy és kitöltötték ezt a mezőt)
+
+
+Ha az ügy nem megoldott, akkor megjelenik a következő kapcsolat információ:  
+Ha szeretnél részt venni a felújításban, írj nekünk a rendkivuliugyek@mkkp.hu-ra!  
+Facebook Share gomb amely megjeleníti az eddigi megosztások számát.  
+A facebook megosztásra kattintva a megosztás képe a mindenkori borítókép lesz.  
+Ha az ügy nem befejezett, akkor a facebook megosztás szövege a részletes leírás szövege.  
+Ha az ügy befejezett, és ki van töltve a zárószöveg mező, akkor a facebook megosztás szövege a zárószöveg szövegével egyezik meg.
+
+
+- Előtte képek (ha vannak)  
+- Ha csak egy kép van, akkor az borítóképként jelenik meg, tehát az előtte képek szekcióban nem jelenik meg.
+- Utána képek (ha vannak)
+- Térkép
+
+A **regisztrált felhasználó** jogosultsági szint a következő elemeket látja az adatlapon:
+- Örökli a regisztrálatlan felhasználó elemeit
+- Komment szekció, ahol kommenteket adhat az adatlapphoz, módosíthatja és törölheti azokat. 
+  A kommenteknél a felhasználó neve és a komment hozzáadásának dátuma szerepel.
+  
+A **szervező felhasználó** jogosultsági szint a következő elemeket látja az adatlapon:  
+- Örökli a regisztrált felhasználó elemeit
+- Adatlap módosítása gomb
+- Előtte képek feltöltése
+- Utána képek feltöltése
+Fontos, hogy az ügyhöz adott szervező, csak az adott ügynél rendelkezik a fentebbi jogokkal. 
+	Más ügyeknél a jogosultsági szintje a rendes jogosultsági szintjével egyezik meg.
+	
+A **regisztrált felhasználó, aki ha bejelentő is** egyben
+- Örökli a szervező felhasználó elemeit
+Fontos, hogy a regisztrált bejelentő, **csak az adott ügynél** rendelkezik a fentebb jogokkal. 
+	Más ügyeknél a jogosultsági szintje a rendes jogosultsági szintjével egyezik meg.
+	
+A **koordinátor felhasználó** jogosultsági szint a következő elemeket látja az adatlapon:
+- Örökli a szervező felhasználó elemeit
+	Fontos, hogy a koordinátor felhasználó nem csak egy adott ügynél rendelkezik a 
+	fentebb leírt jogosultságokkal, hanem az **összes ügynél**.
+	
+Az **admin** felhasználó jogosultsági szint a következő elemeket látja az adatlapon:
+- Örökli a koordinátor felhasználó elemeit
+- Ügy törlése gomb
+- Mások kommentjeinek szerkesztése és törlése
