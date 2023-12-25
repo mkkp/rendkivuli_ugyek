@@ -1,3 +1,5 @@
+# Rendkívüli Ügyek Minisztériuma
+
 ## Specifikáció
 
 A Rendkívüli Ügyek Minisztériuma webes alkalmazás a következő funkciókat teszi lehetővé:  
@@ -171,3 +173,69 @@ Az **admin** felhasználó jogosultsági szint a következő elemeket látja az 
 - Örökli a koordinátor felhasználó elemeit
 - Ügy törlése gomb
 - Mások kommentjeinek szerkesztése és törlése
+
+### 4. Összes bejelentés
+Az összes bejelentés minden jogosultsági szintnek elérhető.   
+A különböző jogosultsági szintek között nincsen eltérés; mindenki ugyanazt látja.  
+Oldalelemek:  
+- Részletes keresés gomb. A gombra kattintva lenyílik egy menü, ahol különböző szűkítéseket lehet megadni:
+  - Státusz
+  - Típus
+  - Megye
+  Amennyiben a Megye részbe Budapest-et ad meg a felhasználó, akkor megjelenik egy további legördülő menü, 
+  ami a Budapesten belüli kerület választást teszi lehetővé.
+- Szöveges keresés 
+A szöveges keresés minden státuszban típusban és megyében keres és független az összes többi szűkítési beállítástól.  
+
+A részletes keresés alatt az egyes ügyek kártyái látszódnak. Egy kártya felépítése a következő:  
+- Fejléc: Típus piktogram, Típus megnevezés
+- Borítókép 
+- Bejelentés megnevezése
+- Város
+- Bejelentés leírása (csak az első mondat)  
+	Az összes bejelentés közül egyszerre csak N darab jelenik meg. 
+	A honlap alján paginációs menü található.
+	
+### 5. Térkép
+A térkép minden jogosultsági szintnek elérhető.  
+A különböző jogosultsági szintek között nincsen eltérés; mindenki ugyanazt látja.  
+Oldalelemek:  
+- Részletes keresés gomb. A gombra kattintva lenyílik egy menü, ahol különböző szűkítéseket lehet megadni:	
+- Típus
+- Státusz
+- Térkép 
+A térképen az egyes ügyek típus ikonokként jelennek meg. 
+Az ikonra kattintva egy új ablak ugrik fel, a következő felépítéssel:
+- Ügy neve
+- Ügy típusa 
+- Ügy státusza
+- Ügy borító képe. A képre kattintva átkerülünk az ügy adatlapjára.
+- Jelmagyarázat
+  A jelmagyarázat mobilon más arányt vesz fel, hogy olvasható maradjon, 
+  tehát két külön kép van beállítva.
+### 6. Statisztika
+A statisztika oldal minden jogosultsági szintnek elérhető.  
+A különböző jogosultsági szintek között nincsen eltérés. Mindenki ugyanazt látja.
+Az adminisztrátori statisztikához lásd: 6. Monitoring fejezet.  
+
+Oldalelemek:
+- Bejelentések megoszlása státusz szerint oszlopdiagram
+- Bejelentések megoszlása megye szerint oszlopdiagram
+- További hasznos statisztikák lista
+- Kényelmetlen fehérneműk száma a Parlamentben: 199
+- Összes statisztika az oldalon: 11.5
+- Főispánok száma Magyarországon: 19
+- Összes bejelentés a honlapon: *A*
+- Összes bolygó száma a Naprendszerben: 8
+- Összes regisztrált felhasználó: *B*
+- Magyarországon található települések száma: 3155
+- Ételautomaták által évente megölt emberek száma átlagosan a világon: 10  
+  Az A és B jelű elemek valós dinamikus változók, az összes többi pont statikus érték.
+
+
+### 7. Regisztráció
+# TODO
+
+
+### 8. Bejelentkezés  
+# TODO
