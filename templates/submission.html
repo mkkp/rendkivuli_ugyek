@@ -13,8 +13,7 @@
 
   <style>
     .hidden_file_upload {
-      display: none; //block 
-      overflow: hidden;
+      display: none;
       }
     
      #loading {  
@@ -22,7 +21,12 @@
      height: auto;
      display: block;
      margin-left: auto;
-     margin-right: auto;   
+     margin-right: auto;  
+     
+     .li{
+     
+     } 
+     
      } 
   </style>    
 </head>
@@ -92,27 +96,33 @@
     <div class="form-group">
     
     <strong><label for="files" style=>Képek feltöltése <label style="color:red">*</label></label></strong>
-    <small>maximum 50 megabyte</small>
+    <small>maximum 50 MB</small>
     
+    <label for="files" id="first_file" class="btn btn-secondary form-control rounded-0 border border-light">Képek kiválasztása</label>
+    <div id="file_list"></div>
     <input type="file" 
            id="files" 
-           name="files" 
-           class="btn btn-secondary form-control rounded-0 border border-light" 
+           name="files"
+           style="visibility:hidden;" 
            multiple="true" 
            required
-           accept="image/x-png, image/jpeg"
-           onchange="show_additional_file_input()">
+           accept="image/png, image/jpeg, image/jpg"
+           onchange="show_additional_file_input(); get_file_list('files');">
    <div class="invalid-feedback">Ellopták a képfájlt. Próbáld újra!</div>
    </div>
+   
    <div class="hidden_file_upload" 
         id="hidden_file_upload">
-     <strong><label for="additional_files" style=>További képek feltöltése</label></strong>
-     <input type="file" 
+     <label for="additional_files" class="btn btn-secondary form-control rounded-0 border border-light">További képek kiválasztása</label>
+     <div id="second_file_list"></div>
+     <input type="file"
             id="additional_files" 
             name="additional_files" 
-            class="btn btn-secondary form-control rounded-0 border border-dark" 
+            style="visibility:hidden;"  
             multiple="true"
-            accept="image/x-png, image/jpeg">
+            accept="image/png, image/jpeg, image/jpg"
+            onchange="get_file_list('additional_files');"
+            >
    </div>
    <br />
    <div class="form-group">
@@ -164,6 +174,7 @@
             required>
      <input hidden type="text" id="lng" name="lng" value=0></p> <!--Ide lehetne valami vicces default értéket adni, pl parlament-->
      <input hidden type="text" id="lat" name="lat" value=0></p> <!--Ide lehetne valami vicces default értéket adni, pl parlament-->
+     <input hidden type="text" id="zipcode" name="zipcode" value=0></p>
      <input hidden type="text" id="city" name="city" value="nem meghatározott"></p>
      <input hidden type="text" id="county" name="county" value="nem meghatározott"></p>
      <button type="button" 
@@ -201,17 +212,36 @@
 
 
 <script>
+
+function get_file_list(type){
+if (type === 'files'){
+	const files = document.getElementById("files").files;
+	file_div = document.getElementById("file_list");
+	file_div.innerText = "";
+	for (let i = 0; i < files.length; i++) {
+	  let file = files.item(i)
+	  file_div = document.getElementById("file_list");
+	  file_div.insertAdjacentHTML("afterbegin", "<li style='list-style-position: inside'>" + file.name + "</li>");
+	}
+	file_div.insertAdjacentHTML("afterbegin", "<label>" + files.length + " kép kiválasztva:</label><br>");
+} else {
+	const files = document.getElementById("additional_files").files;
+	file_div = document.getElementById("second_file_list");
+	file_div.innerText = "";
+	for (let i = 0; i < files.length; i++) {
+	  let file = files.item(i)
+	  file_div = document.getElementById("second_file_list");
+	  file_div.insertAdjacentHTML("afterbegin", "<li style='list-style-position: inside'>" + file.name + "</li>");
+	}
+	file_div.insertAdjacentHTML("afterbegin", "<label>" + files.length + " kép kiválasztva:</label><br>");
+  }
+}
+
 function show_additional_file_input(){
   var content = document.getElementById("hidden_file_upload");
-  if (content.style.display === "block") {
-    content.style.display = "none";
-  } else {
-    content.style.display = "block";
-  }       
+  content.style.display = "block";
 }
-</script>
 
-<script>
 //getCurrentPosition
   window.onload = function getGPSLocation() {
 
@@ -239,6 +269,7 @@ function show_additional_file_input(){
       $.get(url, function (data) {
         var address = data.features[0].place_name;
         var city = address.split(",")[0].trim()
+        var zipcode = address.split(",")[2].trim().substring(1,3)
         var street = address.split(",")[1].trim()
         var postal_code = address.split(",")[2].trim()
         var lng = position.coords.longitude
@@ -254,6 +285,7 @@ function show_additional_file_input(){
         var county = county.replace("megye", "").trim()
 
         document.getElementById("city").value = city
+        document.getElementById("zipcode").value = zipcode
         document.getElementById("county").value = county
         document.getElementById("address").value = address
         document.getElementById("lng").value = lng
@@ -270,9 +302,7 @@ function show_additional_file_input(){
     }//showPosition onLoad
     }
   }//onload
-</script>
 
-<script>
 //CREATE MAP
   mapboxgl.accessToken = '{{ACCESS_KEY}}';
   var map = new mapboxgl.Map({
@@ -318,7 +348,7 @@ function show_additional_file_input(){
     }
     var city = address.split(",")[0].trim()
     var street = address.split(",")[1].trim()
-    var postal_code = address.split(",")[2].trim()
+    var zipcode = address.split(",")[2].trim().substring(1,3)
     
     if (city == "Budapest"){
       var county = "Budapest"
@@ -330,6 +360,7 @@ function show_additional_file_input(){
     var county = county.replace("megye", "").trim()
     
     document.getElementById("city").value = city
+    document.getElementById("zipcode").value = zipcode
     document.getElementById("county").value = county
     document.getElementById("address").value = address
     document.getElementById("lng").value = lng
@@ -344,9 +375,7 @@ function show_additional_file_input(){
     addLayer();
     });
   });// map onClick
-</script>
 
-<script>
 //CÍM KIEGÉSZÍTÉSE
   function complete_address(){
     //FW GEOCODING COMPLETION
@@ -371,6 +400,7 @@ function show_additional_file_input(){
     var lat = data.features[0].center[1]
     var lng = data.features[0].center[0]
     var city = address.split(",")[0].trim()
+    var zipcode = address.split(",")[2].trim().substring(1,3)
   
     if (city == "Budapest"){ 
       var county = "Budapest"
@@ -383,6 +413,7 @@ function show_additional_file_input(){
 
     document.getElementById("address").value = address
     document.getElementById("city").value = city
+    document.getElementById("zipcode").value = zipcode
     document.getElementById("county").value = county
     document.getElementById("lng").value = lng
     document.getElementById("lat").value = lat
@@ -397,9 +428,7 @@ function show_additional_file_input(){
   
   })
 };
-</script>
 
-<script>
 //FOWRARD GEOCODING 
 //when SPACE hit on address
   function getLocation(){
@@ -434,9 +463,7 @@ function show_additional_file_input(){
 	});
 }
 };//getLocation
-</script>
 
-<script>
 //UTILS
   function deleteSource(){
     if (map.getSource('points')) {
@@ -517,9 +544,7 @@ function show_additional_file_input(){
   };//showError
 
 //<--UTILS
-</script>
 
-<script>
 //FORM VALIDATION
   function validate () {
     'use strict'

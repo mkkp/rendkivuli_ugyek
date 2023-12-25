@@ -58,6 +58,7 @@ class SubmissionModel(db.Model):
     suggestion = db.Column(db.String())
     solution = db.Column(db.String())
     address = db.Column(db.String())
+    zipcode = db.Column(db.Integer)
     city = db.Column(db.String())
     county = db.Column(db.String())
     lat = db.Column(db.Float)
@@ -81,6 +82,7 @@ class featuredModel(db.Model):
     """
 
     __tablename__ = "featured"
+    
     id = db.Column(db.Integer, primary_key=True)
     created_date = db.Column(db.String(10))
     parent_id = db.Column(db.Integer, db.ForeignKey("submission.id"))

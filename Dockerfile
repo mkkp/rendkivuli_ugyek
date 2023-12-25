@@ -21,7 +21,7 @@ RUN python3 -m pip install --upgrade pip
 RUN pip install -r requirements.txt
 
 # Clone from GIT
-RUN git clone https://github.com/xngst/rendkivuli_ugyek.git .
+RUN git clone https://github.com/mkkp/rendkivuli_ugyek.git .
 
 VOLUME /usr/src/app/db/app.db
 VOLUME /usr/src/app/static/upload

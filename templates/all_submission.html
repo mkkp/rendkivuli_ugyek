@@ -87,6 +87,11 @@
     .col-sm-6 {
         padding: 0.2em;
     }
+    
+    .zipcode_selection {
+      display: none;
+      overflow: hidden;
+    }
   </style>
 </head>
 <body>
@@ -102,11 +107,12 @@
       <form action="" method="post" enctype="multipart/form-data">
       <p>Aktív filterek:</p>
       {% for key, value in filters.items() %}
-      <p> ▸ {{value}}</p>
+        <p> ⦿ {{ value }}</p>
       {% endfor %}
       <input type="hidden" name="status" value="">
       <input type="hidden" name="type" value="">
       <input type="hidden" name="county" value="">
+      <input type="hidden" name="zipcode" value="">
       <input type="hidden" name="full_text_search" value="">
       <br>
       <button type="submit" class="btn btn-warning form-control rounded-0">
@@ -130,8 +136,7 @@
           <select
             class="form-select form-control"
             aria-label="Státusz kiválasztása"
-            name="status"
-          >
+            name="status">
             <option selected value="">Válassz a státuszok közül!</option>
             <option>Bejelentve</option>
             <option>Folyamatban</option>
@@ -144,8 +149,7 @@
           <select
             class="form-select form-control"
             aria-label="Típus kiválasztása"
-            name="type"
-          >
+            name="type">
             <option selected value="">Válassz a típusok közül!</option>
             <option>Út és Járda</option>
             <option>Szemét</option>
@@ -166,7 +170,7 @@
             class="form-select form-control"
             aria-label="Megye kiválasztása"
             name="county"
-          >
+            onchange="detectChange(this)">
             <option selected value="">Válassz a megyék közül!</option>
             <option>Budapest</option>
             <option>Pest</option>
@@ -189,19 +193,52 @@
             <option>Veszprém</option>
             <option>Zala</option>
           </select>
-
+          
+          
+          <div class="zipcode_selection" 
+               id="zip_div"
+               >
+          <label for="zipcode">Kerület</label>
+          <select
+            class="form-select form-control"
+            aria-label="Kerület kiválasztása"
+            name="zipcode">
+            <option selected value="">Válassz a kerületek közül!</option>
+            <option>1.</option>
+            <option>2.</option>
+            <option>3.</option>
+            <option>4.</option>
+            <option>5.</option>
+            <option>6.</option>
+            <option>7.</option>
+            <option>8.</option>
+            <option>9.</option>
+            <option>10.</option>
+            <option>11.</option>
+            <option>12.</option>
+            <option>13.</option>
+            <option>14.</option>
+            <option>15.</option>
+            <option>16.</option>
+            <option>17.</option>
+            <option>18.</option>
+            <option>19.</option>
+            <option>20.</option>
+            <option>21.</option>    
+            <option>22.</option>
+            <option>23.</option>                                   
+          </select>
+          </div>
+          
           <label for="type">Szöveges keresés az összes ügy leírásában</label>
           <input
-            value=""
             type="text"
             class="form-control"
             id="full_text_search"
-            placeholder=""
             name="full_text_search"
           />
         </div>
         <!--detailed_search-->
-
         <button type="submit" class="btn btn-dark form-control rounded-0">
           Mutasd! 🔎
         </button>
@@ -209,272 +246,128 @@
     </div>
 
     <hr />
-
-    {% if post_list.page == 1%}
-
+    
+     {% set card_head_classes = {
+        'Bejelentve': 'background-color:#f45d5f',
+        'Duplika': 'background-color:#808080',
+        'Figyelemfelhívás': 'background-color:#3be0c8',
+        'Folyamatban': 'background-color:#feb955',
+        'Hivatal megoldotta': 'background-color:#656d77',
+        'Inaktív': 'background-color:#808080',
+        'Készül': 'background-color:#22325e',
+        'Megoldva': 'background-color:#35968a'
+      } %}
+    
+    {% if post_list.page == 1 %}
     <div class="row">
-      {% for row in featured %}
+    {% for row in featured %}
       <div class="col-sm-6">
-        <a href="/single_submission/{{ row.id }}" 
-           rel="noopener noreferrer">
-          <div class="card">
-            {% set status = row.status %} {% if status == 'Bejelentve' %}
-            <div
-              class="card_head"
-              style="background-color:#f45d5f; color:white;"
-            >
-              <div class="card_label">
-                <img src="/static/category/{{ row.problem_type }}.png" />
-                <label>&nbsp;&nbsp;{{ row.problem_type }}</label>
-              </div>
-            </div>
-            {% elif status == 'Folyamatban' %}
-            <div
-              class="card_head"
-              style="background-color:#feb955; color:white;"
-            >
-              <div class="card_label">
-                <img src="/static/category/{{ row.problem_type }}.png" />
-                <label>&nbsp;&nbsp;{{ row.problem_type }}</label>
-              </div>
-            </div>
-            {% elif status == 'Készül' %}
-            <div
-              class="card_head"
-              style="background-color:#22325e; color:white;"
-            >
-              <div class="card_label">
-                <img src="/static/category/{{ row.problem_type }}.png" />
-                <label>&nbsp;&nbsp;{{ row.problem_type }}</label>
-              </div>
-            </div>
-            {% elif status == 'Hivatal megoldotta' %}
-            <div
-              class="card_head"
-              style="background-color:#656d77; color:white;"
-            >
-              <div class="card_label">
-                <img src="/static/category/{{ row.problem_type }}.png" />
-                <label>&nbsp;&nbsp;{{ row.problem_type }}</label>
-              </div>
-            </div>
-            {% elif status == 'Inaktív' %}
-            <div class="card_head" style="background-color:grey; color:white;">
-              <div class="card_label">
-                <img src="/static/category/{{ row.problem_type }}.png" />
-                <label>&nbsp;&nbsp;{{ row.problem_type }}</label>
-              </div>
-            </div>
-            {% elif status == 'Duplika' %}
-            <div class="card_head" style="background-color:grey; color:white;">
-              <div class="card_label">
-                <img src="/static/category/{{ row.problem_type }}.png" />
-                <label>&nbsp;&nbsp;{{ row.problem_type }}</label>
-              </div>
-            </div>
-            {% elif status == 'Megoldva' %}
-            <div
-              class="card_head"
-              style="background-color:#35968a; color:white;"
-            >
-              <div class="card_label">
-                <img src="/static/category/{{ row.problem_type }}.png" />
-                <label>&nbsp;&nbsp;{{ row.problem_type }}</label>
-              </div>
-            </div>
-            {% elif status == 'Figyelemfelhívás' %}
-            <div
-              class="card_head"
-              style="background-color:#3be0c8; color:white;"
-            >
-              <div class="card_label">
-                <img src="/static/category/{{ row.problem_type }}.png" />
-                <label>&nbsp;&nbsp;{{ row.problem_type }}</label>
-              </div>
-            </div> 
-            {% endif%}
-
-            <img
-              class="featured_cropped"
-              src="/static/upload/{{ row.id }}/{{ row.cover_image_full }}"
-              alt="{{ row.title }}"
-            />
-            <div class="card_container">
-              <h6>
-                <b>{{ row.title | upper}}</b>
-              </h6>
-              <i>{{ row.city | upper}}</i>
-              <hr class="card_hr" />
-              {% if row.description %} {% set desc_1 =
-              row.description.split('.') %}
-              <p><i>{{ desc_1[0] }}.</i></p>
-              {% endif %}
-            </div>
-            <!--card_container-->
-          </div>
-          <!--card-->
-        </a>
-      </div>
-      <!--col-sm-3-->
-
-      {% endfor %}
-    </div>
-    {% endif %}
-
-    <div class="row">
-      {% for row in post_list.items %} {% if row.featured == False or
-      row.featured == "" %}
-
-      <div class="col-sm-3">
         <a href="/single_submission/{{ row.id }}" rel="noopener noreferrer">
           <div class="card">
-            {% set status = row.status %} {% if status == 'Bejelentve' %}
-            <div
-              class="card_head"
-              style="background-color:#f45d5f; color:white;"
-            >
+            <div class="card_head"
+                 style= {{ card_head_classes[row.status] }}>
               <div class="card_label">
                 <img src="/static/category/{{ row.problem_type }}.png" />
-                <label>&nbsp;&nbsp;{{ row.problem_type }}</label>
+                <label>{{ row.problem_type }}</label>
               </div>
             </div>
-            {% elif status == 'Folyamatban' %}
-            <div
-              class="card_head"
-              style="background-color:#feb955; color:white;"
-            >
-              <div class="card_label">
-                <img src="/static/category/{{ row.problem_type }}.png" />
-                <label>&nbsp;&nbsp;{{ row.problem_type }}</label>
-              </div>
-            </div>
-            {% elif status == 'Készül' %}
-            <div
-              class="card_head"
-              style="background-color:#22325e; color:white;"
-            >
-              <div class="card_label">
-                <img src="/static/category/{{ row.problem_type }}.png" />
-                <label>&nbsp;&nbsp;{{ row.problem_type }}</label>
-              </div>
-            </div>
-            {% elif status == 'Hivatal megoldotta' %}
-            <div
-              class="card_head"
-              style="background-color:#656d77; color:white;"
-            >
-              <div class="card_label">
-                <img src="/static/category/{{ row.problem_type }}.png" />
-                <label>&nbsp;&nbsp;{{ row.problem_type }}</label>
-              </div>
-            </div>
-            {% elif status == 'Inaktív' %}
-            <div class="card_head" style="background-color:grey; color:white;">
-              <div class="card_label">
-                <img src="/static/category/{{row.problem_type}}.png" />
-                <label>&nbsp;&nbsp;{{ row.problem_type }}</label>
-              </div>
-            </div>
-            {% elif status == 'Duplika' %}
-            <div class="card_head" style="background-color:grey; color:white;">
-              <div class="card_label">
-                <img src="/static/category/{{row.problem_type}}.png" />
-                <label>&nbsp;&nbsp;{{ row.problem_type }}</label>
-              </div>
-            </div>
-            {% elif status == 'Megoldva' %}
-            <div
-              class="card_head"
-              style="background-color:#35968a; color:white;"
-            >
-              <div class="card_label">
-                <img src="/static/category/{{ row.problem_type }}.png" />
-                <label>&nbsp;&nbsp;{{ row.problem_type }}</label>
-              </div>
-            </div>
-            {% elif status == 'Figyelemfelhívás' %}
-            <div
-              class="card_head"
-              style="background-color:#3be0c8; color:white;"
-            >
-              <div class="card_label">
-                <img src="/static/category/{{ row.problem_type }}.png" />
-                <label>&nbsp;&nbsp;{{ row.problem_type }}</label>
-              </div>
-            </div>            
-            {% endif%}
-
-            <img
-              class="cropped"
-              src="/static/upload/{{ row.id }}/{{row.cover_image}}"
-              alt="{{ row.title}}"
-            />
+            <img class="featured_cropped" 
+                 src="/static/upload/{{ row.id }}/{{ row.cover_image_full }}" 
+                 alt="{{ row.title }}" />
             <div class="card_container">
               <h6><b>{{ row.title | upper }}</b></h6>
               <i>{{ row.city | upper }}</i>
               <hr class="card_hr" />
-              {% if row.description %} {% set desc_1 =
-              row.description.split('.') %}
-              <p><i>{{ desc_1[0] }}.</i></p>
+              {% if row.description %}
+                {% set desc_1 = row.description.split('.') %}
+                <p><i>{{ desc_1[0] }}...</i></p>
               {% endif %}
             </div>
-            <!--card_container-->
           </div>
-          <!--card-->
         </a>
       </div>
-      <!--col-sm-3-->
-
-      {% endif %} 
     {% endfor %}
     </div>
-    <!-- row -->
+	{% endif %}
+    
+    <div class="row">
+      {% for row in post_list.items %} 
+        {% if row.featured == False or row.featured == "" %}
+          <div class="col-sm-3">
+            <a href="/single_submission/{{ row.id }}" rel="noopener noreferrer">
+              <div class="card">
+                <div class="card_head"
+                     style= {{ card_head_classes[row.status] }}>
+                  <div class="card_label">
+                    <img src="/static/category/{{ row.problem_type }}.png" />
+                    <label>{{ row.problem_type }}</label>
+                  </div>
+                </div>
+                <img class="cropped"
+                     src="/static/upload/{{ row.id }}/{{row.cover_image}}"
+                     alt="{{ row.title}}"
+                />
+                <div class="card_container">
+                  <h6><b>{{ row.title | upper }}</b></h6>
+                  <i>{{ row.city | upper }}</i>
+                  <hr class="card_hr" />
+                  {% if row.description %} 
+                    {% set desc_1 = row.description.split('.') %}
+                    <p><i>{{ desc_1[0] }}...</i></p>
+                  {% endif %}
+                </div>
+              </div>
+            </a>
+          </div>
+        {% endif %} 
+      {% endfor %}
+    </div>
     <hr />
 
     <!-- Pagination Links-->
     <div class="text-right">
-      <a
-        href="{{ url_for('all_submission', page=post_list.prev_num) }}"
-        class="btn btn-outline-dark {% if post_list.page == 1 %} disabled {% endif %}"
-      >
+      <a href="{{ url_for('all_submission', page=post_list.prev_num) }}"
+         class="btn btn-outline-dark {% if post_list.page == 1 %} disabled {% endif %}">
         &laquo;
       </a>
       <!-- Loop through the number of pages to display a link for each-->
-      {% for page_num in post_list.iter_pages(left_edge=1, right_edge=1,
-      left_current=1, right_current=2) %} 
-        {% if page_num %}
+      {% for page_num in post_list.iter_pages(
+        left_edge=1, 
+        right_edge=1,
+        left_current=1, 
+        right_current=2
+        ) 
+      %} 
         <!-- Check for the active page and set the link to "Active"-->
+        {% if page_num %}
           {% if post_list.page == page_num %}
-          <a
-            href="{{ url_for('all_submission', page=page_num) }}"
-            class="btn btn-dark"
-          >
-            <span style="color:yellow">
-            {{ page_num }}
-            </span>
+          <a href="{{ url_for('all_submission', page=page_num) }}"
+            class="btn btn-dark">
+            <span style="color:yellow">{{ page_num }}</span>
           </a>
           {% else %}
-          <a
-            href="{{ url_for('all_submission', page=page_num) }}"
-            class="btn btn-outline-dark"
-          >
+          <a href="{{ url_for('all_submission', page=page_num) }}"
+             class="btn btn-outline-dark">
           {{ page_num }}
           </a>
           {% endif %} 
         {% else %} ... 
         {% endif %} 
       {% endfor %}
-      <a
-        href="{{ url_for('all_submission', page=post_list.next_num) }}"
-        class="btn btn-outline-dark {% if post_list.page == post_list.pages %} disabled {% endif %}"
-      >
-        &raquo;
+      <a href="{{ url_for('all_submission', page=post_list.next_num) }}"
+         class="btn btn-outline-dark {% if post_list.page == post_list.pages %} disabled {% endif %}">
+         &raquo;
       </a>
     </div>
     <br />
   </div>
 
   <script>
+  
+    if ( window.history.replaceState ) {
+        window.history.replaceState( null, null, window.location.href );
+    }
+    
     var coll = document.getElementsByClassName("collapsible");
     coll[0].addEventListener("click", function() {
       this.classList.toggle("active");
@@ -485,7 +378,19 @@
         content.style.display = "block";
       }
     });
-  </script>
+
+    function detectChange(county) {
+      var content = document.getElementById("zip_div");
+      if (county.value === "Budapest") {
+        if (content.style.display === "block") {
+          content.style.display = "none";
+        } else {
+          content.style.display = "block";
+        }
+      }
+    }
+
+</script>
   
 </body>
 

@@ -4,7 +4,6 @@ MKKP városfelújítós alkalmazás
 # -------------------------------
 # ---------I M P O R T S---------
 # -------------------------------
-#
 
 # BUILTINS
 import os
@@ -205,20 +204,8 @@ def add_submission():
             return render_template(
                 "submission.html", ACCESS_KEY=MAP_KEY, lat=INIT_LAT, lng=INIT_LNG
             )
-            
-        #Image extension validation
-        allowed_extensions = ["jpg","jpeg","png"]
-        files = request.files.getlist("files")
-        if request.files.getlist("files"):
-            for picture in request.files.getlist("files"):
-                extension = picture.filename.split(".")[1]
-                if extension.lower() not in allowed_extensions:
-                    flash("Nem megengedett file kiterjesztés (csak jpg,jpeg és png lehet)","danger")
-                    return render_template(
-                    "submission.html", ACCESS_KEY=MAP_KEY, lat=INIT_LAT, lng=INIT_LNG
-                    )
-                    
-        #Naive XSS validation                
+
+        #Naive XSS validation
         if "<" in request.form["title"] or ">" in request.form["title"]:
             flash("Nem megengedett karakter.","danger")
             return render_template(
@@ -236,13 +223,14 @@ def add_submission():
             return render_template(
                 "submission.html", ACCESS_KEY=MAP_KEY, lat=INIT_LAT, lng=INIT_LNG
                 )
-                        
+                
         submission = SubmissionModel(
             title=request.form["title"],
             problem_type=request.form["type"],
             description=request.form["description"],
             suggestion=request.form["suggestion"],
             city=request.form["city"],
+            zipcode=request.form["zipcode"],
             county=request.form["county"],
             address=request.form["address"],
             lat=request.form["lat"],
@@ -347,6 +335,12 @@ def change_submission_data(submission_id):
             submission.suggestion = new_suggestion
             db.session.commit()
             flash("Sikeresen módosítottad az ügy megoldási javaslatát!", "success")
+            
+        if request.form["new_created_date"] != "":
+            new_created_date = request.form["new_created_date"]
+            submission.created_date = new_created_date
+            db.session.commit()
+            flash("Sikeresen módosítottad az ügy bejelentési dátumát!", "success")            
 
         try:
             featured = request.form["featured"]
@@ -375,13 +369,15 @@ def change_submission_data(submission_id):
                 SUBJECT = f"Státusz változás: {submission.title}"
                 BODY_HTML = create_status_change_mail_SES(submission)
                 RECIPIENT = submission.owner_email
-
-                client.send_email(
-                Destination={'ToAddresses': [RECIPIENT]},
-                Message={'Subject': {'Charset': CHARSET, 'Data': SUBJECT},
-                'Body': {'Html': {'Charset': CHARSET, 'Data': BODY_HTML}}},
-                Source=SENDER
-                )
+                try:
+                    client.send_email(
+                    Destination={'ToAddresses': [RECIPIENT]},
+                    Message={'Subject': {'Charset': CHARSET, 'Data': SUBJECT},
+                    'Body': {'Html': {'Charset': CHARSET, 'Data': BODY_HTML}}},
+                    Source=SENDER
+                    )
+                except Exception as err:
+                    pass
                 
                 flash(
                     f"Sikeresen módosítottad az ügy státuszát erre: {new_status}. A szervezőnek ment levél.",
@@ -400,12 +396,15 @@ def change_submission_data(submission_id):
                 BODY_HTML = create_solution_mail_SES(submission)
                 RECIPIENT = submission.submitter_email
 
-                client.send_email(
-                Destination={'ToAddresses': [RECIPIENT]},
-                Message={'Subject': {'Charset': CHARSET, 'Data': SUBJECT},
-                'Body': {'Html': {'Charset': CHARSET, 'Data': BODY_HTML}}},
-                Source=SENDER
-                )
+                try:
+                    client.send_email(
+                    Destination={'ToAddresses': [RECIPIENT]},
+                    Message={'Subject': {'Charset': CHARSET, 'Data': SUBJECT},
+                    'Body': {'Html': {'Charset': CHARSET, 'Data': BODY_HTML}}},
+                    Source=SENDER
+                    )
+                except Exception as err:
+                    pass
 
         if request.form["closing_solution"].strip() != "":
             closing_solution = request.form["closing_solution"]
@@ -423,12 +422,14 @@ def change_submission_data(submission_id):
         if request.form["new_address"] != "":
             new_address = request.form["new_address"]
             city = request.form["city"]
+            zipcode = request.form["zipcode"]
             county = request.form["county"]
             lat = request.form["lat"]
             lng = request.form["lng"]
 
             submission.address = new_address
             submission.county = county
+            submission.zipcode = zipcode
             submission.city = city
             submission.lat = lat
             submission.lng = lng
@@ -453,15 +454,21 @@ def single_submission(id):
 
         if "comment-submit" in request.form:
             form_comment = request.form["comment"]
-            comment = CommentModel(
-                commenter=request.form["current_user"],
-                created_date=get_date(),
-                body=form_comment,
-                parent_id=submission_id,
-            )
-            db.session.add(comment)
-            db.session.commit()
-            flash(f"Sikeresen hozzáadtál egy kommentet!", "success")
+            
+            if CommentModel.query.filter_by(body=form_comment, parent_id=submission_id).first():
+                #comment is a duplicate
+                pass
+            
+            else:
+                comment = CommentModel(
+                    commenter=request.form["current_user"],
+                    created_date=get_date(),
+                    body=form_comment,
+                    parent_id=submission_id,
+                )
+                db.session.add(comment)
+                db.session.commit()
+                flash(f"Sikeresen hozzáadtál egy kommentet!", "success")
 
         if "comment-edit" in request.form:
             body_change = request.form["comment"]
@@ -495,12 +502,15 @@ def single_submission(id):
             BODY_HTML = create_solution_mail_SES(submission)
             RECIPIENT = submission.submitter_email
 
-            client.send_email(
-            Destination={'ToAddresses': [RECIPIENT]},
-            Message={'Subject': {'Charset': CHARSET, 'Data': SUBJECT},
-            'Body': {'Html': {'Charset': CHARSET, 'Data': BODY_HTML}}},
-            Source=SENDER
-            )
+            try:
+                client.send_email(
+                Destination={'ToAddresses': [RECIPIENT]},
+                Message={'Subject': {'Charset': CHARSET, 'Data': SUBJECT},
+                'Body': {'Html': {'Charset': CHARSET, 'Data': BODY_HTML}}},
+                Source=SENDER
+                )
+            except Exception as err:
+                pass
 
     submission = SubmissionModel.query.filter_by(id=submission_id)
     before_img_list = ImageBeforeModel.query.filter_by(parent_id=submission_id)
@@ -532,17 +542,22 @@ def all_submission():
     if request.method == "POST":
     
         county = request.form["county"]
+        zipcode = request.form["zipcode"]
         problem_type = request.form["type"]
         status = request.form["status"]
         search_text = request.form["full_text_search"]
 
         county_dict = {}
+        zipcode_dict = {}
         problem_type_dict = {}
         status_dict = {}
         text_dict = {}
 
         if county != "":
             county_dict = {"county": county}
+            
+        if zipcode != "":
+            zipcode_dict = {"zipcode": zipcode[:-1]}
 
         if problem_type != "":
             problem_type_dict = {"problem_type": problem_type}
@@ -565,17 +580,18 @@ def all_submission():
             return render_template("all_submission.html", post_list=filtered_list)
 
         # merge dicts
-        query_dict = county_dict | problem_type_dict | status_dict
+        query_dict = county_dict | zipcode_dict | problem_type_dict | status_dict
         
         #store dict in session cookie
         session['filter'] = query_dict
-
+        
         try:
             filtered_list = (
                 SubmissionModel.query.filter_by(**query_dict)
                 .order_by(SubmissionModel.created_date.desc())
                 .paginate(page=1, per_page=ROWS_PER_PAGE)
             )
+            
         except Exception as e:
             flash("Nincs találati eredmény", "danger")
             return render_template(
@@ -631,12 +647,15 @@ def assign(id):
         BODY_HTML = create_organiser_mail_SES(submission)
         RECIPIENT = request.form["email"]
 
-        client.send_email(
-        Destination={'ToAddresses': [RECIPIENT]},
-        Message={'Subject': {'Charset': CHARSET, 'Data': SUBJECT},
-        'Body': {'Html': {'Charset': CHARSET, 'Data': BODY_HTML}}},
-        Source=SENDER
-        )        
+        try:
+            client.send_email(
+            Destination={'ToAddresses': [RECIPIENT]},
+            Message={'Subject': {'Charset': CHARSET, 'Data': SUBJECT},
+            'Body': {'Html': {'Charset': CHARSET, 'Data': BODY_HTML}}},
+            Source=SENDER
+            )        
+        except Exception as err:
+            pass
         
         flash("Szervező sikeresen hozzáadva!", "success")
         return redirect(f"/single_submission/{id}")
@@ -919,13 +938,17 @@ def user_management():
 @login_required
 def user_manage(id):
     "#"
+    if not current_user.role == "admin":
+        flash("Ide csak admin léphet!","danger")
+        return render_template("index.html")
+            
     user = UserModel.query.filter_by(id=id).first()
 
     if request.method == "POST":
         user_role = request.form["role"]
         user.role = user_role
         db.session.commit()
-        flash("Sikeres Módosítás", "success")
+        flash("Sikeres módosítás!", "success")
         return render_template("single_user.html", user=user)
 
     return render_template("single_user.html", user=user)
@@ -940,12 +963,11 @@ def download_data():
         flash("Csak admin vagy kordinátor tölthet le!","danger")
         return render_template("index.html")
         
-    #write download log
-    
-    write_log(BASE_DIR,current_user,"download all data")
+    write_log(BASE_DIR, current_user, "download all data")
 
     submissions = SubmissionModel.query.all()
     
+    submission_id = [submission.id for submission in submissions]
     title = [submission.title for submission in submissions]
     problem_type = [submission.problem_type for submission in submissions]
     problem_type = [submission.problem_type for submission in submissions]
@@ -971,6 +993,7 @@ def download_data():
     extension_type = "csv"
     filename = "RÜM_összes_bejelentés_" + str(get_date()) + "." + extension_type
     data = {
+        "Ügyszám": submission_id,
         "Elnevezés": title,
         "Típus": problem_type,
         "Leírás": description,
@@ -1009,7 +1032,6 @@ def site_login():
     "#"
     return oauth.auth0.authorize_redirect(
         redirect_uri=url_for("callback", _external=True, _scheme="https"
-        #redirect_uri=url_for("callback", _external=True, _scheme="http"
         )
     )
 
@@ -1018,7 +1040,6 @@ def site_login():
 def callback():
     "#"
     token = oauth.auth0.authorize_access_token()
-    # access_token = token['access_token']
     session["user"] = token
     user_email = token["userinfo"]["email"]
     aud = token["userinfo"]["aud"]
@@ -1072,7 +1093,7 @@ def easter_egg():
         resp_json = response.json()
         kutyi_pic = resp_json["message"]
         return render_template("easter_egg.html",
-                                kutyi_pic=kutyi_pic)        
+                                kutyi_pic=kutyi_pic)       
     except Exception as e:
         pass
         
@@ -1086,14 +1107,14 @@ def user_data_info():
 
 # ERROR HANDLER 404
 @app.errorhandler(404)
-def page_not_found():
+def page_not_found(e):
     "#"
     return render_template("404.html")
 
 
 # ERROR HANDLER 502
 @app.errorhandler(502)
-def page_not_found():
+def page_not_found(e):
     "#"
     return render_template("502.html")
     
