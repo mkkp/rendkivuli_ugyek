@@ -1,7 +1,5 @@
 # Rendkívüli Ügyek Minisztériuma
 
-{:toc}
-
 ## Specifikáció
 
 A Rendkívüli Ügyek Minisztériuma webes alkalmazás a következő funkciókat teszi lehetővé:  
@@ -157,17 +155,17 @@ A **szervező felhasználó** jogosultsági szint a következő elemeket látja 
 - Örökli a regisztrált felhasználó elemeit
 - Adatlap módosítása gomb
 - Előtte képek feltöltése
-- Utána képek feltöltése  
+- Utána képek feltöltése
 Fontos, hogy az ügyhöz adott szervező, csak az adott ügynél rendelkezik a fentebbi jogokkal. 
 	Más ügyeknél a jogosultsági szintje a rendes jogosultsági szintjével egyezik meg.
 	
 A **regisztrált felhasználó, aki ha bejelentő is** egyben
-- Örökli a szervező felhasználó elemeit  
-Fontos, hogy a regisztrált bejelentő, **csak az adott ügynél** rendelkezik a fentebb jogokkal.  
-Más ügyeknél a jogosultsági szintje a rendes jogosultsági szintjével egyezik meg.
+- Örökli a szervező felhasználó elemeit
+Fontos, hogy a regisztrált bejelentő, **csak az adott ügynél** rendelkezik a fentebb jogokkal. 
+	Más ügyeknél a jogosultsági szintje a rendes jogosultsági szintjével egyezik meg.
 	
 A **koordinátor felhasználó** jogosultsági szint a következő elemeket látja az adatlapon:
-- Örökli a szervező felhasználó elemeit  
+- Örökli a szervező felhasználó elemeit
 	Fontos, hogy a koordinátor felhasználó nem csak egy adott ügynél rendelkezik a 
 	fentebb leírt jogosultságokkal, hanem az **összes ügynél**.
 	
@@ -201,11 +199,10 @@ A részletes keresés alatt az egyes ügyek kártyái látszódnak. Egy kártya 
 ### 5. Térkép
 A térkép minden jogosultsági szintnek elérhető.  
 A különböző jogosultsági szintek között nincsen eltérés; mindenki ugyanazt látja.  
-
 Oldalelemek:  
 - Részletes keresés gomb. A gombra kattintva lenyílik egy menü, ahol különböző szűkítéseket lehet megadni:	
-  - Típus
-  - Státusz
+- Típus
+- Státusz
 - Térkép 
 A térképen az egyes ügyek típus ikonokként jelennek meg. 
 Az ikonra kattintva egy új ablak ugrik fel, a következő felépítéssel:
@@ -216,6 +213,7 @@ Az ikonra kattintva egy új ablak ugrik fel, a következő felépítéssel:
 - Jelmagyarázat
   A jelmagyarázat mobilon más arányt vesz fel, hogy olvasható maradjon, 
   tehát két külön kép van beállítva.
+  
 ### 6. Statisztika
 A statisztika oldal minden jogosultsági szintnek elérhető.  
 A különböző jogosultsági szintek között nincsen eltérés. Mindenki ugyanazt látja.
@@ -242,3 +240,130 @@ Oldalelemek:
 
 ### 8. Bejelentkezés  
 # TODO
+
+### 9. Fiókbeállítások
+A fiókbeállítás menüpontot csak a regisztrált felhasználó látja.  
+Oldalelemek:  
+- Felhasználónév  
+- Email cím  
+- Telefon szám  
+- Létrehozva  
+- Felhasználói szint  
+- Adatok módosítása gomb  
+A gombra kattintva megjelenik az adatmódosító felület.  
+Az adatmódosító felületen a következő módosítások végezhetőek:  
+  - Felhasználónév módosítása  
+  - Email módosítása  
+  - Telefonszám módosítása  
+
+- Ügyeim listája gomb
+A gombra kattintva két lista jelenik meg.
+  - Általam bejelentve lista.  
+  Ez minden olyan ügy, amit a felhasználó jelentett be.
+
+  - Szervező vagyok lista.  
+  Ez minden olyan ügy, ahol a felhasználó szervezőként lett hozzáadva az ügyhöz.
+
+
+- Dokumentáció és egyéb anyagok link
+- Github oldal link
+- Monitorozó oldal link
+- Adatkezelési szabályzat link
+
+Admin  jogosultsági szint elér egy további oldal elemet:
+- Összes ügy letöltése egy csv-ben. 
+A gombra kattintva elkezdődik az összes ügy exportálása és letöltése CSV (“,”) formátumban. Windows alatt lehet hogy beolvasásakor be kell állítani, hogy UTF-8 karakterkészlettel értelmezze a szöveget. 
+Windows alatt lehet hogy nem elég simán dupla klikkel megnyitni, hanem 
+Adatok > Szövegből > UTF-8
+A néni 1:12-től nagyon szépen elmagyarázza: https://www.youtube.com/watch?v=ZbljSnxoNLo
+A csv a következő mezőket tartalmazza:
+- ID
+- Bejelentő email	
+- Bejelentő telefon	
+- Cím	
+- Elnevezés	
+- Hosszúsági fok	
+- Kiemelt	Leírás	
+- Létrehozva	
+- Megoldás	
+- Megoldási javaslat	
+- Megye	
+- Státusz	
+- Státusz változás dátuma
+- Státuszt változtató felhasználó	
+- Szervező email	Szervező felhasználó	
+- Szélességi fok	
+- Típus	
+- Város
+Figyelem, ez a táblázat tartalmazza a bejelentő email címét és esetlegesen a telefonszámát is,
+	vagyis a GDPR szerinti személyes adatokat! Regisztrálatlan és regisztrált (nem szervező, 
+	nem koordinátor és nem admin) felhasználók számára ezek az adatok  a honlapon belül sehol nem
+	jelennek meg.
+	
+### 10. Felhasználói adatok módosítása
+A Felhasználói adatok módosítása oldalt a regisztrált felhasználó látja.  
+A következő adatokat tudja módosítani a felhasználó:  
+- Felhasználónév
+- Email
+- Telefonszám
+
+### 11. Felhasználók
+A Felhasználók oldalt az csak admin jogosultsági szint éri el.  
+Oldalelemek:
+- Email alapú keresési mező. A keresés nem közöl adatokat az adatbázis felé, végig a frontenden marad.
+- Táblázat a következő adatokkal:
+- Felhasználó
+- Email
+- Telefon
+- Felhasználói szint
+- Létrehozva
+- Utoljára itt
+
+A felhasználó nevére kattintva megjelenik a Felhasználó kezelése nevű oldal.  
+A Felhasználó kezelése oldalt az csak admin jogosultsági szint éri el.  
+
+Oldalelemek:
+- Felhasználó név
+- Jogosultsági szint legördülő menü. A kiválasztott jogosultsági szintet (registered / coordinator / admin)a Ment gombra kattintva lehet érvényesíteni.  
+A jogosultsági szintnek nem kell átfutási idő, viszont egy kijelentkezés-bejelentkezés javasolt az új jogosultsági szinttel rendelkező felhasználó részéről.
+- Email
+- Telefon
+- Felhasználó létrehozva
+- Utolsó bejelentkezés
+- Ment gomb
+
+### 12. Ügy adatainak módosítása
+Az ügy adatainak módosítását a szervező, a koordinátor és az admin jogosultsági szint éri el.
+
+Oldalelemek:
+- Státusz lenyíló menü  
+  Ha a státuszt Megoldottra állítjuk, akkor megjelenik a Megoldás szabadszöveges mező. 
+- Bejelentő email címe szabadszöveges mező
+- Ügy megnevezése szabadszöveges mező
+- Bejelentő telefonszáma szabadszöveges mező
+- Ügy megnevezése szabadszöveges mező
+- Ügy típusa lenyíló menü
+- Ügy leírása szabadszöveges mező 
+- Megoldási javaslat szabadszöveges mező
+- Cím szabadszöveges mező
+- Cím módosítása szabadszöveges mező
+- Cím ellenőrzése gomb
+- Csak az admin jogosoltságú felhasználónak elérhető oldalelem:
+Kiemelt bejegyzés
+
+### 13. Szervező hozzáadása
+A rendező hozzáadása felület a koordinátor és az admin jogosultsági szinteknek elérhető.
+Oldalelemek:
+- Email alapú kereső
+- Táblázat a következő elemekkel:
+  - kijelöl (kipipálható doboz)
+  - email 
+  - felhasználó
+  - telefon
+  - Hozzáadom gomb
+Egyszerre csak egy rendező adható hozzá egy bejelentéshez!
+
+### 14. Easter Egg
+
+01001110 11101001 01111010 01100100 00100000 01101101 01100101 01100111 00100000 01100001 01111010 00100000 01101111 01101100 01100100 01100001 01101100 01101111 01101110 00100000 00101111 01101011 01110101 01110100 01111001 01101001 00100000 01010101 01010010 01001100 00101101 01110100 00100001 
+01000001 00100000 01101011 11101001 01110000 01100101 01101011 00100000 01100001 00100000 01101000 01110100 01110100 01110000 01110011 00111010 00101111 00101111 01100100 01101111 01100111 00101110 01100011 01100101 01101111 00101111 01100100 01101111 01100111 00101101 01100001 01110000 01101001 00101111 00100000 00101101 01110010 11110011 01101100 00100000 01101010 11110110 01101110 01101110 01100101 01101011 00101110 
