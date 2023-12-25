@@ -1,7 +1,8 @@
 # Rendkívüli Ügyek Minisztériuma
 MKKP Rendkívüli Ügyek Minisztériuma python implementáció
 
-Honlap: rendkivuliugyek.com
+Honlap: https://rendkivuliugyek.com/  
+Dokumentáció: https://mkkp.github.io/rendkivuli_ugyek/  
 
 A Rendkívüli Ügyek Minisztériuma webes alkalmazás a következő funkciókat teszi lehetővé:  
 * Közterületen található elhanyagolt állapotú tárgyakról szóló bejelentés felvétele az adatbázisba.  
@@ -11,5 +12,5 @@ A Rendkívüli Ügyek Minisztériuma webes alkalmazás a következő funkciókat
 (levelek, kommentek, elérhetőségek)  
 * Bejelentések megjelenítése 
 (kártyaként és térképen) 
-* Kapcsolattartás biztosítása a Ganümédeszen állomásozó űrhajókkal
+* **Kapcsolattartás biztosítása a Ganümédeszen állomásozó űrhajókkal**
 ---
