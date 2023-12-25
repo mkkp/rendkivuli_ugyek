@@ -157,17 +157,17 @@ A **szervező felhasználó** jogosultsági szint a következő elemeket látja 
 - Örökli a regisztrált felhasználó elemeit
 - Adatlap módosítása gomb
 - Előtte képek feltöltése
-- Utána képek feltöltése
+- Utána képek feltöltése  
 Fontos, hogy az ügyhöz adott szervező, csak az adott ügynél rendelkezik a fentebbi jogokkal. 
 	Más ügyeknél a jogosultsági szintje a rendes jogosultsági szintjével egyezik meg.
 	
 A **regisztrált felhasználó, aki ha bejelentő is** egyben
-- Örökli a szervező felhasználó elemeit
-Fontos, hogy a regisztrált bejelentő, **csak az adott ügynél** rendelkezik a fentebb jogokkal. 
-	Más ügyeknél a jogosultsági szintje a rendes jogosultsági szintjével egyezik meg.
+- Örökli a szervező felhasználó elemeit  
+Fontos, hogy a regisztrált bejelentő, **csak az adott ügynél** rendelkezik a fentebb jogokkal.  
+Más ügyeknél a jogosultsági szintje a rendes jogosultsági szintjével egyezik meg.
 	
 A **koordinátor felhasználó** jogosultsági szint a következő elemeket látja az adatlapon:
-- Örökli a szervező felhasználó elemeit
+- Örökli a szervező felhasználó elemeit  
 	Fontos, hogy a koordinátor felhasználó nem csak egy adott ügynél rendelkezik a 
 	fentebb leírt jogosultságokkal, hanem az **összes ügynél**.
 	
@@ -201,10 +201,11 @@ A részletes keresés alatt az egyes ügyek kártyái látszódnak. Egy kártya 
 ### 5. Térkép
 A térkép minden jogosultsági szintnek elérhető.  
 A különböző jogosultsági szintek között nincsen eltérés; mindenki ugyanazt látja.  
+
 Oldalelemek:  
 - Részletes keresés gomb. A gombra kattintva lenyílik egy menü, ahol különböző szűkítéseket lehet megadni:	
-- Típus
-- Státusz
+  - Típus
+  - Státusz
 - Térkép 
 A térképen az egyes ügyek típus ikonokként jelennek meg. 
 Az ikonra kattintva egy új ablak ugrik fel, a következő felépítéssel:
