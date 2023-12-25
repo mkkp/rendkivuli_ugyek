@@ -1,5 +1,7 @@
 # Rendkívüli Ügyek Minisztériuma
 
+{:toc}
+
 ## Specifikáció
 
 A Rendkívüli Ügyek Minisztériuma webes alkalmazás a következő funkciókat teszi lehetővé:  
