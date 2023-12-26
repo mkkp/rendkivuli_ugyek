@@ -367,10 +367,6 @@ Egyszerre csak egy rendező adható hozzá egy bejelentéshez!
 
 01001110 11101001 01111010 01100100 00100000 01101101 01100101 01100111 00100000 01100001 01111010 00100000 01101111 01101100 01100100 01100001 01101100 01101111 01101110 00100000 00101111 01101011 01110101 01110100 01111001 01101001 00100000 01010101 01010010 01001100 00101101 01110100 00100001 
 01000001 00100000 01101011 11101001 01110000 01100101 01101011 00100000 01100001 00100000 01101000 01110100 01110100 01110000 01110011 00111010 00101111 00101111 01100100 01101111 01100111 00101110 01100011 01100101 01101111 00101111 01100100 01101111 01100111 00101101 01100001 01110000 01101001 00101111 00100000 00101101 01110010 11110011 01101100 00100000 01101010 11110110 01101110 01101110 01100101 01101011 00101110 
-<<<<<<< HEAD
-
-=======
->>>>>>> 2ab5b14226d2f6f095e957ceef08293f14725419
 
 ### Szoftver architektúra
 Az alábbi fejezetek tartalmazzák az alkalmazás techinkai leírását.  
@@ -378,19 +374,22 @@ A Rendkívüli Ügyek Minisztériuma specifikáció python Flask keretrendszerbe
 A flask adja a backend részt, míg a frontend HTML CSS és Javascript nyelven írt elemekből épül fel.  
 A felhasznált python modulokat a requirements.txt tartalmazza.  
 A Flask alkalmazások az MVT (Model View Template) architektúrát követik.  
-![Flask MVT](flask_arch-640x296.png)
-Ez egy kicsit más, mint az MVC (Model View Controller) architektúra. Mivel a Flask egy mikorkeretrendszer, ezért nem támogatja teljes egészében az MVC architektúra megvalósítását. Az MVT esetében a Controll részről a keretrendszer gondoskodik, amely HTTP requestre válaszként sablont (Template) küld.
-A templatek a .\templates mappában találhatóak. 
-A model, vagyis az adatbázis sémák definíciója a .\models.py fileban található. 
-Az adatbázis a .\app.db nevű sqlite fileban található és az alkalmazás (app.py) első indításakor keletkezik a models.py definíciói alapján. 
-A View részt az .\app.py kezeli 
-A lekéréseket WSGI (PEP333) specifikáció szerint kezeli a middleware.
-![Flask Nginx](flask_nginx.png)
+![Flask MVT](flask_arch-640x296.png)  
+Ez egy kicsit más, mint az ismertebb MVC (Model View Controller) architektúra.   
+Mivel a Flask egy mikorkeretrendszer, ezért nem támogatja teljes egészében az MVC architektúra megvalósítását.  
+Az MVT esetében a Controll részről a keretrendszer gondoskodik, amely HTTP requestre válaszként sablont (Template) küld.  
+A templatek a .\templates mappában találhatóak.  
+A model, vagyis az adatbázis sémák definíciója a .\models.py fileban található.  
+Az adatbázis a .\app.db nevű sqlite fileban található és az alkalmazás (app.py) első indításakor keletkezik a models.py definíciói alapján.  
+A View részt az .\app.py kezeli  
+A lekéréseket WSGI (PEP333) specifikáció szerint kezeli a middleware.  
+![Flask Nginx](flask_nginx.png)  
 A RÜM applikáció Gunicorn alkalmazás szervert használ, amely a következő feladatokért felel:
 - Több alkalmazás instanciát futtat. (A RÜM esetében a Gunicorn 4 instanciát futtat)
-Lásd Dockerfile: CMD ["-w=4", "-b", "0.0.0.0:5000", "app:app"]
+> Lásd Dockerfile: CMD ["-w=4", "-b", "0.0.0.0:5000", "app:app"]
 - Ha leáll az alkalmazás, akkor automatikusan újraindítja az insanciát
 - HTTP requesteket közvetít a webszerver és az alkalmazás között
 - Terheléselosztást (load balancing) végez.
-Dokumentáció: https://docs.gunicorn.org/en/stable/
+
+Gunicorn dokumentáció: https://docs.gunicorn.org/en/stable/
 
