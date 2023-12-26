@@ -572,7 +572,7 @@ Ahol szükség van parent-child referenciára, ott egységesen a parent_id mező
 - body = db.Column(db.String())
 - parent_id = db.Column(db.Integer, db.ForeignKey("submission.id"))
 
-### Funkcionalitások részletes leírása
+### Funkcionalitások leírása
 Ez a fejezet azt foglalja össze, hogy milyen műveleteket lehet végrehajtani az alkalmazással.  
 Az hogy melyik szerep jogosult használni a funkciókat a felhasználói jogosultságok kezelése fejezet tartalmazza részletesen.
 
