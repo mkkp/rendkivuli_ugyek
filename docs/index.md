@@ -490,3 +490,85 @@ Példa levélküldés:
 >        Source=SENDER
 >        )
 
+
+### Adatbázis leírása
+A RÜM egy SQLite relációs adatbázisban tárolja a működéshez szükséges adatokat.  
+A Flask alkalmazás egy SQLAlchemy nevű Object Relation Mappert (ORM) használ hogy első induláskor létrehozza a models.py-ban definiált tábla sémákat. 
+Tehát ha kitöröljük az adatbázist (akár futás közben ), majd újraindítjuk az alkalmazást, akkor az SQLAlchemy létrehoz egy üres adatbázist.  
+Az alkalmazás így képes elindulni és kezelni az adatbázist.  
+Az adatbázis neve a .env fileban van rögzítve. Jelenleg ez a név ‘app.db’.  
+SQLITE dokumentáció: https://www.sqlite.org/docs.html  
+A dátum mezők string típusként vannak definiálva. Az alkalmazás ISO_8601 dátum formátumot használ.
+https://en.wikipedia.org/wiki/ISO_8601
+
+A User és Submission tábla az adatok kis mennyisége és a könnyebb átláthatóság kedvéért nincsen normálizálva.  
+Az alkalmazás gyakorlatban egyszerű lekéréseket használ joinok nélkül.  
+Ahol szükség van parent-child referenciára, ott egységesen a parent_id mezőnév lett megadva.  
+#### Táblák listája:
+**user**
+- id = db.Column(db.Integer, primary_key=True)
+- create = db.Column(db.Boolean())
+- read = db.Column(db.Boolean())
+- update = db.Column(db.Boolean())
+- delete = db.Column(db.Boolean())
+- active = db.Column(db.Boolean())
+- role = db.Column(db.String(10))
+- created_date = db.Column(db.String(10))  # 2022-09-01
+- email = db.Column(db.String(80), unique=True)  # GDPR
+- inactive_date = db.Column(db.String(10))  # 2022-09-01
+- last_login = db.Column(db.String(10))  # 2022-09-01
+- phone = db.Column(db.String(20))  # GDPR
+- user_name = db.Column(db.String(100), unique=True)
+- verified = db.Column(db.Boolean())
+
+**submission**
+- id = db.Column(db.Integer, primary_key=True)
+- title = db.Column(db.String())
+- problem_type = db.Column(db.String())
+- description = db.Column(db.String())
+- suggestion = db.Column(db.String())
+- solution = db.Column(db.String())
+- address = db.Column(db.String())
+- city = db.Column(db.String())
+- zipcode = db.Column(db.Integer)
+- county = db.Column(db.String())
+- lat = db.Column(db.Float)
+-  lng = db.Column(db.Float)
+- submitter_email = db.Column(db.String())
+- submitter_phone = db.Column(db.String())
+- owner_email = db.Column(db.String())
+- owner_user = db.Column(db.String())
+- created_date = db.Column(db.String())
+- cover_image = db.Column(db.String())
+- cover_image_full = db.Column(db.String())
+- featured = db.Column(db.Boolean())
+- status = db.Column(db.String())
+- status_changed_date = db.Column(db.String())  # 2022-09-01
+- status_changed_by = db.Column(db.String())
+
+**featured**
+- id = db.Column(db.Integer, primary_key=True)
+- created_date = db.Column(db.String(10))
+- parent_id = db.Column(db.Integer, db.ForeignKey("submission.id"))
+
+**image_before**
+- id = db.Column(db.Integer, primary_key=True)
+- file_name = db.Column(db.String(80))
+- thumb_file_name = db.Column(db.String(128))
+- created_date = db.Column(db.String(10))
+- parent_id = db.Column(db.Integer, db.ForeignKey("submission.id"))
+
+**image_after**
+- id = db.Column(db.Integer, primary_key=True)
+- file_name = db.Column(db.String(80))
+- thumb_file_name = db.Column(db.String(128))
+- created_date = db.Column(db.String(10))
+- parent_id = db.Column(db.Integer, db.ForeignKey("submission.id"))
+
+**comment**
+- id = db.Column(db.Integer, primary_key=True)
+- commenter = db.Column(db.String(120))
+- created_date = db.Column(db.String(10))
+- body = db.Column(db.String())
+- parent_id = db.Column(db.Integer, db.ForeignKey("submission.id"))
+
