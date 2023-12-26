@@ -572,7 +572,7 @@ Ahol szükség van parent-child referenciára, ott egységesen a parent_id mező
 - body = db.Column(db.String())
 - parent_id = db.Column(db.Integer, db.ForeignKey("submission.id"))
 
-### Funkcionalitások részletes leírása
+### Funkcionalitások leírása
 Ez a fejezet azt foglalja össze, hogy milyen műveleteket lehet végrehajtani az alkalmazással.  
 Az hogy melyik szerep jogosult használni a funkciókat a felhasználói jogosultságok kezelése fejezet tartalmazza részletesen.
 
@@ -604,4 +604,34 @@ Az hogy melyik szerep jogosult használni a funkciókat a felhasználói jogosul
 - Bejelentés kép törlése
 - Befejezés szöveg hozzáadása
 - Szervező hozzáadása bejelentéshez.
+
+### 3rd party szoftverek integráltsága
+
+- Mapbox
+[xngst](https://github.com/xngst) által regisztrált térképszolgáltató.  
+Honlap: https://www.mapbox.com
+A flask környezet a mapboxgl API-val kommunikálva a következő mapbox szolgáltatásokat fogyasztja:  
+Map Display (50,000 free loads / hó)  
+Forward Geocoding (100,000 szabad lekérés / hó)  
+Backward Geocoding (100,000 szabad lekérés / hó)  
+Minden lekérdezés kötelező eleme az API kulcs, ami a .env fileban van megadva.  
+API kulcs megújítás: https://account.mapbox.com/access-tokens/  
+
+- Amazon SES
+MKKP által regisztrált Email szolgáltató.  
+Honlap: https://aws.amazon.com/ses/  
+Az alkalmazás névterébe az import boto3 sor hívja be az email klienst.  
+A kliens inicializálása a következő sorral történik:  
+> client = boto3.client('ses',region_name=AWS_REGION,aws_access_key_id=AWS_ACC_ID,
+> aws_secret_access_key=AWS_SECRET)
+Kommunikációnál használt email cím: rendkivuliugyek@mkkp.hu  
+További technikai dokumentáció: https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html  
+
+- Auth0
+MKKP által regisztrált felhasználó azonosításhoz használt szolgáltató.  
+Az Auth0 eredetileg a https://passziv.mkkp.party -hoz van regisztrálva.  
+A regisztráció és a belépés az Auth0-n keresztül fut.  
+Ez azt jelenti, hogy a https://passziv.mkkp.party/regisztracio-n keresztül regisztrált felhasználók be tudnak lépni a RÜM-be is.  
+
+
 
