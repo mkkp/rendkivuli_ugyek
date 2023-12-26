@@ -572,3 +572,36 @@ Ahol szükség van parent-child referenciára, ott egységesen a parent_id mező
 - body = db.Column(db.String())
 - parent_id = db.Column(db.Integer, db.ForeignKey("submission.id"))
 
+### Funkcionalitások részletes leírása
+Ez a fejezet azt foglalja össze, hogy milyen műveleteket lehet végrehajtani az alkalmazással.  
+Az hogy melyik szerep jogosult használni a funkciókat a felhasználói jogosultságok kezelése fejezet tartalmazza részletesen.
+
+- Bejelentés létrehozása
+- Összes bejelentés megnézése
+- Egyes Bejelentés megnézése
+- Statisztikák megnézése
+- Kezdőoldal megnézése
+- Térkép megnézése
+- Regisztráció
+- Felhasználói fiók elérése
+- Saját bejelentések listája
+- Bejelentések listája, ahol a felhasználó rendezőként lett megjelölve
+- Bejelentkezés
+- Egyes bejelentés törlése
+- Bejelentés komment hozzáadása
+- Bejelentés komment szerkesztése
+- Bejelentés komment eltávolítása
+- Bejelentés Előtte kép hozzáadása
+- Bejelentés Utána kép hozzáadása
+- Bejelentés Borítókép módosítása
+- Bejelentés Cím módosítása
+- Bejelentés Dátum módosítása
+- Bejelentés státusz módosítása
+- Bejelentés kiemeltté tétele
+- Felhasználói szint módosítása
+- Bejelentés rendező hozzáadása
+- Felhasználó törlése
+- Bejelentés kép törlése
+- Befejezés szöveg hozzáadása
+- Szervező hozzáadása bejelentéshez.
+
