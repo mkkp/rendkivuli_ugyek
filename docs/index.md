@@ -675,3 +675,73 @@ Ez azt jelenti, hogy a https://passziv.mkkp.party/regisztracio-n keresztül regi
 | Bejelentés Előtte kép hozzáadása                                      |                                      | X (csak ha ő volt az ügy bejelentője)    | X        | X           | X     |
 
 
+### Spam Botok elleni védelem
+Az applikáció korábbi változatánál előbb-utóbb spam botok is elkezdték használni a bejelentő adatlapot.  
+A szövegek legtöbbször nem magyar nyelvűek voltak.  
+Gyakran már a megnevezés címébe is külső url címeket írtak bele.   
+Ezért a bejelentés https://rendkivuliugyek.site/submission felületen a cím nem tartalmazhat „http” karakterláncot. 
+ 
+
+### Sütik
+Az alkalmazás a felhasználó kezelése során ügymenet sütiket (session cookie) rak le,  
+amelyek a böngésző bezárása után maradéktalanul megsemmisülnek.  
+A GDPR szerint a session cookiek szigorú értelemben szükséges sütiknek minősülnek,   
+így kivételt képeznek a felhasználói engedélyezés szükségessége alól.   
+Forrás: https://www.gdprsummary.com/gdpr-definitions/strictly-necessary-cookie/  
+Az alkalmazás nem gyűjt és nem tárol felhasználói adatokat, mint pl IP cím, tartózkodási hely stb.  
+
+
+### Ismert biztonsági sebezhetőségek
+Figyelni kell arra, hogy munkaszerveren ne maradjon az app.py utolsó soraiban a debugolás bekapcsolva.
+
+>if __name__ == '__main__':
+>    app.run(debug=False)
+
+Ez az újabb verziókban már csak egy pin kóddal hozzáférhető debugger konzolt tesz elérhetővé, 
+azonban nem kizárt hogy ha be van kapcsolva, akkor további sebezhetőségi felületet nyit.
+
+### Hibaelhárítás
+
+- Nem jelenik meg a térkép
+A mapbox egy olyan api kulcsot használ amit [xngst](https://github.com/xngst) regisztrált.  
+A szolgáltatás a free tierben meghatározott limit eléréséig  ingyenes, de regisztrációhoz kötött.  
+Ha úgy tűnik, hogy nem érvényes az API kulcs, akkor a hibaelhárító félnek regisztrálnia kell egy mapbox accountot és lecserélni a kulcsot a .env fileban a szerveren. 
+
+- Nem mennek ki levelek
+Az Amazon SES kulcs lejárt vagy kompromittálódott és le lett cserélve.  
+Megoldás: Meg kell bizonyosodni a szerveren használt és az éppen érvényben lévő kulcsok azonosságáról.  
+Ha erre nincsen lehetőség, akkor új Amazon SES accountot kell regisztrálni és a régi kulcsokat le kell cserélni a .env fileban.  
+https://aws.amazon.com/ses/
+
+- Facebook megosztás nem működik
+Vagy nem jelenít meg képet, vagy egy másik képet jelenít meg előnézetben.  
+Először javasolt frissíteni a facebook ablakra ami a megosztás előnézetét tartalmazza.  
+Továbbá az alábbi linken lehet ellenőrizni hogy mit lát a facebook scraper, illetve újrascrapeltetni is itt lehet:  
+https://developers.facebook.com/tools/debug/  
+
+### Adatkezelési szabályzat  
+[Elérhető ezen a linken](https://rendkivuliugyek.com/user_data_info)
+
+### GDPR
+Az alkalmazás a felhasználókezelés során ügymenet sütiket (session cookie) rak le, amelyek a böngésző bezárása után maradéktalanul megsemmisülnek.  
+A GDPR szerint a session cookiek szigorúan szükséges sütiknek minősülnek, így kivételt képeznek a felhasználói engedélyezés szükségessége alól.  
+Forrás: https://www.gdprsummary.com/gdpr-definitions/strictly-necessary-cookie/  
+2gdpr scan eredménye: https://2gdpr.com/406961259
+
+### Monitoring
+
+A https://rendkivuliugyek.com/dashboard/overview 
+url alatt elérhető egy performance monitoring dashboard  
+Dokumentáció: https://flask-monitoringdashboard.readthedocs.io/en/latest/
+user, jelszóval kapcs: [xngst](https://github.com/xngst)
+
+### Gyakran Ismételt Kérdések
+
+**Hol tudom megnézni a saját bejelentéseim listáját?**
+A saját bejelentések listáját a Fiók Beállítások alatt, az Ügyeim listája gombra kattintva lehet elérni, a Bejelentve általam szekció alatt.
+
+**Hol tudom megnézni azoknak a bejelentéseknek a listáját, ahol szervezőként lettem megjelölve?**
+A Fiók Beállítások alatt, az Ügyeim listája gombra kattintva lehet elérni, a Szervező vagyok szekció alatt.
+
+
+
