@@ -1,7 +1,8 @@
 # Rendkívüli Ügyek Minisztériuma
 
-<!-- TOC start (generated with https://github.com/derlin/bitdowntoc) -->
-
+---
+<!-- TOC start -->
+## Tartalomjegyzék
 - [Rendkívüli Ügyek Minisztériuma](#rendkívüli-ügyek-minisztériuma)
    * [Specifikáció](#specifikáció)
    * [Az applikáció általános magas szintű leírása  ](#az-applikáció-általános-magas-szintű-leírása)
@@ -36,8 +37,8 @@
    * [Monitoring](#monitoring)
    * [Gyakran Ismételt Kérdések](#gyakran-ismételt-kérdések)
 <!-- TOC end -->
-
 <!-- TOC --><a name="rendkívüli-ügyek-minisztériuma"></a>
+---
 
 ## Specifikáció
 
@@ -761,16 +762,15 @@ Forrás: https://www.gdprsummary.com/gdpr-definitions/strictly-necessary-cookie/
 
 A https://rendkivuliugyek.com/dashboard/overview 
 url alatt elérhető egy performance monitoring dashboard  
-Dokumentáció: https://flask-monitoringdashboard.readthedocs.io/en/latest/
+Dokumentáció: https://flask-monitoringdashboard.readthedocs.io/en/latest/  
 user, jelszóval kapcs: [xngst](https://github.com/xngst)
 
 ### Gyakran Ismételt Kérdések
 
-**Hol tudom megnézni a saját bejelentéseim listáját?**
-A saját bejelentések listáját a Fiók Beállítások alatt, az Ügyeim listája gombra kattintva lehet elérni, a Bejelentve általam szekció alatt.
+**Hol tudom megnézni a saját bejelentéseim listáját?**  
+A saját bejelentések listáját a Fiókbeállítások alatt, az Ügyeim listája gombra kattintva lehet elérni, a Bejelentve általam szekció alatt.
 
-**Hol tudom megnézni azoknak a bejelentéseknek a listáját, ahol szervezőként lettem megjelölve?**
-A Fiók Beállítások alatt, az Ügyeim listája gombra kattintva lehet elérni, a Szervező vagyok szekció alatt.
+**Hol tudom megnézni azoknak a bejelentéseknek a listáját, ahol szervezőként lettem megjelölve?**  
+A Fiókbeállítások alatt, az Ügyeim listája gombra kattintva lehet elérni, a Szervező vagyok szekció alatt.
 
-
-
+---
