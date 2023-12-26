@@ -393,3 +393,100 @@ A RÜM applikáció Gunicorn alkalmazás szervert használ, amely a következő 
 
 Gunicorn dokumentáció: https://docs.gunicorn.org/en/stable/
 
+### Az applikáció szerkezeti áttekintése
+A RÜM applikáció python programnyelvben íródott és alapvetőleg a Flask modulra támaszkodik.  
+A Flask egy mikrokeretrendszer, ami egy minimális webalkalmazás futtatását teszi lehetővé.  
+Az alap keretrendszer a következő eszközöket tartalmazza:  
+- Werkzeug:  
+Ez adja a WSGI interfészt. 
+A RÜM esetében ezzel kommunikál a Gunicorn applikációs szerver.  
+- Jinja2 templating engine:   
+Ez teszi lehetővé hogy a statikus HTML vázba dinamikus változókat írjon az applikáció.   
+Egy jinja template tehát képes kezelni az alkalmazás backendről kapott adatokat.
+
+Flask dokumentáció: https://flask.palletsprojects.com/en/2.2.x/
+
+Mivel ez egy minimális keretrendszer számos kiegészítő modulra szorul.  
+Felhasznált 3rd party Flask modulok:  
+- Flask-SQLAlchemy  
+Adatbázis agnosztikus Object Relationship Mapper. Ez építi fel a modely.py-ban definiált adatbázist,  
+illetve ez a modul biztosítja az alkalmazás kommunikációját (CRUD) az adatbázissal.  
+Az SQLAlchemynek köszönhetően as SQLite adatbázis lecserélhető más relációs adatbázis rendszerekre, pl MySQL vagy Postgres.  
+https://pypi.org/project/flask-sqlalchemy/
+
+
+- Flask-Login  
+Ez a modul kezeli a bejelentkezett felhasználókat.  
+A models.py-ban definiált user tábla osztály örökli a flask._login.UserMixint. 
+Az azonosítás email alapján történik.   
+A regisztráció a https://passziv.mkkp.party/regisztracio auth0 passzivista felületen történik.  
+Sikeres bejelentkezéskor az alkalmazás visszakapja a felhasználó email címét az Auth0 rendszertől.  
+Alkalmazáson belüli inicializálás:  
+> login.init_app(app)  
+> login.login_view = 'login'  
+Ahol a ’login’ megegyezik a /login url routtal.  
+  
+Az app.py alkalmazáson belül meghívott flask-login modulok:  
+
+- login_user
+A login user függvényt a  /callback url route hívja és egy érvényes SQLAlchemy user modelt fogad paraméterként.  
+Az érvényes user model objektumot a következő sor adja:  
+user = UserModel.query.filter_by(email = user_email).first()  
+A user_email string a sikeres bejelentkezés után az auth0 API-tól érkezik.  
+https://flask-login.readthedocs.io/en/latest/#flask_login.login_user  
+
+
+- logout_user
+A logout_user függvényt a /logout url route hívja és nincsenek megadanó paraméterei.  
+A current_usert fogja kijelentkeztetni a rendkivuliugyek.com alkalmazásból.
+A https://passziv.mkkp.party oldalt nem érinti ez a kijelentkeztetés.  
+Ha ténylegesen ki akarunk jelentkezni, akkor a https://passziv.mkkp.party oldalról is ki kell jelentkeznünk.
+
+- current_user  
+Proxyként szolgál az adott ügymenteben azonosított felhasználóhoz.   
+A flask-login a flask context processor method dekorátort használva magától létrehoz egy current_user nevű változót,  
+ami elérhetővé válik az összes Jinja templaten belül.  
+https://flask-login.readthedocs.io/en/latest/#flask_login.current_user
+
+- login_required 
+Url route köré rakott dekorátor, ami biztosítja hogy csak bejelentkezett felhasználók nyithatják meg az adott route-ot.  
+Dokumentáció: https://pypi.org/project/Flask-Login/
+
+
+- Flask-Cors  
+https://pypi.org/project/Flask-Cors/  
+A Flask-Cors bővítmény a Cross Origin Resource Sharing (CORS)-ban rejlő sebezhetőségek ellen nyújt védelmet.  
+Inicializálás:  
+> CORS(app, resources={r'/*': {'origins': '*'}})
+
+
+- Flask-Paranoid
+https://pypi.org/project/Flask-Paranoid/  
+Felhasználói ügymenet védelem. Ha egy kliens csatlakozik az applikációhoz, akkor IP és user agent alapon készít egy paranoid tokent. Az összes későbbi lekérés alkalmával újra készíti a tokent és összeveti az előzővel. Ha az ügymenet sütihez (session cookie) harmadik fél hozzányúl, akkor a flask-paranoid blokkolja a lekérést, törli az ügymenet sütiket és visszairányítja a klienst egy meghatározott url végpontra (redirect_view).  
+Inicializálás:
+> paranoid = Paranoid(app)
+> paranoid.redirect_view = '/'
+
+#### További 3rd party modulok:
+- boto3  
+AWS SDK python számára. A kulcsok a .env fileban vannak.  
+>import boto3
+>client = boto3.client('ses',
+>                       region_name=AWS_REGION,
+>                       aws_access_key_id=AWS_ACC_ID,
+>                       aws_secret_access_key=AWS_SECRET
+>                       )
+
+Példa levélküldés:
+>        from mail_template import create_submission_mail_SES
+>        SUBJECT = "Sikeres városmódosító bejelentés!"
+>        BODY_HTML = create_submission_mail_SES(submission)
+>        RECIPIENT = request.form["email"]
+
+>        response = client.send_email(
+>        Destination={'ToAddresses': [RECIPIENT]},
+>        Message={'Subject': {'Charset': CHARSET, 'Data': SUBJECT},
+>        'Body': {'Html': {'Charset': CHARSET, 'Data': BODY_HTML}}},
+>        Source=SENDER
+>        )
+
