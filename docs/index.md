@@ -1,5 +1,44 @@
 # Rendkívüli Ügyek Minisztériuma
 
+<!-- TOC start (generated with https://github.com/derlin/bitdowntoc) -->
+
+- [Rendkívüli Ügyek Minisztériuma](#rendkívüli-ügyek-minisztériuma)
+   * [Specifikáció](#specifikáció)
+   * [Az applikáció általános magas szintű leírása  ](#az-applikáció-általános-magas-szintű-leírása)
+      + [1. Kezdőlap  ](#1-kezdőlap)
+      + [2. Bejelentés  ](#2-bejelentés)
+      + [3. Ügy adatlap](#3-ügy-adatlap)
+      + [4. Összes bejelentés](#4-összes-bejelentés)
+      + [5. Térkép](#5-térkép)
+      + [6. Statisztika](#6-statisztika)
+      + [7. Regisztráció](#7-regisztráció)
+      + [TODO](#todo)
+      + [8. Bejelentkezés  ](#8-bejelentkezés)
+      + [TODO](#todo-1)
+      + [9. Fiókbeállítások](#9-fiókbeállítások)
+      + [10. Felhasználói adatok módosítása](#10-felhasználói-adatok-módosítása)
+      + [11. Felhasználók](#11-felhasználók)
+      + [12. Ügy adatainak módosítása](#12-ügy-adatainak-módosítása)
+      + [13. Szervező hozzáadása](#13-szervező-hozzáadása)
+      + [14. Easter Egg](#14-easter-egg)
+   * [Szoftver architektúra](#szoftver-architektúra)
+      + [Az applikáció szerkezeti áttekintése](#az-applikáció-szerkezeti-áttekintése)
+      + [További 3rd party modulok](#további-3rd-party-modulok)
+      + [Adatbázis leírása](#adatbázis-leírása)
+      + [Funkcionalitások leírása](#funkcionalitások-leírása)
+      + [3rd party szoftverek integráltsága](#3rd-party-szoftverek-integráltsága)
+   * [Jogosulstágkezelés](#jogosulstágkezelés)
+   * [Spam Botok elleni védelem](#spam-botok-elleni-védelem)
+   * [GDPR](#gdpr)
+   * [Sütik](#sütik)
+   * [Adatkezelési szabályzat  ](#adatkezelési-szabályzat)
+   * [Hibaelhárítás](#hibaelhárítás)
+   * [Monitoring](#monitoring)
+   * [Gyakran Ismételt Kérdések](#gyakran-ismételt-kérdések)
+<!-- TOC end -->
+
+<!-- TOC --><a name="rendkívüli-ügyek-minisztériuma"></a>
+
 ## Specifikáció
 
 A Rendkívüli Ügyek Minisztériuma webes alkalmazás a következő funkciókat teszi lehetővé:  
@@ -467,7 +506,7 @@ Inicializálás:
 > paranoid = Paranoid(app)
 > paranoid.redirect_view = '/'
 
-#### További 3rd party modulok:
+### További 3rd party modulok:
 - boto3  
 AWS SDK python számára. A kulcsok a .env fileban vannak.  
 >import boto3
@@ -504,7 +543,7 @@ https://en.wikipedia.org/wiki/ISO_8601
 A User és Submission tábla az adatok kis mennyisége és a könnyebb átláthatóság kedvéért nincsen normálizálva.  
 Az alkalmazás gyakorlatban egyszerű lekéréseket használ joinok nélkül.  
 Ahol szükség van parent-child referenciára, ott egységesen a parent_id mezőnév lett megadva.  
-#### Táblák listája:
+**Táblák listája:**  
 **user**
 - id = db.Column(db.Integer, primary_key=True)
 - create = db.Column(db.Boolean())
@@ -689,16 +728,6 @@ A GDPR szerint a session cookiek szigorú értelemben szükséges sütiknek min�
 így kivételt képeznek a felhasználói engedélyezés szükségessége alól.   
 Forrás: https://www.gdprsummary.com/gdpr-definitions/strictly-necessary-cookie/  
 Az alkalmazás nem gyűjt és nem tárol felhasználói adatokat, mint pl IP cím, tartózkodási hely stb.  
-
-
-### Ismert biztonsági sebezhetőségek
-Figyelni kell arra, hogy munkaszerveren ne maradjon az app.py utolsó soraiban a debugolás bekapcsolva.
-
->if __name__ == '__main__':
->    app.run(debug=False)
-
-Ez az újabb verziókban már csak egy pin kóddal hozzáférhető debugger konzolt tesz elérhetővé, 
-azonban nem kizárt hogy ha be van kapcsolva, akkor további sebezhetőségi felületet nyit.
 
 ### Hibaelhárítás
 
