@@ -633,5 +633,45 @@ Az Auth0 eredetileg a https://passziv.mkkp.party -hoz van regisztrálva.
 A regisztráció és a belépés az Auth0-n keresztül fut.  
 Ez azt jelenti, hogy a https://passziv.mkkp.party/regisztracio-n keresztül regisztrált felhasználók be tudnak lépni a RÜM-be is.  
 
+### Jogosulstágkezelés
+
+| Tevékenység                                                           | Anonim felhasználó (nem regisztrált) | MKKP passzivista regisztrált felhasználó | Szervező | Koordinátor | Admin |
+|-----------------------------------------------------------------------|--------------------------------------|------------------------------------------|----------|-------------|-------|
+| Bejelentés létrehozása                                                | X                                    | X                                        | X        | X           | X     |
+| Egyes Bejelentés megnézése                                            | X                                    | X                                        | X        | X           | X     |
+| Kezdőoldal megnézése                                                  | X                                    | X                                        | X        | X           | X     |
+| Összes bejelentés megnézése                                           | X                                    | X                                        | X        | X           | X     |
+| Regisztráció                                                          | X                                    | X                                        | X        | X           | X     |
+| Statisztikák megnézése                                                | X                                    | X                                        | X        | X           | X     |
+| Térkép megnézése                                                      | X                                    | X                                        | X        | X           | X     |
+| Bejelentés Borítókép módosítása                                       |                                      |                                          | X        | X           | X     |
+| Bejelentés Cím módosítása                                             |                                      |                                          | X        | X           | X     |
+| Bejelentés Előtte kép hozzáadása                                      |                                      |                                          | X        | X           | X     |
+| Bejelentés kategória típus módosítása                                 |                                      |                                          | X        | X           | X     |
+| Bejelentés kép törlése                                                |                                      |                                          | X        | X           | X     |
+| Bejelentés kiemeltté tétele                                           |                                      |                                          |          |             | X     |
+| Bejelentés Komment eltávolítása                                       |                                      | X (saját komment)                        | X        | X           | X     |
+| Bejelentés komment hozzáadása                                         |                                      | X (saját komment)                        | X        | X           | X     |
+| Bejelentés Komment szerkesztése                                       |                                      | X (saját komment)                        | X        | X           | X     |
+| Bejelentés leírásának módosítása                                      |                                      |                                          | X        | X           | X     |
+| Bejelentés megnevezésének módosítása                                  |                                      |                                          | X        | X           | X     |
+| Bejelentés szervező hozzáadása                                        |                                      |                                          |          | X           | X     |
+| Bejelentés státusz módosítása                                         |                                      |                                          | X        | X           | X     |
+| Bejelentés Utána kép hozzáadása                                       |                                      | X (csak ha ő volt az ügy bejelentője)    | X        | X           | X     |
+| Bejelentés záró szöveg hozzáadása                                     |                                      |                                          | X        | X           | X     |
+| Bejelentés záró szöveg módosítása                                     |                                      |                                          | X        | X           | X     |
+| Bejelentések listája, ahol saját felhasználó szervező lett megjelölve |                                      |                                          | X        |             |       |
+| Bejelentkezés                                                         |                                      | X                                        | X        | X           | X     |
+| Egyes bejelentés törlése                                              |                                      |                                          |          |             | X     |
+| Felhasználó törlése                                                   |                                      |                                          |          |             | X     |
+| Felhasználói fiók elérése                                             |                                      | X                                        | X        | X           | X     |
+| Többi felhasználó jogosultsági szint módosítása                       |                                      |                                          |          |             | X     |
+| Kép borítóképpé tétele az adatlapon                                   |                                      | X (csak ha ő volt az ügy bejelentője)    | X        | X           | X     |
+| Kép törlése adatlapon                                                 |                                      | X (csak ha ő volt az ügy bejelentője)    | X        | X           | X     |
+| Saját bejelentések listája                                            |                                      | X                                        | X        | X           | X     |
+| Saját felhasználó email módosítása                                    |                                      | X                                        | X        | X           | X     |
+| Saját felhasználó név módosítása                                      |                                      | X                                        | X        | X           | X     |
+| Saját felhasználó telefon megadása / módosítása                       |                                      | X                                        | X        | X           | X     |
+| Bejelentés Előtte kép hozzáadása                                      |                                      | X (csak ha ő volt az ügy bejelentője)    | X        | X           | X     |
 
 
