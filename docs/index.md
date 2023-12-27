@@ -686,6 +686,7 @@ Ez azt jelenti, hogy a https://passziv.mkkp.party/regisztracio-n keresztül regi
 | Térkép megnézése                                                      | X                                    | X                                        | X        | X           | X     |
 | Bejelentés Borítókép módosítása                                       |                                      |                                          | X        | X           | X     |
 | Bejelentés Cím módosítása                                             |                                      |                                          | X        | X           | X     |
+| Bejelentés Dátum módosítása                                           |                                      |                                          | X        | X           | X     |
 | Bejelentés Előtte kép hozzáadása                                      |                                      |                                          | X        | X           | X     |
 | Bejelentés kategória típus módosítása                                 |                                      |                                          | X        | X           | X     |
 | Bejelentés kép törlése                                                |                                      |                                          | X        | X           | X     |
@@ -697,22 +698,22 @@ Ez azt jelenti, hogy a https://passziv.mkkp.party/regisztracio-n keresztül regi
 | Bejelentés megnevezésének módosítása                                  |                                      |                                          | X        | X           | X     |
 | Bejelentés szervező hozzáadása                                        |                                      |                                          |          | X           | X     |
 | Bejelentés státusz módosítása                                         |                                      |                                          | X        | X           | X     |
-| Bejelentés Utána kép hozzáadása                                       |                                      | X (csak ha ő volt az ügy bejelentője)    | X        | X           | X     |
+| Bejelentés Utána kép hozzáadása                                       |                                      | X (csak ha az adott felhasználó volt az ügy bejelentője)    | X        | X           | X     |
 | Bejelentés záró szöveg hozzáadása                                     |                                      |                                          | X        | X           | X     |
 | Bejelentés záró szöveg módosítása                                     |                                      |                                          | X        | X           | X     |
-| Bejelentések listája, ahol saját felhasználó szervező lett megjelölve |                                      |                                          | X        |             |       |
+| Bejelentések listája, ahol saját felhasználó szervezőként lett megjelölve |                                  |                                          | X        |             |  X    |
 | Bejelentkezés                                                         |                                      | X                                        | X        | X           | X     |
 | Egyes bejelentés törlése                                              |                                      |                                          |          |             | X     |
 | Felhasználó törlése                                                   |                                      |                                          |          |             | X     |
 | Felhasználói fiók elérése                                             |                                      | X                                        | X        | X           | X     |
 | Többi felhasználó jogosultsági szint módosítása                       |                                      |                                          |          |             | X     |
-| Kép borítóképpé tétele az adatlapon                                   |                                      | X (csak ha ő volt az ügy bejelentője)    | X        | X           | X     |
-| Kép törlése adatlapon                                                 |                                      | X (csak ha ő volt az ügy bejelentője)    | X        | X           | X     |
+| Kép borítóképpé tétele az adatlapon                                   |                                      | X (csak ha az adott felhasználó volt az ügy bejelentője)    | X        | X           | X     |
+| Kép törlése adatlapon                                                 |                                      | X (csak ha az adott felhasználó volt az ügy bejelentője)    | X        | X           | X     |
 | Saját bejelentések listája                                            |                                      | X                                        | X        | X           | X     |
 | Saját felhasználó email módosítása                                    |                                      | X                                        | X        | X           | X     |
 | Saját felhasználó név módosítása                                      |                                      | X                                        | X        | X           | X     |
 | Saját felhasználó telefon megadása / módosítása                       |                                      | X                                        | X        | X           | X     |
-| Bejelentés Előtte kép hozzáadása                                      |                                      | X (csak ha ő volt az ügy bejelentője)    | X        | X           | X     |
+| Bejelentés Előtte kép hozzáadása                                      |                                      | X (csak ha az adott felhasználó volt az ügy bejelentője)    | X        | X           | X     |
 
 
 ### Spam Botok elleni védelem
