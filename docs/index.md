@@ -425,8 +425,8 @@ A View részt az .\app.py kezeli
 A lekéréseket WSGI (PEP333) specifikáció szerint kezeli a middleware.  
 ![Flask Nginx](flask_nginx.png)  
 A RÜM applikáció Gunicorn alkalmazás szervert használ, amely a következő feladatokért felel:
-- Több alkalmazás instanciát futtat. (A RÜM esetében a Gunicorn 4 instanciát futtat)
-> Lásd Dockerfile: CMD ["-w=4", "-b", "0.0.0.0:5000", "app:app"]
+- Több alkalmazás instanciát futtat. (A RÜM esetében a Gunicorn 4 instanciát futtat)  
+Lásd Dockerfile: `CMD ["-w=4", "-b", "0.0.0.0:5000", "app:app"]`
 - Ha leáll az alkalmazás, akkor automatikusan újraindítja az insanciát
 - HTTP requesteket közvetít a webszerver és az alkalmazás között
 - Terheléselosztást (load balancing) végez.
@@ -462,8 +462,8 @@ Az azonosítás email alapján történik.
 A regisztráció a https://passziv.mkkp.party/regisztracio auth0 passzivista felületen történik.  
 Sikeres bejelentkezéskor az alkalmazás visszakapja a felhasználó email címét az Auth0 rendszertől.  
 Alkalmazáson belüli inicializálás:  
-> login.init_app(app)  
-> login.login_view = 'login'  
+` login.init_app(app)`  
+` login.login_view = 'login'`  
 Ahol a ’login’ megegyezik a /login url routtal.  
   
 Az app.py alkalmazáson belül meghívott flask-login modulok:  
@@ -497,38 +497,42 @@ Dokumentáció: https://pypi.org/project/Flask-Login/
 https://pypi.org/project/Flask-Cors/  
 A Flask-Cors bővítmény a Cross Origin Resource Sharing (CORS)-ban rejlő sebezhetőségek ellen nyújt védelmet.  
 Inicializálás:  
-> CORS(app, resources={r'/*': {'origins': '*'}})
+` CORS(app, resources={r'/*': {'origins': '*'}})`
 
 
 - Flask-Paranoid
 https://pypi.org/project/Flask-Paranoid/  
 Felhasználói ügymenet védelem. Ha egy kliens csatlakozik az applikációhoz, akkor IP és user agent alapon készít egy paranoid tokent. Az összes későbbi lekérés alkalmával újra készíti a tokent és összeveti az előzővel. Ha az ügymenet sütihez (session cookie) harmadik fél hozzányúl, akkor a flask-paranoid blokkolja a lekérést, törli az ügymenet sütiket és visszairányítja a klienst egy meghatározott url végpontra (redirect_view).  
 Inicializálás:
-> paranoid = Paranoid(app)
-> paranoid.redirect_view = '/'
+` paranoid = Paranoid(app)`  
+` paranoid.redirect_view = '/'`  
 
 ### További 3rd party modulok:
 - boto3  
-AWS SDK python számára. A kulcsok a .env fileban vannak.  
->import boto3
->client = boto3.client('ses',
->                       region_name=AWS_REGION,
->                       aws_access_key_id=AWS_ACC_ID,
->                       aws_secret_access_key=AWS_SECRET
->                       )
+AWS SDK python számára. A kulcsok a .env fileban vannak.
+```
+import boto3
+client = boto3.client('ses',
+                       region_name=AWS_REGION,
+                       aws_access_key_id=AWS_ACC_ID,
+                       aws_secret_access_key=AWS_SECRET
+                       )
+```
 
 Példa levélküldés:
->        from mail_template import create_submission_mail_SES
->        SUBJECT = "Sikeres városmódosító bejelentés!"
->        BODY_HTML = create_submission_mail_SES(submission)
->        RECIPIENT = request.form["email"]
+```
+from mail_template import create_submission_mail_SES
+SUBJECT = "Sikeres városmódosító bejelentés!"
+BODY_HTML = create_submission_mail_SES(submission)
+RECIPIENT = request.form["email"]
 
->        response = client.send_email(
->        Destination={'ToAddresses': [RECIPIENT]},
->        Message={'Subject': {'Charset': CHARSET, 'Data': SUBJECT},
->        'Body': {'Html': {'Charset': CHARSET, 'Data': BODY_HTML}}},
->        Source=SENDER
->        )
+response = client.send_email(
+Destination={'ToAddresses': [RECIPIENT]},
+Message={'Subject': {'Charset': CHARSET, 'Data': SUBJECT},
+'Body': {'Html': {'Charset': CHARSET, 'Data': BODY_HTML}}},
+Source=SENDER
+)
+```
 
 
 ### Adatbázis leírása
@@ -662,8 +666,7 @@ MKKP által regisztrált Email szolgáltató.
 Honlap: https://aws.amazon.com/ses/  
 Az alkalmazás névterébe az import boto3 sor hívja be az email klienst.  
 A kliens inicializálása a következő sorral történik:  
-> client = boto3.client('ses',region_name=AWS_REGION,aws_access_key_id=AWS_ACC_ID,
-> aws_secret_access_key=AWS_SECRET)
+` client = boto3.client('ses',region_name=AWS_REGION,aws_access_key_id=AWS_ACC_ID,aws_secret_access_key=AWS_SECRET)`   
 Kommunikációnál használt email cím: rendkivuliugyek@mkkp.hu  
 További technikai dokumentáció: https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html  
 
@@ -719,8 +722,8 @@ Ez azt jelenti, hogy a https://passziv.mkkp.party/regisztracio-n keresztül regi
 ### Spam Botok elleni védelem
 Az applikáció korábbi változatánál előbb-utóbb spam botok is elkezdték használni a bejelentő adatlapot.  
 A szövegek legtöbbször nem magyar nyelvűek voltak.  
-Gyakran már a megnevezés címébe is külső url címeket írtak bele.   
-Ezért a bejelentés https://rendkivuliugyek.site/submission felületen a cím nem tartalmazhat „http” karakterláncot. 
+Gyakran már a megnevezés címébe is külső url címeket írtak bele.  
+Ezért a bejelentés https://rendkivuliugyek.site/submission felületen a cím nem tartalmazhat „http” karakterláncot.  
  
 
 ### Sütik
