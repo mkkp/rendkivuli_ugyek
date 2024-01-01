@@ -12,7 +12,7 @@ from random import randint
 import pathlib
 
 # THIRD PARTY MODULES
-import boto3 #AWS 
+import boto3  # AWS
 from botocore.exceptions import ClientError
 
 from dotenv import load_dotenv
@@ -81,35 +81,35 @@ if load_dotenv():
 else:
     print("---internal .env was not found---")
 
-#APP
+# APP
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static/upload')
+UPLOAD_FOLDER = os.path.join(BASE_DIR, "static/upload")
 
-DEBUG_MODE = os.environ['DEBUG_MODE']
-PORT = os.environ['PORT']
-APP_SECRET_KEY = os.environ['APP_SECRET_KEY']
-ROWS_PER_PAGE = int(os.environ['ROWS_PER_PAGE'])
+DEBUG_MODE = os.environ["DEBUG_MODE"]
+PORT = os.environ["PORT"]
+APP_SECRET_KEY = os.environ["APP_SECRET_KEY"]
+ROWS_PER_PAGE = int(os.environ["ROWS_PER_PAGE"])
 
 ##MAP
-MAP_KEY = os.environ['MAP_KEY']
-INIT_LAT = os.environ['INIT_LAT']
-INIT_LNG = os.environ['INIT_LNG']
+MAP_KEY = os.environ["MAP_KEY"]
+INIT_LAT = os.environ["INIT_LAT"]
+INIT_LNG = os.environ["INIT_LNG"]
 
-#AWS
-SENDER = os.environ['SENDER']
-CHARSET = os.environ['CHARSET']
-AWS_REGION = os.environ['AWS_REGION']
-AWS_ACC_ID = os.environ['AWS_ACC_ID']
-AWS_SECRET = os.environ['AWS_SECRET']
+# AWS
+SENDER = os.environ["SENDER"]
+CHARSET = os.environ["CHARSET"]
+AWS_REGION = os.environ["AWS_REGION"]
+AWS_ACC_ID = os.environ["AWS_ACC_ID"]
+AWS_SECRET = os.environ["AWS_SECRET"]
 
 ##DB
-DB_NAME = os.environ['DB_NAME']
+DB_NAME = os.environ["DB_NAME"]
 DB_PATH = os.path.join(BASE_DIR, "db", DB_NAME)
 
 # AUTH0
-AUTH0_CLIENT_ID = os.environ['AUTH0_CLIENT_ID']
-AUTH0_CLIENT_SECRET = os.environ['AUTH0_CLIENT_SECRET']
-AUTH0_DOMAIN = os.environ['AUTH0_DOMAIN']
+AUTH0_CLIENT_ID = os.environ["AUTH0_CLIENT_ID"]
+AUTH0_CLIENT_SECRET = os.environ["AUTH0_CLIENT_SECRET"]
+AUTH0_DOMAIN = os.environ["AUTH0_DOMAIN"]
 
 ##APP
 app = Flask(__name__)
@@ -136,7 +136,7 @@ app.secret_key = APP_SECRET_KEY
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + DB_PATH
 
-#DASHBOARD
+# DASHBOARD
 dashboard.bind(app)
 
 # CORS
@@ -153,16 +153,18 @@ login.init_app(app)
 login.login_view = "login"
 
 # AWS SES
-client = boto3.client('ses',
-                       region_name=AWS_REGION,
-                       aws_access_key_id=AWS_ACC_ID,
-                       aws_secret_access_key=AWS_SECRET
-                       )
+client = boto3.client(
+    "ses",
+    region_name=AWS_REGION,
+    aws_access_key_id=AWS_ACC_ID,
+    aws_secret_access_key=AWS_SECRET,
+)
 
 
 # -------------------------------
 # ---------V I E W S-------------
 # -------------------------------
+
 
 # ADATBÁZIS LÉTREHOZÁSA
 @app.before_first_request
@@ -198,32 +200,32 @@ def add_submission():
                 "submission.html", ACCESS_KEY=MAP_KEY, lat=INIT_LAT, lng=INIT_LNG
             )
 
-        #Embedded link validation
+        # Embedded link validation
         if "http" in request.form["title"]:
             flash("A szöveg nem tartalmazhat linket!", "danger")
             return render_template(
                 "submission.html", ACCESS_KEY=MAP_KEY, lat=INIT_LAT, lng=INIT_LNG
             )
 
-        #Naive XSS validation
+        # Naive XSS validation
         if "<" in request.form["title"] or ">" in request.form["title"]:
-            flash("Nem megengedett karakter.","danger")
+            flash("Nem megengedett karakter.", "danger")
             return render_template(
                 "submission.html", ACCESS_KEY=MAP_KEY, lat=INIT_LAT, lng=INIT_LNG
-                )
-                
+            )
+
         if "<" in request.form["type"] or ">" in request.form["type"]:
-            flash("Nem megengedett karakter.","danger")
+            flash("Nem megengedett karakter.", "danger")
             return render_template(
                 "submission.html", ACCESS_KEY=MAP_KEY, lat=INIT_LAT, lng=INIT_LNG
-                )
+            )
 
         if "<" in request.form["address"] or ">" in request.form["address"]:
-            flash("Nem megengedett karakter.","danger")
+            flash("Nem megengedett karakter.", "danger")
             return render_template(
                 "submission.html", ACCESS_KEY=MAP_KEY, lat=INIT_LAT, lng=INIT_LNG
-                )
-                
+            )
+
         submission = SubmissionModel(
             title=request.form["title"],
             problem_type=request.form["type"],
@@ -264,21 +266,23 @@ def add_submission():
             submission_id=str(submission.id),
         )
 
-        #SEND EMAIL 
+        # SEND EMAIL
         SUBJECT = "Sikeres városmódosító bejelentés!"
         BODY_HTML = create_submission_mail_SES(submission)
         RECIPIENT = request.form["email"]
 
         try:
             response = client.send_email(
-            Destination={'ToAddresses': [RECIPIENT]},
-            Message={'Subject': {'Charset': CHARSET, 'Data': SUBJECT},
-            'Body': {'Html': {'Charset': CHARSET, 'Data': BODY_HTML}}},
-            Source=SENDER
+                Destination={"ToAddresses": [RECIPIENT]},
+                Message={
+                    "Subject": {"Charset": CHARSET, "Data": SUBJECT},
+                    "Body": {"Html": {"Charset": CHARSET, "Data": BODY_HTML}},
+                },
+                Source=SENDER,
             )
         except Exception as err:
             pass
-        
+
         flash("Sikeres bejelentés! Küldtünk egy levelet is!", "success")
         return redirect(f"/single_submission/{submission.id}")
 
@@ -299,7 +303,6 @@ def change_submission_data(submission_id):
     submission = SubmissionModel.query.filter_by(id=submission_id).first()
 
     if request.method == "POST":
-
         if request.form["new_title"] != "":
             new_title = request.form["new_title"]
             submission.title = new_title
@@ -335,12 +338,12 @@ def change_submission_data(submission_id):
             submission.suggestion = new_suggestion
             db.session.commit()
             flash("Sikeresen módosítottad az ügy megoldási javaslatát!", "success")
-            
+
         if request.form["new_created_date"] != "":
             new_created_date = request.form["new_created_date"]
             submission.created_date = new_created_date
             db.session.commit()
-            flash("Sikeresen módosítottad az ügy bejelentési dátumát!", "success")            
+            flash("Sikeresen módosítottad az ügy bejelentési dátumát!", "success")
 
         try:
             featured = request.form["featured"]
@@ -354,7 +357,6 @@ def change_submission_data(submission_id):
             db.session.commit()
 
         if request.form["status"] != submission.status:
-
             new_status = request.form["status"]
             changed_by = request.form["current_user"]
 
@@ -362,23 +364,24 @@ def change_submission_data(submission_id):
             submission.status_changed_date = get_date()
             submission.status_changed_by = changed_by
             db.session.commit()
-            
-            #MAIL TO SZERVEZŐ
+
+            # MAIL TO SZERVEZŐ
             if submission.owner_email != "":
-            
                 SUBJECT = f"Státusz változás: {submission.title}"
                 BODY_HTML = create_status_change_mail_SES(submission)
                 RECIPIENT = submission.owner_email
                 try:
                     client.send_email(
-                    Destination={'ToAddresses': [RECIPIENT]},
-                    Message={'Subject': {'Charset': CHARSET, 'Data': SUBJECT},
-                    'Body': {'Html': {'Charset': CHARSET, 'Data': BODY_HTML}}},
-                    Source=SENDER
+                        Destination={"ToAddresses": [RECIPIENT]},
+                        Message={
+                            "Subject": {"Charset": CHARSET, "Data": SUBJECT},
+                            "Body": {"Html": {"Charset": CHARSET, "Data": BODY_HTML}},
+                        },
+                        Source=SENDER,
                     )
                 except Exception as err:
                     pass
-                
+
                 flash(
                     f"Sikeresen módosítottad az ügy státuszát erre: {new_status}. A szervezőnek ment levél.",
                     "success",
@@ -391,17 +394,18 @@ def change_submission_data(submission_id):
                 )
 
             if new_status == "Megoldva":
-
                 SUBJECT = f"RÜM befejezett ügy: {submission.title}"
                 BODY_HTML = create_solution_mail_SES(submission)
                 RECIPIENT = submission.submitter_email
 
                 try:
                     client.send_email(
-                    Destination={'ToAddresses': [RECIPIENT]},
-                    Message={'Subject': {'Charset': CHARSET, 'Data': SUBJECT},
-                    'Body': {'Html': {'Charset': CHARSET, 'Data': BODY_HTML}}},
-                    Source=SENDER
+                        Destination={"ToAddresses": [RECIPIENT]},
+                        Message={
+                            "Subject": {"Charset": CHARSET, "Data": SUBJECT},
+                            "Body": {"Html": {"Charset": CHARSET, "Data": BODY_HTML}},
+                        },
+                        Source=SENDER,
                     )
                 except Exception as err:
                     pass
@@ -451,14 +455,15 @@ def single_submission(id):
     submission_id = str(id)
 
     if request.method == "POST":
-
         if "comment-submit" in request.form:
             form_comment = request.form["comment"]
-            
-            if CommentModel.query.filter_by(body=form_comment, parent_id=submission_id).first():
-                #comment is a duplicate
+
+            if CommentModel.query.filter_by(
+                body=form_comment, parent_id=submission_id
+            ).first():
+                # comment is a duplicate
                 pass
-            
+
             else:
                 comment = CommentModel(
                     commenter=request.form["current_user"],
@@ -504,10 +509,12 @@ def single_submission(id):
 
             try:
                 client.send_email(
-                Destination={'ToAddresses': [RECIPIENT]},
-                Message={'Subject': {'Charset': CHARSET, 'Data': SUBJECT},
-                'Body': {'Html': {'Charset': CHARSET, 'Data': BODY_HTML}}},
-                Source=SENDER
+                    Destination={"ToAddresses": [RECIPIENT]},
+                    Message={
+                        "Subject": {"Charset": CHARSET, "Data": SUBJECT},
+                        "Body": {"Html": {"Charset": CHARSET, "Data": BODY_HTML}},
+                    },
+                    Source=SENDER,
                 )
             except Exception as err:
                 pass
@@ -532,15 +539,14 @@ def single_submission(id):
 def all_submission():
     "#"
     page = request.args.get("page", 1, type=int)
-    
+
     post_list = SubmissionModel.query.order_by(
         SubmissionModel.created_date.desc()
-        ).paginate(page=page, per_page=ROWS_PER_PAGE)
+    ).paginate(page=page, per_page=ROWS_PER_PAGE)
 
     featured = SubmissionModel.query.filter_by(featured=True).all()
 
     if request.method == "POST":
-    
         county = request.form["county"]
         zipcode = request.form["zipcode"]
         problem_type = request.form["type"]
@@ -555,7 +561,7 @@ def all_submission():
 
         if county != "":
             county_dict = {"county": county}
-            
+
         if zipcode != "":
             zipcode_dict = {"zipcode": zipcode[:-1]}
 
@@ -574,40 +580,36 @@ def all_submission():
                 .order_by(SubmissionModel.created_date.desc())
                 .paginate(page=page, per_page=ROWS_PER_PAGE)
             )
-            
-            # A szöveges kereső még nincs integrálva a többi keresőopcióval, 
-            #ezért vagy-vagy alapon lehet használni
+
+            # A szöveges kereső még nincs integrálva a többi keresőopcióval,
+            # ezért vagy-vagy alapon lehet használni
             return render_template("all_submission.html", post_list=filtered_list)
 
         # merge dicts
         query_dict = county_dict | zipcode_dict | problem_type_dict | status_dict
-        
-        #store dict in session cookie
-        session['filter'] = query_dict
-        
+
+        # store dict in session cookie
+        session["filter"] = query_dict
+
         try:
             filtered_list = (
                 SubmissionModel.query.filter_by(**query_dict)
                 .order_by(SubmissionModel.created_date.desc())
                 .paginate(page=1, per_page=ROWS_PER_PAGE)
             )
-            
+
         except Exception as e:
             flash("Nincs találati eredmény", "danger")
-            return render_template(
-                "all_submission.html", post_list=post_list
-            )
-        
+            return render_template("all_submission.html", post_list=post_list)
+
         return render_template(
-            "all_submission.html",
-            post_list=filtered_list,
-            filters=query_dict
+            "all_submission.html", post_list=filtered_list, filters=query_dict
         )
-        
-    #GET
+
+    # GET
     try:
-        if 'filter' in session.keys():
-            query_dict = session['filter']
+        if "filter" in session.keys():
+            query_dict = session["filter"]
             filtered_list = (
                 SubmissionModel.query.filter_by(**query_dict)
                 .order_by(SubmissionModel.created_date.desc())
@@ -617,11 +619,11 @@ def all_submission():
                 "all_submission.html",
                 post_list=filtered_list,
                 featured=featured,
-                filters=query_dict
+                filters=query_dict,
             )
     except Exception as err:
         pass
-    
+
     return render_template(
         "all_submission.html", post_list=post_list, featured=featured
     )
@@ -636,27 +638,28 @@ def assign(id):
     submission = SubmissionModel.query.filter_by(id=id).first()
 
     if request.method == "POST":
-
         submission.owner_email = request.form["email"]
         submission.owner_user = request.form["username"]
         submission.status = "Folyamatban"
         db.session.commit()
 
-        #send mail
+        # send mail
         SUBJECT = f"RÜM szervező lettél!"
         BODY_HTML = create_organiser_mail_SES(submission)
         RECIPIENT = request.form["email"]
 
         try:
             client.send_email(
-            Destination={'ToAddresses': [RECIPIENT]},
-            Message={'Subject': {'Charset': CHARSET, 'Data': SUBJECT},
-            'Body': {'Html': {'Charset': CHARSET, 'Data': BODY_HTML}}},
-            Source=SENDER
-            )        
+                Destination={"ToAddresses": [RECIPIENT]},
+                Message={
+                    "Subject": {"Charset": CHARSET, "Data": SUBJECT},
+                    "Body": {"Html": {"Charset": CHARSET, "Data": BODY_HTML}},
+                },
+                Source=SENDER,
+            )
         except Exception as err:
             pass
-        
+
         flash("Szervező sikeresen hozzáadva!", "success")
         return redirect(f"/single_submission/{id}")
 
@@ -668,7 +671,7 @@ def assign(id):
 @login_required
 def delete_comment(id):
     "#"
-    
+
     comment = CommentModel.query.filter_by(id=id)
     submission_id = comment.first().parent_id
     comment.delete()
@@ -692,8 +695,8 @@ def delete_picture(status_type, id):
     db.session.commit()
     flash("A képet sikeresen töröltük!", "success")
     return redirect(f"/single_submission/{submission_id}")
-    
- 
+
+
 # BORÍTÓKÉP MÓDOSÍTÁSA
 @app.route("/change_cover/<status_type>/<id>", methods=["GET"])
 @login_required
@@ -708,14 +711,17 @@ def change_cover(status_type, id):
     submission = SubmissionModel.query.filter_by(id=submission_id).first()
     submission.cover_image = picture.first().thumb_file_name
     submission.cover_image_full = picture.first().file_name
-    
+
     db.session.commit()
-    
-    flash("""A borítókép cserélési eljárás
+
+    flash(
+        """A borítókép cserélési eljárás
              előkészítését elindítottuk.
              Ügyintézőnk egy héten belül jelentkezik.
              Kérjük, addig ne mozduljon a készüléke mellől!
-         ""","success")
+         """,
+        "success",
+    )
     return redirect(f"/single_submission/{submission_id}")
 
 
@@ -724,17 +730,17 @@ def change_cover(status_type, id):
 @login_required
 def delete_submission(id):
     "#"
-    
-    write_log(BASE_DIR,current_user,f"delete submission_{id}")
-    
+
+    write_log(BASE_DIR, current_user, f"delete submission_{id}")
+
     if current_user.role != "admin" and current_user.role != "coordinator":
         flash("Bejelentést csak admin vagy kordinátor törölhet!", "danger")
         return render_template("index.html")
-    
+
     submission = SubmissionModel.query.filter_by(id=id)
     submission.delete()
 
-    images_before = ImageBeforeModel.query.	filter_by(parent_id=id)
+    images_before = ImageBeforeModel.query.filter_by(parent_id=id)
     images_after = ImageAfterModel.query.filter_by(parent_id=id)
     comments = CommentModel.query.filter_by(parent_id=id)
 
@@ -754,7 +760,7 @@ def delete_submission(id):
 @app.route("/statistics", methods=["POST", "GET"])
 def statistics():
     "#"
-    
+
     post_count = SubmissionModel.query.count()
     user_count = UserModel.query.count()
     submitted_count = SubmissionModel.query.filter_by(status="Bejelentve").count()
@@ -791,7 +797,6 @@ def full_map():
     emtpy_result = False
 
     if request.method == "POST":
-
         submission_type = request.form["type"]
         submission_status = request.form["status"]
 
@@ -874,7 +879,6 @@ def full_map():
 def user_account():
     "#"
     if request.method == "POST":
-
         if "own_submissions" in request.form:
             user_id = int(request.form["user_id"])
             user = UserModel.query.filter_by(id=user_id).first()
@@ -895,7 +899,6 @@ def change_user_data(user_id):
     user = UserModel.query.filter_by(id=user_id).first()
 
     if request.method == "POST":
-
         if request.form["new_user_name"] != "":
             new_user_name = request.form["new_user_name"]
             user.user_name = new_user_name
@@ -922,11 +925,11 @@ def change_user_data(user_id):
 @login_required
 def user_management():
     "#"
-    
+
     if not current_user.role == "admin":
-        flash("Ide csak admin léphet!","danger")
+        flash("Ide csak admin léphet!", "danger")
         return render_template("index.html")
-    
+
     if request.method == "POST":
         pass
     user_list = UserModel.query.all()
@@ -939,9 +942,9 @@ def user_management():
 def user_manage(id):
     "#"
     if not current_user.role == "admin":
-        flash("Ide csak admin léphet!","danger")
+        flash("Ide csak admin léphet!", "danger")
         return render_template("index.html")
-            
+
     user = UserModel.query.filter_by(id=id).first()
 
     if request.method == "POST":
@@ -958,15 +961,14 @@ def user_manage(id):
 @app.route("/download", methods=["GET"])
 @login_required
 def download_data():
-    
     if current_user.role != "admin" and current_user.role != "coordinator":
-        flash("Csak admin vagy kordinátor tölthet le!","danger")
+        flash("Csak admin vagy kordinátor tölthet le!", "danger")
         return render_template("index.html")
-        
+
     write_log(BASE_DIR, current_user, "download all data")
 
     submissions = SubmissionModel.query.all()
-    
+
     submission_id = [submission.id for submission in submissions]
     title = [submission.title for submission in submissions]
     problem_type = [submission.problem_type for submission in submissions]
@@ -1031,8 +1033,7 @@ def register():
 def site_login():
     "#"
     return oauth.auth0.authorize_redirect(
-        redirect_uri=url_for("callback", _external=True, _scheme="https"
-        )
+        redirect_uri=url_for("callback", _external=True, _scheme="https")
     )
 
 
@@ -1089,15 +1090,15 @@ def easter_egg():
     "#"
     try:
         import requests
+
         response = requests.get("https://dog.ceo/api/breeds/image/random")
         resp_json = response.json()
         kutyi_pic = resp_json["message"]
-        return render_template("easter_egg.html",
-                                kutyi_pic=kutyi_pic)       
+        return render_template("easter_egg.html", kutyi_pic=kutyi_pic)
     except Exception as e:
         pass
-        
-        
+
+
 # ADATVÉDELMI TÁJÉKOZTATÓ
 @app.route("/user_data_info", methods=["GET"])
 def user_data_info():
@@ -1117,9 +1118,8 @@ def page_not_found(e):
 def page_not_found(e):
     "#"
     return render_template("502.html")
-    
+
 
 # APP RUN
 if __name__ == "__main__":
     app.run(host="localhost", port=PORT, debug=DEBUG_MODE)
-
