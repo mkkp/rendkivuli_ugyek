@@ -130,13 +130,14 @@ oauth.register(
     server_metadata_url=f"https://{AUTH0_DOMAIN}/.well-known/openid-configuration",
 )
 
-##DATABASE
-db.init_app(app)
-
 # APP CONFIG
 app.secret_key = APP_SECRET_KEY
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + DB_PATH
+
+##DATABASE
+db.init_app(app)
+
 
 # DASHBOARD
 dashboard.bind(app)
