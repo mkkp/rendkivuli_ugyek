@@ -9,7 +9,6 @@ MKKP városfelújítós alkalmazás
 import os
 import shutil
 from random import randint
-import pathlib
 
 # THIRD PARTY MODULES
 import boto3  # AWS
