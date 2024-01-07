@@ -24,6 +24,7 @@
       + [14. Easter Egg](#14-easter-egg)
    * [Szoftver architektúra](#szoftver-architektúra)
       + [Az applikáció szerkezeti áttekintése](#az-applikáció-szerkezeti-áttekintése)
+      + [Formázási beállítások](#formázási-beállítások)
       + [További 3rd party modulok](#további-3rd-party-modulok)
       + [Adatbázis leírása](#adatbázis-leírása)
       + [Funkcionalitások leírása](#funkcionalitások-leírása)
@@ -432,6 +433,10 @@ Lásd Dockerfile: `CMD ["-w=4", "-b", "0.0.0.0:5000", "app:app"]`
 - Terheléselosztást (load balancing) végez.
 
 Gunicorn dokumentáció: https://docs.gunicorn.org/en/stable/
+
+### Formázási beállítások
+A project python kód része black-el formázott.  
+https://pypi.org/project/black/
 
 ### Az applikáció szerkezeti áttekintése
 A RÜM applikáció python programnyelvben íródott és alapvetőleg a Flask modulra támaszkodik.  
