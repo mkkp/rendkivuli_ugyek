@@ -4,6 +4,7 @@ General utility functions for MKKP városfelújítós
 import os
 import re
 import uuid
+import logging
 
 from dotenv import load_dotenv
 from datetime import datetime as dt
@@ -17,6 +18,8 @@ from models import db
 from models import SubmissionModel
 from models import ImageBeforeModel
 from models import ImageAfterModel
+
+logger = logging.getLogger("rum.utils")
 
 THUMBNAIL_SIZE = (1000, 1000)
 FULL_SIZE = (1200, 2400)
