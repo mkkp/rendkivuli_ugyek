@@ -64,6 +64,7 @@ from utils import get_date
 from utils import save_picture
 from utils import get_random_name
 from utils import write_log
+from utils import MockBoto3Client
 
 # MAIL TEMPLATES
 
@@ -157,12 +158,15 @@ login.init_app(app)
 login.login_view = "login"
 
 # AWS SES
-client = boto3.client(
-    "ses",
-    region_name=AWS_REGION,
-    aws_access_key_id=AWS_ACC_ID,
-    aws_secret_access_key=AWS_SECRET,
-)
+if AWS_REGION == "MOCK":
+    client = MockBoto3Client()
+else:
+    client = boto3.client(
+        "ses",
+        region_name=AWS_REGION,
+        aws_access_key_id=AWS_ACC_ID,
+        aws_secret_access_key=AWS_SECRET,
+    )
 
 
 # -------------------------------

@@ -5,6 +5,7 @@ import os
 import re
 import uuid
 import logging
+import json
 
 from dotenv import load_dotenv
 from datetime import datetime as dt
@@ -150,3 +151,10 @@ def write_log(base_dir, current_user, event):
     return
 
 
+class MockBoto3Client:
+    def send_email(self, **kwargs):
+        logger.info(
+            "Mail would have been sent: {}".format(
+                json.dumps(kwargs, indent=4, sort_keys=True, ensure_ascii=False)
+            )
+        )
