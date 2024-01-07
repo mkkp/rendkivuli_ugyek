@@ -2,6 +2,7 @@ app.db
 config.py
 static/upload
 .env
+flask_monitoringdashboard.db
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
