@@ -285,7 +285,7 @@ def add_submission():
                 Source=SENDER,
             )
         except Exception as err:
-            pass
+            logger.error("Error sending email", err)
 
         flash("Sikeres bejelentés! Küldtünk egy levelet is!", "success")
         return redirect(f"/single_submission/{submission.id}")
