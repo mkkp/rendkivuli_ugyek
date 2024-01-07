@@ -9,6 +9,7 @@ MKKP városfelújítós alkalmazás
 import os
 import shutil
 from random import randint
+import logging
 
 # THIRD PARTY MODULES
 import boto3  # AWS
@@ -75,10 +76,12 @@ from mail_template import create_organiser_mail_SES
 # ---------C O N F I G-----------
 # -------------------------------
 
+logger = logging.getLogger("rum.app")
+
 if load_dotenv():
-    print("loading env...")
+    logger.info("loading env...")
 else:
-    print("---internal .env was not found---")
+    logger.warn("---internal .env was not found---")
 
 # APP
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
