@@ -18,8 +18,9 @@ from models import SubmissionModel
 from models import ImageBeforeModel
 from models import ImageAfterModel
 
-THUMBNAIL_SIZE = (1000,1000)
-FULL_SIZE = (1200,2400)
+THUMBNAIL_SIZE = (1000, 1000)
+FULL_SIZE = (1200, 2400)
+
 
 def valid_email(email: str) -> bool:
     """
@@ -45,7 +46,6 @@ def save_picture(pictures, upload_folder, tag, submission_id):
     picture_dir = os.path.join(upload_folder, submission_id)
 
     for picture in pictures:
-
         """Az adatlapon keresztül utólagosan feltöltött képek is a save_picture API-t használják,
         ami nem veszi figyelembe hogy eddig hány kép lett elmentve milyen sorszámmal.
         Ez azt eredményezi, hogy lehet két ugyanolyan nevű de más tartalmú képünk is.
@@ -87,7 +87,6 @@ def save_picture(pictures, upload_folder, tag, submission_id):
 
         # UPDATE DB MODELS
         if tag == "before":
-
             image = ImageBeforeModel(
                 parent_id=submission_id,
                 file_name=new_filename,
@@ -95,7 +94,6 @@ def save_picture(pictures, upload_folder, tag, submission_id):
                 created_date=get_date(),
             )
         if tag == "after":
-
             image = ImageAfterModel(
                 parent_id=submission_id,
                 file_name=new_filename,
@@ -141,9 +139,10 @@ def get_random_name():
         name_list = [name.strip() for name in file.readlines()]
     return name_list[randint(1, len(name_list))]
 
+
 def write_log(base_dir, current_user, event):
     ts = dt.now().strftime("%Y-%m-%d %H:%M")
-    with open(Path(base_dir)/f"sec_log.txt","a") as f:
+    with open(Path(base_dir) / f"sec_log.txt", "a") as f:
         f.write(f"\n{ts},{current_user.email},{event}")
     return
 
