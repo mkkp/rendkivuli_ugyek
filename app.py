@@ -76,6 +76,7 @@ from mail_template import create_organiser_mail_SES
 # ---------C O N F I G-----------
 # -------------------------------
 
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("rum.app")
 
 if load_dotenv():
