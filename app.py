@@ -9,7 +9,7 @@ MKKP városfelújítós alkalmazás
 import os
 import shutil
 from random import randint
-import pathlib
+import logging
 
 # THIRD PARTY MODULES
 import boto3  # AWS
@@ -64,6 +64,7 @@ from utils import get_date
 from utils import save_picture
 from utils import get_random_name
 from utils import write_log
+from utils import MockBoto3Client
 
 # MAIL TEMPLATES
 
@@ -76,10 +77,13 @@ from mail_template import create_organiser_mail_SES
 # ---------C O N F I G-----------
 # -------------------------------
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("rum.app")
+
 if load_dotenv():
-    print("loading env...")
+    logger.info("loading env...")
 else:
-    print("---internal .env was not found---")
+    logger.warn("---internal .env was not found---")
 
 # APP
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -128,13 +132,14 @@ oauth.register(
     server_metadata_url=f"https://{AUTH0_DOMAIN}/.well-known/openid-configuration",
 )
 
-##DATABASE
-db.init_app(app)
-
 # APP CONFIG
 app.secret_key = APP_SECRET_KEY
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + DB_PATH
+
+##DATABASE
+db.init_app(app)
+
 
 # DASHBOARD
 dashboard.bind(app)
@@ -153,12 +158,15 @@ login.init_app(app)
 login.login_view = "login"
 
 # AWS SES
-client = boto3.client(
-    "ses",
-    region_name=AWS_REGION,
-    aws_access_key_id=AWS_ACC_ID,
-    aws_secret_access_key=AWS_SECRET,
-)
+if AWS_REGION == "MOCK":
+    client = MockBoto3Client()
+else:
+    client = boto3.client(
+        "ses",
+        region_name=AWS_REGION,
+        aws_access_key_id=AWS_ACC_ID,
+        aws_secret_access_key=AWS_SECRET,
+    )
 
 
 # -------------------------------
@@ -281,7 +289,7 @@ def add_submission():
                 Source=SENDER,
             )
         except Exception as err:
-            pass
+            logger.error("Error sending email", err)
 
         flash("Sikeres bejelentés! Küldtünk egy levelet is!", "success")
         return redirect(f"/single_submission/{submission.id}")
