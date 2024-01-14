@@ -1053,7 +1053,6 @@ def site_login():
 def callback():
     "#"
     token = oauth.auth0.authorize_access_token()
-    session["user"] = token
     user_email = token["userinfo"]["email"]
     aud = token["userinfo"]["aud"]
     user_name = token["userinfo"]["name"]
