@@ -7,7 +7,6 @@ import uuid
 import logging
 import json
 
-from dotenv import load_dotenv
 from datetime import datetime as dt
 from functools import wraps
 from pathlib import Path

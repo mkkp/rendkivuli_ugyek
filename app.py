@@ -13,7 +13,6 @@ import logging
 
 # THIRD PARTY MODULES
 import boto3  # AWS
-from botocore.exceptions import ClientError
 
 from dotenv import load_dotenv
 import flask_excel as excel
