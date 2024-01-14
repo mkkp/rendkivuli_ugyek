@@ -31,6 +31,8 @@ logger = logging.getLogger("rum.utils")
 THUMBNAIL_SIZE = (1000, 1000)
 FULL_SIZE = (1200, 2400)
 
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+
 
 def valid_email(email: str) -> bool:
     """
@@ -150,9 +152,9 @@ def get_random_name():
     return name_list[randint(1, len(name_list))]
 
 
-def write_log(base_dir, current_user, event):
+def auditlog(event):
     ts = dt.now().strftime("%Y-%m-%d %H:%M")
-    with open(Path(base_dir) / f"sec_log.txt", "a") as f:
+    with open(Path(BASE_DIR) / f"sec_log.txt", "a") as f:
         f.write(f"\n{ts},{current_user.email},{event}")
     return
 

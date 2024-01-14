@@ -64,9 +64,10 @@ from utils import role_required
 from utils import get_date
 from utils import save_picture
 from utils import get_random_name
-from utils import write_log
+from utils import auditlog
 from utils import MockBoto3Client
 from utils import MockOauth2Client
+from utils import BASE_DIR
 
 # MAIL TEMPLATES
 
@@ -88,7 +89,6 @@ else:
     logger.warn("---internal .env was not found---")
 
 # APP
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 UPLOAD_FOLDER = os.path.join(BASE_DIR, "static/upload")
 
 DEBUG_MODE = os.environ["DEBUG_MODE"]
@@ -744,7 +744,7 @@ def change_cover(status_type, id):
 def delete_submission(id):
     "#"
 
-    write_log(BASE_DIR, current_user, f"delete submission_{id}")
+    auditlog(f"delete submission_{id}")
 
     submission = SubmissionModel.query.filter_by(id=id)
     submission.delete()
@@ -963,7 +963,7 @@ def user_manage(id):
 @app.route("/download", methods=["GET"])
 @role_required(("admin", "coordinator"))
 def download_data():
-    write_log(BASE_DIR, current_user, "download all data")
+    auditlog("download all data")
 
     submissions = SubmissionModel.query.all()
 
