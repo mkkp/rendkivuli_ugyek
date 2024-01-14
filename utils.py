@@ -12,6 +12,8 @@ from datetime import datetime as dt
 from pathlib import Path
 from random import randint
 
+from flask import redirect
+
 from PIL import Image
 from PIL import ImageOps
 
@@ -158,3 +160,29 @@ class MockBoto3Client:
                 json.dumps(kwargs, indent=4, sort_keys=True, ensure_ascii=False)
             )
         )
+
+
+class MockOauth2Client:
+    def __init__(self, client_id):
+        self.client_id = client_id
+
+    @property
+    def auth0(self):
+        return self
+
+    def register(self, name, client_id, **kwargs):
+        self.client_id = client_id
+
+    def authorize_redirect(self, redirect_uri):
+        # XXX: Not using redirect_url, since it is forced to be https
+        # and we want to test on simple http too on localhost.
+        return redirect("/callback")
+
+    def authorize_access_token(self):
+        return {
+            "userinfo": {
+                "email": "ketfarku@kutyi.kuty",
+                "aud": self.client_id,
+                "name": "Teszt Elek",
+            }
+        }

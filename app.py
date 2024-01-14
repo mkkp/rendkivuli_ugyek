@@ -65,6 +65,7 @@ from utils import save_picture
 from utils import get_random_name
 from utils import write_log
 from utils import MockBoto3Client
+from utils import MockOauth2Client
 
 # MAIL TEMPLATES
 
@@ -120,17 +121,20 @@ app = Flask(__name__)
 migrate = Migrate(app, db)
 
 ##OAUTH
-oauth = OAuth(app)
+if AUTH0_CLIENT_ID == "MOCK":
+    oauth = MockOauth2Client(AUTH0_CLIENT_ID)
+else:
+    oauth = OAuth(app)
 
-oauth.register(
-    "auth0",
-    client_id=AUTH0_CLIENT_ID,
-    client_secret=AUTH0_CLIENT_SECRET,
-    client_kwargs={
-        "scope": "openid profile email",
-    },
-    server_metadata_url=f"https://{AUTH0_DOMAIN}/.well-known/openid-configuration",
-)
+    oauth.register(
+        "auth0",
+        client_id=AUTH0_CLIENT_ID,
+        client_secret=AUTH0_CLIENT_SECRET,
+        client_kwargs={
+            "scope": "openid profile email",
+        },
+        server_metadata_url=f"https://{AUTH0_DOMAIN}/.well-known/openid-configuration",
+    )
 
 # APP CONFIG
 app.secret_key = APP_SECRET_KEY
