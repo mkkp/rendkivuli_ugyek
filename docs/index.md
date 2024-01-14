@@ -276,11 +276,19 @@ Oldalelemek:
 
 
 ### 7. Regisztráció
-# TODO
+A regisztráció oldal egy átirányítás a https://passziv.mkkp.party/regisztracio oldalra,
+hiszen innen történik a bejelentkezés is.
 
 
 ### 8. Bejelentkezés  
-# TODO
+A bejelentkezés OAuth2-vel történik, a passziv.mkkp.partyün keresztül.
+A visszakapott OAuth2 adatokból csak az eümail cím van használva,
+az alapján, ha még nincs létező felhasználói rekord, létre van hozva egy
+felhasználó az SQL adatbázisban a következő felhasználói adatokkal:
+- e-mail: az OAuth-ból kapott e-mail
+- felhasználónév: Véletlenszerű
+- telefonszám: üres
+- felhasználó szintje: regisztrált (nem admin)
 
 ### 9. Fiókbeállítások
 A fiókbeállítás menüpontot csak a regisztrált felhasználó látja.  
