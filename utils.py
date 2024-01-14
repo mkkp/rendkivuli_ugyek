@@ -9,10 +9,14 @@ import json
 
 from dotenv import load_dotenv
 from datetime import datetime as dt
+from functools import wraps
 from pathlib import Path
 from random import randint
 
 from flask import redirect
+from flask import flash
+from flask_login import current_user
+from flask_login import login_required
 
 from PIL import Image
 from PIL import ImageOps
@@ -186,3 +190,20 @@ class MockOauth2Client:
                 "name": "Teszt Elek",
             }
         }
+
+
+def role_required(required_roles):
+    if isinstance(required_roles, str):
+        required_roles = (required_roles,)
+
+    def decorator(func):
+        @wraps(func)
+        def wrapped_func(*args, **kwargs):
+            if current_user.role not in required_roles:
+                flash("Ez a funkcionalitás nagykutyáknak van fenntartva.", "danger")
+                return redirect("/")
+            return func(*args, **kwargs)
+
+        return login_required(wrapped_func)
+
+    return decorator

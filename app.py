@@ -60,6 +60,7 @@ from models import CommentModel
 
 # UTILS
 from utils import valid_email
+from utils import role_required
 from utils import get_date
 from utils import save_picture
 from utils import get_random_name
@@ -739,15 +740,11 @@ def change_cover(status_type, id):
 
 # BEJELENTÉS TÖRLÉS
 @app.route("/delete_submission/<id>", methods=["GET"])
-@login_required
+@role_required(("admin", "coordinator"))
 def delete_submission(id):
     "#"
 
     write_log(BASE_DIR, current_user, f"delete submission_{id}")
-
-    if current_user.role != "admin" and current_user.role != "coordinator":
-        flash("Bejelentést csak admin vagy kordinátor törölhet!", "danger")
-        return render_template("index.html")
 
     submission = SubmissionModel.query.filter_by(id=id)
     submission.delete()
@@ -934,13 +931,9 @@ def change_user_data(user_id):
 
 # FELHASZNÁLÓK ÁTTEKINTÉSE (ADMIN FELÜLET)
 @app.route("/user_administration", methods=["POST", "GET"])
-@login_required
+@role_required("admin")
 def user_management():
     "#"
-
-    if not current_user.role == "admin":
-        flash("Ide csak admin léphet!", "danger")
-        return render_template("index.html")
 
     if request.method == "POST":
         pass
@@ -950,12 +943,9 @@ def user_management():
 
 # FELHASZNÁLÓ KEZELÉSE
 @app.route("/user_manage/<id>", methods=["POST", "GET"])
-@login_required
+@role_required("admin")
 def user_manage(id):
     "#"
-    if not current_user.role == "admin":
-        flash("Ide csak admin léphet!", "danger")
-        return render_template("index.html")
 
     user = UserModel.query.filter_by(id=id).first()
 
@@ -971,12 +961,8 @@ def user_manage(id):
 
 # ÜGYEK TÁBLÁZATOS LETÖLTÉSE
 @app.route("/download", methods=["GET"])
-@login_required
+@role_required(("admin", "coordinator"))
 def download_data():
-    if current_user.role != "admin" and current_user.role != "coordinator":
-        flash("Csak admin vagy kordinátor tölthet le!", "danger")
-        return render_template("index.html")
-
     write_log(BASE_DIR, current_user, "download all data")
 
     submissions = SubmissionModel.query.all()
