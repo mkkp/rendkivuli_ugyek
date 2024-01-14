@@ -20,17 +20,17 @@ from flask_login import login_required
 from PIL import Image
 from PIL import ImageOps
 
-from models import db
-from models import SubmissionModel
-from models import ImageBeforeModel
-from models import ImageAfterModel
+from app.env import BASE_DIR
 
-logger = logging.getLogger("rum.utils")
+from .models import db
+from .models import SubmissionModel
+from .models import ImageBeforeModel
+from .models import ImageAfterModel
+
+logger = logging.getLogger(__name__)
 
 THUMBNAIL_SIZE = (1000, 1000)
 FULL_SIZE = (1200, 2400)
-
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 
 def valid_email(email: str) -> bool:
@@ -40,6 +40,7 @@ def valid_email(email: str) -> bool:
     pattern = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+$"
     if re.fullmatch(pattern, email):
         return True
+    return False
 
 
 def get_date():
@@ -126,7 +127,6 @@ def save_picture(pictures, upload_folder, tag, submission_id):
 
 
 def mk_upload_dir(upload_dir: str):
-    "#"
     if not os.path.isdir(upload_dir):
         os.mkdir(upload_dir)
 
@@ -143,7 +143,6 @@ def resize(size: tuple, file_path: str):
 
 
 def get_random_name():
-    "#"
     in_dir = Path(os.path.dirname(__file__))
     file_name = "random_name_list.txt"
     with open(in_dir / file_name, "r", encoding="UTF-8") as file:
@@ -156,41 +155,6 @@ def auditlog(event):
     with open(Path(BASE_DIR) / f"sec_log.txt", "a") as f:
         f.write(f"\n{ts},{current_user.email},{event}")
     return
-
-
-class MockBoto3Client:
-    def send_email(self, **kwargs):
-        logger.info(
-            "Mail would have been sent: {}".format(
-                json.dumps(kwargs, indent=4, sort_keys=True, ensure_ascii=False)
-            )
-        )
-
-
-class MockOauth2Client:
-    def __init__(self, client_id):
-        self.client_id = client_id
-
-    @property
-    def auth0(self):
-        return self
-
-    def register(self, name, client_id, **kwargs):
-        self.client_id = client_id
-
-    def authorize_redirect(self, redirect_uri):
-        # XXX: Not using redirect_url, since it is forced to be https
-        # and we want to test on simple http too on localhost.
-        return redirect("/callback")
-
-    def authorize_access_token(self):
-        return {
-            "userinfo": {
-                "email": "ketfarku@kutyi.kuty",
-                "aud": self.client_id,
-                "name": "Teszt Elek",
-            }
-        }
 
 
 def role_required(required_roles):

@@ -8,17 +8,12 @@ Migration steps:
 4. flask db migrate -m "-some commit text-"
 5. flask db upgrade
 """
+from typing import Any
 from flask_login import UserMixin
-from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 
-login = LoginManager()
-db = SQLAlchemy()
-
-@login.user_loader
-def load_user(id):
-    "#"
-    return UserModel.query.get(int(id))
+# XXX: We ignore all types here, because SQLAlchemy is a bit too magic for pyright.
+db: Any = SQLAlchemy()
 
 
 class UserModel(UserMixin, db.Model):
@@ -76,13 +71,13 @@ class SubmissionModel(db.Model):
     status_changed_by = db.Column(db.String())
 
 
-class featuredModel(db.Model):
+class FeaturedModel(db.Model):
     """
     table schema for featured submissions
     """
 
     __tablename__ = "featured"
-    
+
     id = db.Column(db.Integer, primary_key=True)
     created_date = db.Column(db.String(10))
     parent_id = db.Column(db.Integer, db.ForeignKey("submission.id"))
@@ -128,4 +123,3 @@ class ImageAfterModel(db.Model):
     thumb_file_name = db.Column(db.String(128))
     created_date = db.Column(db.String(10))
     parent_id = db.Column(db.Integer, db.ForeignKey("submission.id"))
-

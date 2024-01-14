@@ -1,6 +1,8 @@
 """
 AWS SES BODY_HTML templates
 """
+
+
 def create_submission_mail_SES(submission):
     """
     Bejelentéskor kimenő email
@@ -13,7 +15,8 @@ def create_submission_mail_SES(submission):
               Addig is itt tudod nyomonkövetni, hogyan állunk vele: https://rendkivuliugyek.com/single_submission/{submission.id}</p>
               <p><b>Rendkívüli Ügyek Minisztériuma</b></p>                            
            """
- 
+
+
 def create_status_change_mail_SES(submission):
     """
     Státusz változáskor kimenő email
@@ -25,6 +28,7 @@ def create_status_change_mail_SES(submission):
 	       <p><b>Rendkívüli Ügyek Minisztériuma</b></p>
 	    """
 
+
 def create_solution_mail_SES(submission):
     """
     Ügy lezárásakor kimenő email
@@ -34,7 +38,8 @@ def create_solution_mail_SES(submission):
                <p>Itt tudod megnézni, hogy mire jutottunk: https://rendkivuliugyek.com/single_submission/{submission.id}</p>
                <p><b>Rendkívüli Ügyek Minisztériuma</b></p>
             """
-	
+
+
 def create_organiser_mail_SES(submission):
     """
     Szervező_hozzáadásakor kimenő email
