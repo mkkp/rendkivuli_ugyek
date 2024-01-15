@@ -7,20 +7,27 @@ import uuid
 import logging
 import json
 
-from dotenv import load_dotenv
 from datetime import datetime as dt
+from functools import wraps
 from pathlib import Path
 from random import randint
+
+from flask import redirect
+from flask import flash
+from flask_login import current_user
+from flask_login import login_required
 
 from PIL import Image
 from PIL import ImageOps
 
-from models import db
-from models import SubmissionModel
-from models import ImageBeforeModel
-from models import ImageAfterModel
+from app.env import BASE_DIR
 
-logger = logging.getLogger("rum.utils")
+from .models import db
+from .models import SubmissionModel
+from .models import ImageBeforeModel
+from .models import ImageAfterModel
+
+logger = logging.getLogger(__name__)
 
 THUMBNAIL_SIZE = (1000, 1000)
 FULL_SIZE = (1200, 2400)
@@ -33,6 +40,7 @@ def valid_email(email: str) -> bool:
     pattern = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+$"
     if re.fullmatch(pattern, email):
         return True
+    return False
 
 
 def get_date():
@@ -119,7 +127,6 @@ def save_picture(pictures, upload_folder, tag, submission_id):
 
 
 def mk_upload_dir(upload_dir: str):
-    "#"
     if not os.path.isdir(upload_dir):
         os.mkdir(upload_dir)
 
@@ -136,7 +143,6 @@ def resize(size: tuple, file_path: str):
 
 
 def get_random_name():
-    "#"
     in_dir = Path(os.path.dirname(__file__))
     file_name = "random_name_list.txt"
     with open(in_dir / file_name, "r", encoding="UTF-8") as file:
@@ -144,17 +150,25 @@ def get_random_name():
     return name_list[randint(1, len(name_list))]
 
 
-def write_log(base_dir, current_user, event):
+def auditlog(event):
     ts = dt.now().strftime("%Y-%m-%d %H:%M")
-    with open(Path(base_dir) / f"sec_log.txt", "a") as f:
+    with open(Path(BASE_DIR) / f"sec_log.txt", "a") as f:
         f.write(f"\n{ts},{current_user.email},{event}")
     return
 
 
-class MockBoto3Client:
-    def send_email(self, **kwargs):
-        logger.info(
-            "Mail would have been sent: {}".format(
-                json.dumps(kwargs, indent=4, sort_keys=True, ensure_ascii=False)
-            )
-        )
+def role_required(required_roles):
+    if isinstance(required_roles, str):
+        required_roles = (required_roles,)
+
+    def decorator(func):
+        @wraps(func)
+        def wrapped_func(*args, **kwargs):
+            if current_user.role not in required_roles:
+                flash("Ez a funkcionalitás nagykutyáknak van fenntartva.", "danger")
+                return redirect("/")
+            return func(*args, **kwargs)
+
+        return login_required(wrapped_func)
+
+    return decorator

@@ -276,11 +276,19 @@ Oldalelemek:
 
 
 ### 7. Regisztráció
-# TODO
+A regisztráció oldal egy átirányítás a https://passziv.mkkp.party/regisztracio oldalra,
+hiszen innen történik a bejelentkezés is.
 
 
 ### 8. Bejelentkezés  
-# TODO
+A bejelentkezés OAuth2-vel történik, a passziv.mkkp.partyün keresztül.
+A visszakapott OAuth2 adatokból csak az eümail cím van használva,
+az alapján, ha még nincs létező felhasználói rekord, létre van hozva egy
+felhasználó az SQL adatbázisban a következő felhasználói adatokkal:
+- e-mail: az OAuth-ból kapott e-mail
+- felhasználónév: Véletlenszerű
+- telefonszám: üres
+- felhasználó szintje: regisztrált (nem admin)
 
 ### 9. Fiókbeállítások
 A fiókbeállítás menüpontot csak a regisztrált felhasználó látja.  
@@ -773,6 +781,29 @@ A https://rendkivuliugyek.com/dashboard/overview
 url alatt elérhető egy performance monitoring dashboard  
 Dokumentáció: https://flask-monitoringdashboard.readthedocs.io/en/latest/  
 user, jelszóval kapcs: [xngst](https://github.com/xngst)
+
+### Tesztkörnyezet felállítása
+
+Egy localhost-on kiszolgált tesztkörnyezetet a következő módon lehet létrehozni:
+
+```
+git clone git@github.com:mkkp/rendkivuli_ugyek.git
+cd rendkivuli_ugyek
+python3 -m venv .venv
+. .venv/bin/activate
+pip install -r requirements.txt
+cp test.env .env
+python3 app.py
+```
+
+Ez az env config mockolni fogja az e-mail küldést és az OAuth-ot, így lehet
+az éles rendszerhez való hozzáférés nélkül tesztelni.
+
+A test user jogosultsági szintjét az első bejelentkezés után a következőképp lehet
+változtatni:
+```
+echo "update user set role='registered' where email='ketfarku@kutyi.kuty';" | sqlite3 db/app.db
+```
 
 ### Gyakran Ismételt Kérdések
 
