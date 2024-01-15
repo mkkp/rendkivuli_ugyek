@@ -812,6 +812,6 @@ echo "update user set role='registered' where email='ketfarku@kutyi.kuty';" | sq
 A saját bejelentések listáját a Fiókbeállítások alatt, az Ügyeim listája gombra kattintva lehet elérni, a Bejelentve általam szekció alatt.
 
 **Hol tudom megnézni azoknak a bejelentéseknek a listáját, ahol szervezőként lettem megjelölve?**  
-A Fiókbeállítások alatt, az Ügyeim listája gombra kattintva lehet elérni, a Szervező vagyok szekció alatt.
-
+A Fiókbeállítások alatt, az Ügyeim listája gombra kattintva lehet elérni, a Szervező vagyok szekció alatt.  
+  
 ---
