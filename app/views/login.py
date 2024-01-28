@@ -13,9 +13,8 @@ def register():
 
 def site_login(oauth):
     return oauth.auth0.authorize_redirect(
-        redirect_uri=url_for("callback", _external=True, _scheme="https")
+        "https://rendkivuliugyek.com/callback"
     )
-
 
 def callback(oauth):
     token = oauth.auth0.authorize_access_token()
