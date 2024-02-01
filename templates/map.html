@@ -178,15 +178,13 @@
            const cover_path = "{{url_for( 'static',filename='upload/')}}" + submission_id + "/" + cover_image
 
            if (status === 'szurke'){
-           console.log("ezt nem mutatjuk")
-           console.log(submission_title, submission_status, submission_type)
            continue;
            };
 
     const img_path = "{{url_for( 'static',filename='marker/')}}" +
                      submission_status +
                      "/" +
-                     submission_type+
+                     submission_type +
                      ".png"
 
     map.loadImage(img_path,
@@ -230,10 +228,8 @@
     `<span>${display_status}</span>` +
     `<a href=/single_submission/${submission_id}` +
                       " target='blank' rel='noopener noreferrer'>" +
-                      "<p>Adatlap</p>" +
-                      `<img height='10' width = 'auto' src=${cover_path}/>` +
-                      "</a>" +
-           `</div>`
+                      "<p>Adatlap megnyitása</p>" +
+                      "</a>" + `</div>`
       );
 
     var marker = new mapboxgl.Marker()
