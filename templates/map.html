@@ -33,6 +33,12 @@
     .mapboxgl-marker {
       opacity: 0 !important;
     }
+    
+    .popup{
+      padding: 0.5em;
+      font-size: 14px;
+      font-family: "Lucida Console", "Courier New", monospace;
+    }    
 
     .content {
       display: none;
@@ -105,179 +111,199 @@
     {% endif %}
 
     <div id="map" style="width: auto; height: 50em;"></div>
-
-    <picture>
-      <source media="(max-width: 465px)"
-      srcset={{url_for('static',filename='site_img/jelmagyarazat_mobil.webp')}}>
-      <img src={{url_for('static',filename='site_img/jelmagyarazat.webp')}}
-      alt="Jelmagyarázat">
-    </picture>
-
     <hr />
   </div>
-
+  
   <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.js"></script>
   <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
-  <script
-    id="search-js"
-    defer
-    src="https://api.mapbox.com/search-js/v1.0.0-beta.13/web.js"
-  ></script>
+  <script id="search-js" defer src="https://api.mapbox.com/search-js/v1.0.0-beta.13/web.js"></script>
 
   <script>
-    var status_dict = {
-    'Megoldva': 'megoldva',
-    'Figyelemfelhívás': 'figyelemfelhivas',
-    'Bejelentve': 'bejelentve',
-    'Duplika': 'szurke',
-    'Folyamatban': 'folyamatban',
-    'Hivatal megoldotta': 'szurke',
-    'Inaktív': 'szurke',
-    'Készül': 'keszul',
-    }
+	mapboxgl.accessToken = '{{ACCESS_KEY}}';
+	var map = new mapboxgl.Map({
+	container: 'map',
+	center: [{{lat}}, {{lng}}],
+	zoom: 6.5,
+	language: 'auto',
+	style: 'mapbox://styles/mapbox/streets-v11' //'mapbox://styles/mapbox/navigation-night-v1'
+	}
+	)
 
-    var type_dict = {
-    'Akadálymentesítés': 'akadalymentesites',
-    'Állat': 'allat',
-    'Közlekedés': 'kozlekedes',
-    'Közmű': 'kozmu',
-    'Egyéb': 'egyeb',
-    'Épület': 'epulet',
-    'Növény': 'noveny',
-    'Műemlék': 'muemlek',
-    'Szemét': 'szemet',
-    'Tájékoztatás': 'tajekoztatas',
-    'Utcabútor':'utcabutor',
-    'Út és Járda': 'ut_es_jarda',
-    }
+	map.on('load', function () {
+	map.addSource('markers', {
+	type: 'geojson',
+	data: {{ feature_collection | safe}},
+	cluster: true, // Enable clustering
+	clusterMaxZoom: 10, // Max zoom level for clustering
+	clusterRadius: 60, // Cluster radius in pixels
+	}
+	);
+            
+            // Add a layer for clustered points
+	map.addLayer({
+	id: 'clusters',
+	type: 'circle',
+	source: 'markers',
+	filter: ['has', 'point_count'],
+	paint: {
+	'circle-color': [
+	'step',
+	['get', 'point_count'],
+	'#33ccff',
+	10,
+	'#ffff66',
+	50,
+	'#ff5050'
+	],
+	'circle-radius': [
+	'step',
+	['get', 'point_count'],
+	20,
+	10,
+	30,
+	50,
+	40
+	],
+			'circle-stroke-width': 3,
+	'circle-stroke-color': '#ffffff'
+	}
+	});
+            
+	map.addLayer({
+	id: 'cluster-count',
+	type: 'symbol',
+	source: 'markers',
+	filter: ['has', 'point_count'],
+	layout: {
+	'text-field': '{point_count_abbreviated}',
+	'text-size': 14
+	},paint: {'text-color': '#000000'
+	}}); 
 
-        mapboxgl.accessToken = '{{ACCESS_KEY}}';
-        var map = new mapboxgl.Map({
-          container: 'map',
-          center: [{{lat}}, {{lng}}],
-          zoom: 6.5,
-          language: 'auto',
-          style: 'mapbox://styles/mapbox/streets-v11' //'mapbox://styles/mapbox/navigation-night-v1'
-          }
-         );
+	map.addLayer({
+	id: 'unclustered-point',
+	type: 'circle',
+	source: 'markers',
+	filter: ['!', ['has', 'point_count']],
+	paint: {
+	'circle-color': '#ff5050',
+	'circle-radius': 10,
+	'circle-stroke-width': 3,
+	'circle-stroke-color': '#ffffff'
+	}
+	});				        
 
-         map.on('load', () => {
-         data = {{ feature_collection | safe}}
+            // Define different custom markers for different types
 
-         for (let i = 0; i < data['features'].length; i++) {
+    var markerImages = {
+	'Akadálymentesítés': '/static/marker/bejelentve/akadalymentesites.png',
+	'Állat': '/static/marker/bejelentve/allat.png',
+	'Közlekedés': '/static/marker/bejelentve/kozlekedes.png',
+	'Közmű': '/static/marker/bejelentve/kozmu.png',
+	'Egyéb': '/static/marker/bejelentve/egyeb.png',
+	'Épület': '/static/marker/bejelentve/epulet.png',
+	'Növény': '/static/marker/bejelentve/noveny.png',
+	'Műemlék': '/static/marker/bejelentve/muemlek.png',
+	'Szemét': '/static/marker/bejelentve/szemet.png',
+	'Tájékoztatás': '/static/marker/bejelentve/tajekoztatas.png',
+	'Utcabútor':'/static/marker/bejelentve/utcabutor.png',
+	'Út és Járda': '/static/marker/bejelentve/ut_es_jarda.png',
+	}
+			
+			
+    // Add a layer for individual markers with custom marker images
+	map.on('data', function (e) {
+	if (e.sourceId === 'markers' && e.isSourceLoaded) {
+		Object.keys(markerImages).forEach(function (type) {
+			var image = markerImages[type];
+			map.loadImage(image, function (error, img) {
+				if (error) throw error;
+				if (!map.hasImage(type)) {
+					map.addImage(type, img);
+					map.addLayer({
+					id: type,
+					type: 'symbol',
+					source: 'markers',              
+					filter: ['==', 'type', type],
+					layout: {
+						'icon-image': type,
+						'icon-size': 0.5
+					}
+					});
+				}
+			});
+		});
+	}
+	});
+	});
 
-           const submission_title = data['features'][i]['properties']['title']
-           const display_type = data['features'][i]['properties']['type']
-           const submission_status = status_dict[data['features'][i]['properties']['status']]
-           const display_status = data['features'][i]['properties']['status']
-           const submission_type = type_dict[data['features'][i]['properties']['type']]
-           const cover_image = data['features'][i]['properties']['cover_image']
-           const submission_id = data['features'][i]['properties']['id']
-           const lng = data['features'][i]['geometry']['coordinates'][0]
-           const lat = data['features'][i]['geometry']['coordinates'][1]
-           const cover_path = "{{url_for( 'static',filename='upload/')}}" + submission_id + "/" + cover_image
+	// Add click event listener for clusters
+	map.on('click', 'clusters', function (e) {
+	var features = map.queryRenderedFeatures(e.point, { layers: ['clusters'] });
+	var clusterId = features[0].properties.cluster_id;
+	map.getSource('markers').getClusterExpansionZoom(clusterId, function (err, zoom) {
+	if (err) return;
 
-           if (status === 'szurke'){
-           continue;
-           };
-
-    const img_path = "{{url_for( 'static',filename='marker/')}}" +
-                     submission_status +
-                     "/" +
-                     submission_type +
-                     ".png"
-
-    map.loadImage(img_path,
-      (error, image) => {
-        if (error) throw error;
-        map.addImage(`custom-marker_${i}`, image);
-
-    // Add a GeoJSON source with 2 points
-    map.addSource(`points_${i}`, {
-    	 'type': 'geojson',
-    	 'data': {
-    	 'type': 'FeatureCollection',
-    	 'features': [
-    	 {
-    	 'type': 'Feature',
-    	 'properties': {},
-    	 'geometry': {
-    	 'type': 'Point',
-    	 'coordinates': [lng,lat]
-    	 }}]}
-    	})
-
-    // Add a symbol layer
-    map.addLayer({
-    'id': `point_${i}`,
-    'type': 'symbol',
-    'source': `points_${i}`,
-    'layout': {
-    'icon-image': `custom-marker_${i}`,
-    'icon-allow-overlap': false
-    }
-    });
-    }
-    ); //loadImage
-
-    var popup = new mapboxgl.Popup()
-      .setHTML(
-    `<div class="" style='padding:0.5em'>` +
-    `<span><b>${submission_title}</b> | </span>` +
-    `<span>${display_type} | </span>`+
-    `<span>${display_status}</span>` +
-    `<a href=/single_submission/${submission_id}` +
-                      " target='blank' rel='noopener noreferrer'>" +
-                      "<p>Adatlap megnyitása</p>" +
-                      "</a>" + `</div>`
-      );
-
-    var marker = new mapboxgl.Marker()
-      .setLngLat([lng,lat])
-      .addTo(map)
-      .setPopup(popup);
-
-         } //end for
-
-         for (let i = 0; i < map.getStyle().layers.length; i++){
-
-         }
-
-         }); //on load
-
-         map.on('click', 'pint_1', (e) => {
-         console.log(e)
-         console.log(e.features[0].geometry.coordinates)
-         })
-
-          //data = {{ feature_collection | safe}},
-
-    map.addControl(
-    new MapboxGeocoder({
-    accessToken: mapboxgl.accessToken,
-    country:'HUN',
-    language:'hu',
-    mapboxgl: mapboxgl
-    })
-    );
-
-    map.addControl(new mapboxgl.NavigationControl());
-    map.addControl(new mapboxgl.FullscreenControl());
+	map.flyTo({
+	center: features[0].geometry.coordinates,
+	zoom: zoom + 1, // You can customize the zoom level
+	speed: 1.5, // Animation speed
+	curve: 1.4, // Animation curve
+	easing: function (t) {
+		return t; // Linear easing, adjust as needed
+	}
+	});
+	});
+	});
+      
+	map.on('click', 'unclustered-point', (e) => {
+	const coordinates = e.features[0].geometry.coordinates.slice();
+	const type = e.features[0].properties.type
+	const status = e.features[0].properties.status
+	const title = e.features[0].properties.title
+	const submission_id = e.features[0].properties.id
+	 
+	// Ensure that if the map is zoomed out such that
+	// multiple copies of the feature are visible, the
+	// popup appears over the copy being pointed to.
+	while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+	coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+	}
+	 
+	new mapboxgl.Popup()
+	.setLngLat(coordinates)
+	.setHTML(
+	`<div class="popup">` +
+	`<b>${title}</b><br> ${type} | ${status}`+
+	`<a href=/single_submission/${submission_id}` +
+    " target='blank' rel='noopener noreferrer'>" +
+    "<p>Adatlap</p></a> <div>"
+	).addTo(map);
+	});  
+	
+	map.on('mouseenter', 'clusters', () => {
+	map.getCanvas().style.cursor = 'pointer';
+	});
+	map.on('mouseleave', 'clusters', () => {
+	map.getCanvas().style.cursor = '';
+	});     
+            
   </script>
-
+  
   <script>
-    var coll = document.getElementsByClassName("collapsible");
-    coll[0].addEventListener("click", function () {
-      this.classList.toggle("active");
-      var content = this.nextElementSibling;
-      if (content.style.display === "block") {
-        content.style.display = "none";
-      } else {
-        content.style.display = "block";
-      }
-    });
+	var coll = document.getElementsByClassName("collapsible");
+	coll[0].addEventListener("click", function () {
+	this.classList.toggle("active");
+	var content = this.nextElementSibling;
+	if (content.style.display === "block") {
+	content.style.display = "none";
+	} else {
+	content.style.display = "block";
+	}
+	});
   </script>
+    
 </body>
+</html>
 
 {% endblock %}
-
