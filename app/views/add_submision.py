@@ -1,6 +1,6 @@
 import logging
 
-from flask import Flask, request, flash, render_template, redirect
+from flask import Flask, request, flash, render_template, redirect, Markup
 
 from app.utils import valid_email, get_date, save_picture, valid_image
 from app.env import MAP_KEY, INIT_LAT, INIT_LNG, UPLOAD_FOLDER
@@ -26,43 +26,24 @@ def view_post():
             "submission.html", ACCESS_KEY=MAP_KEY, lat=INIT_LAT, lng=INIT_LNG
         )
 
-    # Naive XSS validation
-    if "<" in request.form["title"] or ">" in request.form["title"]:
-        flash("Nem megengedett karakter.", "danger")
-        return render_template(
-            "submission.html", ACCESS_KEY=MAP_KEY, lat=INIT_LAT, lng=INIT_LNG
-        )
-
-    if "<" in request.form["type"] or ">" in request.form["type"]:
-        flash("Nem megengedett karakter.", "danger")
-        return render_template(
-            "submission.html", ACCESS_KEY=MAP_KEY, lat=INIT_LAT, lng=INIT_LNG
-        )
-
-    if "<" in request.form["address"] or ">" in request.form["address"]:
-        flash("Nem megengedett karakter.", "danger")
-        return render_template(
-            "submission.html", ACCESS_KEY=MAP_KEY, lat=INIT_LAT, lng=INIT_LNG
-        )
-
     submission = SubmissionModel(
-        title=request.form["title"],
-        problem_type=request.form["type"],
-        description=request.form["description"],
-        suggestion=request.form["suggestion"],
-        city=request.form["city"],
+        title=Markup.escape(request.form["title"]),
+        problem_type=Markup.escape(request.form["type"]),
+        description=Markup.escape(request.form["description"]),
+        suggestion=Markup.escape(request.form["suggestion"]),
+        city=Markup.escape(request.form["city"]),
         zipcode=request.form["zipcode"],
-        county=request.form["county"],
-        address=request.form["address"],
+        county=Markup.escape(request.form["county"]),
+        address=Markup.escape(request.form["address"]),
         lat=request.form["lat"],
         lng=request.form["lng"],
-        submitter_email=request.form["email"],
-        submitter_phone=request.form["phone"],
+        submitter_email=Markup.escape(request.form["email"]),
+        submitter_phone=Markup.escape(request.form["phone"]),
         owner_email="",
         status="Bejelentve",
         featured=False,
         status_changed_date=get_date(),
-        status_changed_by=request.form["email"],
+        status_changed_by=Markup.escape(request.form["email"]),
         created_date=get_date(),
     )
 
@@ -70,18 +51,19 @@ def view_post():
     db.session.commit()
 
     # SAVE PICTURES
-     
+
     pictures = request.files.getlist("files")
     additional_pictures = request.files.getlist("additional_files")
-    
+
     if additional_pictures[0].filename != "":
         pictures = pictures + additional_pictures
-        
+
     for picture in pictures:
         if picture and not valid_image(picture.filename):
             flash("Nem megengedett fájlkiterjesztés!", "danger")
-        return render_template(
-        "submission.html", ACCESS_KEY=MAP_KEY, lat=INIT_LAT, lng=INIT_LNG)         
+            return render_template(
+                "submission.html", ACCESS_KEY=MAP_KEY, lat=INIT_LAT, lng=INIT_LNG
+            )
 
     tag = "before"
 
