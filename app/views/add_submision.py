@@ -2,7 +2,7 @@ import logging
 
 from flask import Flask, request, flash, render_template, redirect
 
-from app.utils import valid_email, get_date, save_picture
+from app.utils import valid_email, get_date, save_picture, valid_image
 from app.env import MAP_KEY, INIT_LAT, INIT_LNG, UPLOAD_FOLDER
 from app.models import db, SubmissionModel
 from app.mail_template import create_submission_mail_SES
@@ -70,11 +70,18 @@ def view_post():
     db.session.commit()
 
     # SAVE PICTURES
+     
     pictures = request.files.getlist("files")
     additional_pictures = request.files.getlist("additional_files")
-
+    
     if additional_pictures[0].filename != "":
         pictures = pictures + additional_pictures
+        
+    for picture in pictures:
+        if picture and not valid_image(picture.filename):
+            flash("Nem megengedett fájlkiterjesztés!", "danger")
+        return render_template(
+        "submission.html", ACCESS_KEY=MAP_KEY, lat=INIT_LAT, lng=INIT_LNG)         
 
     tag = "before"
 

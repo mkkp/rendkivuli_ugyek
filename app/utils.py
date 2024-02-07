@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 
 THUMBNAIL_SIZE = (1000, 1000)
 FULL_SIZE = (1200, 2400)
-
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 def valid_email(email: str) -> bool:
     """
@@ -41,6 +41,10 @@ def valid_email(email: str) -> bool:
     if re.fullmatch(pattern, email):
         return True
     return False
+
+
+def valid_image(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 def get_date():
