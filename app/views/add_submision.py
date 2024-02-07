@@ -70,18 +70,19 @@ def view_post():
     db.session.commit()
 
     # SAVE PICTURES
-     
+
     pictures = request.files.getlist("files")
     additional_pictures = request.files.getlist("additional_files")
-    
+
     if additional_pictures[0].filename != "":
         pictures = pictures + additional_pictures
-        
+
     for picture in pictures:
         if picture and not valid_image(picture.filename):
             flash("Nem megengedett fájlkiterjesztés!", "danger")
-        return render_template(
-        "submission.html", ACCESS_KEY=MAP_KEY, lat=INIT_LAT, lng=INIT_LNG)         
+            return render_template(
+                "submission.html", ACCESS_KEY=MAP_KEY, lat=INIT_LAT, lng=INIT_LNG
+            )
 
     tag = "before"
 
