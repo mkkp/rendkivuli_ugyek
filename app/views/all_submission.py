@@ -1,4 +1,4 @@
-from flask import flash, render_template, request, session
+from flask import flash, render_template, request, session, Markup
 from app.env import ROWS_PER_PAGE
 
 from app.models import SubmissionModel
@@ -18,7 +18,7 @@ def view():
         zipcode = request.form["zipcode"]
         problem_type = request.form["type"]
         status = request.form["status"]
-        search_text = request.form["full_text_search"]
+        search_text = Markup.escape(request.form["full_text_search"])
 
         county_dict = {}
         zipcode_dict = {}
