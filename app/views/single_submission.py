@@ -1,5 +1,6 @@
-from flask import flash, render_template, request, url_for
+from flask import flash, render_template, request, url_for, Markup
 from flask_login.login_manager import redirect
+from app.utils import valid_image
 from app.env import MAP_KEY, UPLOAD_FOLDER
 from app.mail_template import create_solution_mail_SES
 
@@ -16,17 +17,17 @@ from app.utils import get_date, save_picture
 
 def view_post(submission_id):
     if "comment-submit" in request.form:
-        form_comment = request.form["comment"]
+        form_comment = Markup.escape(request.form["comment"])
 
         if CommentModel.query.filter_by(
             body=form_comment, parent_id=submission_id
         ).first():
-            # comment is a duplicate
+            # comment is duplicate
             pass
 
         else:
             comment = CommentModel(
-                commenter=request.form["current_user"],
+                commenter=Markup.escepe(request.form["current_user"]),
                 created_date=get_date(),
                 body=form_comment,
                 parent_id=submission_id,
@@ -36,7 +37,7 @@ def view_post(submission_id):
             flash("Sikeresen hozzáadtál egy kommentet!", "success")
 
     if "comment-edit" in request.form:
-        body_change = request.form["comment"]
+        body_change = Markup.escape(request.form["comment"])
         comment_id = request.form["comment_id"]
         comment = CommentModel.query.filter_by(id=comment_id).first()
         comment.body = body_change
@@ -47,23 +48,37 @@ def view_post(submission_id):
     if "upload_before_images" in request.form:
         tag = "before"
         pictures = request.files.getlist("files")
+
+        for picture in pictures:
+            if picture and not valid_image(picture.filename):
+                flash("Nem megengedett fájlkiterjesztés!", "danger")
+                return redirect(
+                    url_for("single_submission", submission_id=submission_id)
+                )
+
         save_picture(pictures, UPLOAD_FOLDER, tag, submission_id)
         flash("Kép sikeresen hozzáadva!", "success")
 
     if "upload_after_images" in request.form:
         tag = "after"
         pictures = request.files.getlist("files")
+
+        for picture in pictures:
+            if picture and not valid_image(picture.filename):
+                flash("Nem megengedett fájlkiterjesztés!", "danger")
+                return redirect(
+                    url_for("single_submission", submission_id=submission_id)
+                )
+
         save_picture(pictures, UPLOAD_FOLDER, tag, submission_id)
 
-        # Ha kerül fel egy bejelentéshez utána kép, akkor szerintem
-        # átállhatna magától a bejelentés státusza befejezettre
         changed_by = request.form["current_user"]
         submission = SubmissionModel.query.filter_by(id=submission_id).first()
         submission.status = "Megoldva"
         submission.status_changed_date = get_date()
         submission.status_changed_by = changed_by
         db.session.commit()
-        # send mail
+
         send_email(
             f"RÜM befejezett ügy: {submission.title}",
             create_solution_mail_SES(submission),
