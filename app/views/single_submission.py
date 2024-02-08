@@ -27,7 +27,7 @@ def view_post(submission_id):
 
         else:
             comment = CommentModel(
-                commenter=Markup.escepe(request.form["current_user"]),
+                commenter=Markup.escape(request.form["current_user"]),
                 created_date=get_date(),
                 body=form_comment,
                 parent_id=submission_id,
