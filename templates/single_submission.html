@@ -72,9 +72,9 @@
   <p><strong>Cím:</strong> {{ submission[0].address }}</p>
 
   {%if submission[0].owner_email %}
-    <p><strong>Szervező:</strong> {{ submission[0].owner_email }}</p>
+    <a href="mailto:{{ submission[0].owner_email }}?subject=RÜM ügy: {{ submission[0].id }}">Írok a szervezőnek!</a>
   {% endif %}
-        
+      
   {%if submission[0].solution %}
     <p><strong>Záró szöveg:<br>
     </strong>{{ submission[0].solution }}</p>
