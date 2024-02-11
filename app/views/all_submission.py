@@ -39,27 +39,18 @@ def view():
 
         if search_text != "":
             search_text = search_text.lower()
-            filtered_list = (
-                SubmissionModel.query.filter(
-                    SubmissionModel.description.ilike(f"%{search_text}%")
-                )
-                .order_by(SubmissionModel.created_date.desc())
-                .paginate(page=page, per_page=ROWS_PER_PAGE)
-            )
-
-            # A szöveges kereső még nincs integrálva a többi keresőopcióval,
-            # ezért vagy-vagy alapon lehet használni
-            return render_template("all_submission.html", post_list=filtered_list)
-
+            
         # merge dicts
         query_dict = county_dict | zipcode_dict | problem_type_dict | status_dict
 
         # store dict in session cookie
         session["filter"] = query_dict
-
+        session["search_text"] = search_text
+        
         try:
             filtered_list = (
                 SubmissionModel.query.filter_by(**query_dict)
+                .filter(SubmissionModel.description.ilike(f"%{search_text}%"))
                 .order_by(SubmissionModel.created_date.desc())
                 .paginate(page=1, per_page=ROWS_PER_PAGE)
             )
@@ -69,15 +60,17 @@ def view():
             return render_template("all_submission.html", post_list=post_list)
 
         return render_template(
-            "all_submission.html", post_list=filtered_list, filters=query_dict
+            "all_submission.html", post_list=filtered_list, filters=query_dict, search_text=search_text
         )
 
     # GET
     try:
         if "filter" in session.keys():
             query_dict = session["filter"]
+            search_text = session["search_text"]
             filtered_list = (
                 SubmissionModel.query.filter_by(**query_dict)
+                .filter(SubmissionModel.description.ilike(f"%{search_text}%"))
                 .order_by(SubmissionModel.created_date.desc())
                 .paginate(page=page, per_page=ROWS_PER_PAGE)
             )
@@ -86,6 +79,7 @@ def view():
                 post_list=filtered_list,
                 featured=featured,
                 filters=query_dict,
+                search_text = search_text,
             )
     except Exception:
         pass

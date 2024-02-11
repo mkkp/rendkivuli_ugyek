@@ -50,7 +50,7 @@ def view_post(submission_id):
         pictures = request.files.getlist("files")
 
         for picture in pictures:
-            if picture and not valid_image(picture.filename):
+            if picture and not valid_image(picture):
                 flash("Nem megengedett fájlkiterjesztés!", "danger")
                 return redirect(
                     url_for("single_submission", submission_id=submission_id)
@@ -64,7 +64,7 @@ def view_post(submission_id):
         pictures = request.files.getlist("files")
 
         for picture in pictures:
-            if picture and not valid_image(picture.filename):
+            if picture and not valid_image(picture):
                 flash("Nem megengedett fájlkiterjesztés!", "danger")
                 return redirect(
                     url_for("single_submission", submission_id=submission_id)

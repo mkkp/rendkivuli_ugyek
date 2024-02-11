@@ -101,9 +101,11 @@
     <h2>
       <i><b>ÖSSZES BEJELENTÉS</b></i>
     </h2>
-    
-    {% if filters %}
-      <hr>
+    <hr>
+    {% if search_text %}
+      <p>Keresőszó: {{ search_text }}</p>
+    {% endif %}
+    {% if filters %}      
       <form action="" method="post" enctype="multipart/form-data">
       <p>Aktív filterek:</p>
       {% for key, value in filters.items() %}
