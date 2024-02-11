@@ -16,6 +16,7 @@ from flask import redirect
 from flask import flash
 from flask_login import current_user
 from flask_login import login_required
+from werkzeug.utils import secure_filename
 
 from PIL import Image
 from PIL import ImageOps
@@ -31,7 +32,8 @@ logger = logging.getLogger(__name__)
 
 THUMBNAIL_SIZE = (1000, 1000)
 FULL_SIZE = (1200, 2400)
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
+
 
 def valid_email(email: str) -> bool:
     """
@@ -43,8 +45,18 @@ def valid_email(email: str) -> bool:
     return False
 
 
-def valid_image(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+def valid_image(picture):
+    if (
+        "." in picture.filename
+        and picture.filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+    ):
+        try:
+            Image.open(picture)
+            return True
+        except IOError as ioe:
+            return False
+    else:
+        return False
 
 
 def get_date():

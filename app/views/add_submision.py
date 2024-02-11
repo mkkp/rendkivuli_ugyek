@@ -33,7 +33,7 @@ def view_post():
         pictures = pictures + additional_pictures
 
     for picture in pictures:
-        if picture and not valid_image(picture.filename):
+        if picture and not valid_image(picture):
             flash("Nem megengedett fájlkiterjesztés!", "danger")
             return render_template(
                 "submission.html", ACCESS_KEY=MAP_KEY, lat=INIT_LAT, lng=INIT_LNG
