@@ -102,15 +102,16 @@
       <i><b>ÖSSZES BEJELENTÉS</b></i>
     </h2>
     <hr>
-    {% if search_text %}
-      <p>Keresőszó: {{ search_text }}</p>
-    {% endif %}
-    {% if filters %}      
+    
+    {% if filters or search_text%}      
       <form action="" method="post" enctype="multipart/form-data">
       <p>Aktív filterek:</p>
       {% for key, value in filters.items() %}
         <p> ⦿ {{ value }}</p>
       {% endfor %}
+      {% if search_text %}
+        <p>Keresőszó: {{ search_text }}</p>
+      {% endif %}    
       <input type="hidden" name="status" value="">
       <input type="hidden" name="type" value="">
       <input type="hidden" name="county" value="">
