@@ -20,7 +20,7 @@ PORT = os.environ["PORT"]
 APP_SECRET_KEY = os.environ["APP_SECRET_KEY"]
 ROWS_PER_PAGE = int(os.environ["ROWS_PER_PAGE"])
 
-##MAP
+# MAP
 MAP_KEY = os.environ["MAP_KEY"]
 INIT_LAT = os.environ["INIT_LAT"]
 INIT_LNG = os.environ["INIT_LNG"]
@@ -32,11 +32,15 @@ AWS_REGION = os.environ["AWS_REGION"]
 AWS_ACC_ID = os.environ["AWS_ACC_ID"]
 AWS_SECRET = os.environ["AWS_SECRET"]
 
-##DB
+# DB
 DB_NAME = os.environ["DB_NAME"]
 DB_PATH = os.path.join(BASE_DIR, "db", DB_NAME)
 
-# AUTH0
-AUTH0_CLIENT_ID = os.environ["AUTH0_CLIENT_ID"]
-AUTH0_CLIENT_SECRET = os.environ["AUTH0_CLIENT_SECRET"]
-AUTH0_DOMAIN = os.environ["AUTH0_DOMAIN"]
+# KEYCLOAK
+KC_SERVER_URL = os.environ["KC_SERVER_URL"]
+KC_CLIENT_ID = os.environ["KC_CLIENT_ID"]
+REALM_NAME = os.environ["REALM_NAME"]
+
+REDIRECT_LOGIN = os.environ["REDIRECT_LOGIN"]
+REDIRECT_LOGOUT = os.environ["REDIRECT_LOGOUT"]
+REDIRECT_REGISTER = os.environ["REDIRECT_REGISTER"]

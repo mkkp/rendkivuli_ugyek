@@ -16,6 +16,7 @@ from . import single_submission
 from . import statistics
 from . import user
 from . import user_data_info
+from . import szimat
 
 
 def setup(app):
@@ -37,3 +38,4 @@ def setup(app):
     statistics.setup(app)
     user.setup(app)
     user_data_info.setup(app)
+    szimat.setup(app)

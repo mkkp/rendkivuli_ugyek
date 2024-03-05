@@ -160,7 +160,7 @@ def resize(size: tuple, file_path: str):
 
 def get_random_name():
     in_dir = Path(os.path.dirname(__file__))
-    file_name = "random_name_list.txt"
+    file_name = "../random_name_list.txt"
     with open(in_dir / file_name, "r", encoding="UTF-8") as file:
         name_list = [name.strip() for name in file.readlines()]
     return name_list[randint(1, len(name_list))]
