@@ -692,7 +692,7 @@ Ez azt jelenti, hogy a https://passziv.mkkp.party/regisztracio-n keresztül regi
 
 ### Jogosulstágkezelés
 
-| Tevékenység                                                           | Anonim felhasználó (nem regisztrált) | MKKP passzivista regisztrált felhasználó | Szervező | Koordinátor | Admin |
+| Tevékenység                                                           | Anonim felhasználó (nem regisztrált) | MKKP passzivista regisztrált felhasználó | Szervező* | Koordinátor | Admin |
 |-----------------------------------------------------------------------|--------------------------------------|------------------------------------------|----------|-------------|-------|
 | Bejelentés létrehozása                                                | X                                    | X                                        | X        | X           | X     |
 | Egyes Bejelentés megnézése                                            | X                                    | X                                        | X        | X           | X     |
@@ -732,6 +732,7 @@ Ez azt jelenti, hogy a https://passziv.mkkp.party/regisztracio-n keresztül regi
 | Saját felhasználó telefon megadása / módosítása                       |                                      | X                                        | X        | X           | X     |
 | Bejelentés Előtte kép hozzáadása                                      |                                      | X (csak ha az adott felhasználó volt az ügy bejelentője)    | X        | X           | X     |
 
+\* A szervező minden koordinátori jogot megkap, de ezek a jogok csak az adott bejelentésre terjednek ki.
 
 ### Spam Botok elleni védelem
 Az applikáció korábbi változatánál előbb-utóbb spam botok is elkezdték használni a bejelentő adatlapot.  
