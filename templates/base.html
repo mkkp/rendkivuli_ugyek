@@ -26,49 +26,49 @@
             integrity="sha256-w8CvhFs7iHNVUtnSP0YKEg00p9Ih13rlL9zGqvLdePA="
             crossorigin="anonymous"></script>    
   <head>
-    <style>
-      ::selection {
-        color: black;
-        background: coral;
-      }
+	<style>
+	  /* Text selection styling */
+	  ::selection {
+		color: black;
+		background: coral;
+	  }
 
-      .submission_button {
-        background-color: #81c000;
-        color: white;
-      }
+	  /* Submission button styles */
+	  .submission_button {
+		background-color: #81c000;
+		color: white;
+	  }
 
-      .submission_button:hover {
-        color: black !important;
-        background-color: #81c000;
-        font-weight: bold;
-      }
+	  .submission_button:hover {
+		color: black !important;
+		background-color: #81c000;
+		font-weight: bold;
+	  }
 
-      .navbar-dark .navbar-nav .nav-link {
-        color: #ececec;
-      }
+	  /* Navbar link styles */
+	  .navbar-dark .navbar-nav .nav-link {
+		color: #ececec;
+	  }
 
-      .navbar-dark .navbar-nav .nav-link:hover {
-        color: #81c000;
-      }
+	  .navbar-dark .navbar-nav .nav-link:hover {
+		color: #fff;
+		animation: glow 1s ease-in-out infinite alternate;
+	  }
 
-/*
-  .navbar-dark .navbar-nav .nav-link:hover{
-   color:#fff;
-   animation: glow 1s ease-in-out infinite alternate;   
-  }
-  
-
-  @-webkit-keyframes glow {
-    from {
-      text-shadow: 0 0 1px #fff, 0 0 1px #fff, 0 0 1px #fff, 0 0 1px #fff, 0 0 1px #fff, 0 0 1px #fff, 0 0 1px #fff;
-    }
-  
-    to {
-      text-shadow: 0 0 2px #fff, 0 0 3px #fff, 0 0 4px #fff, 0 0 5px #fff, 0 0 5px #fff, 0 0 5px #fff, 0 0 5px #fff;
-    }
-  }  
-*/
-    </style>
+	  /* Glow animation for hovered links */
+	  @-webkit-keyframes glow {
+		from {
+		  text-shadow: 0 0 1px #fff, 0 0 1px #fff, 0 0 1px #fff, 
+		               0 0 1px #fff, 0 0 1px #fff, 0 0 1px #fff, 
+		               0 0 1px #fff;
+		}
+		to {
+		  text-shadow: 0 0 2px #fff, 0 0 3px #fff, 0 0 4px #fff, 
+		               0 0 5px #fff, 0 0 5px #fff, 0 0 5px #fff, 
+		               0 0 5px #fff;
+		}
+	  }
+	</style>
   </head>
   {% endblock %}
 
@@ -93,15 +93,12 @@
           <li class="nav-item">
             <a class="nav-link" href="/all_submission">Összes bejelentés</a>
           </li>
-
           <li class="nav-item">
             <a class="nav-link" href="/full_map">Térkép</a>
           </li>
-
           <li class="nav-item">
             <a class="nav-link" href="/statistics">Statisztika</a>
           </li>
-
           {% if role == 'admin'%}
           <li class="nav-item">
             <a href="/user_administration" class="nav-link">Felhasználók</a>
@@ -119,11 +116,11 @@
           </li>
           <li class="nav-item">
             <a class="nav-link" href="/login">Bejelentkezés</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="https:mkkp.hu">MKKP.hu</a>
-          </li>               
+          </li>              
           {% endif %}
+          <li class="nav-item">
+            <a class="nav-link" href="https://ketfarkukutya.mkkp.party" target="_blank" rel="noopener noreferrer">MKKP.hu</a>
+          </li>           
         </ul>
         <ul class="navbar-nav ml-auto">
           <li class="nav-item">
