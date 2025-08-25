@@ -1,6 +1,6 @@
 from flask import flash, redirect
 from flask_login import LoginManager, login_user, logout_user
-from app.env import REDIRECT_REGISTER, REDIRECT_LOGIN, REDIRECT_LOGOUT
+from app.env import REDIRECT_REGISTER, REDIRECT_LOGIN, REDIRECT_LOGOUT, KC_SERVER_URL
 from app.models import db, UserModel
 from app.utils import get_date, get_random_name
 
@@ -8,7 +8,7 @@ from app.utils import get_date, get_random_name
 # REGISZTRÁCIÓ
 def register():
     return redirect(
-        f"https://sso.mkkp.party/realms/passivist/protocol/openid-connect/registrations?client_id=rendkivuliugyek&scope=openid email&response_type=code&redirect_uri={REDIRECT_REGISTER}",
+        f"{KC_SERVER_URL}/realms/passivist/protocol/openid-connect/registrations?client_id=rendkivuliugyek&scope=openid email&response_type=code&redirect_uri={REDIRECT_REGISTER}",
         code=302,
     )
 
@@ -16,7 +16,7 @@ def register():
 # BEJELENTKEZÉS
 def site_login():
     return redirect(
-        f"https://sso.mkkp.party/realms/passivist/protocol/openid-connect/auth?client_id=rendkivuliugyek&scope=openid email&response_type=code&redirect_uri={REDIRECT_LOGIN}"
+        f"{KC_SERVER_URL}/realms/passivist/protocol/openid-connect/auth?client_id=rendkivuliugyek&scope=openid email&response_type=code&redirect_uri={REDIRECT_LOGIN}"
     )
 
 
@@ -25,7 +25,7 @@ def logout():
     logout_user()
     flash("Sikeres kijelentkezés!", "success")
     return redirect(
-        f"https://sso.mkkp.party/realms/passivist/protocol/openid-connect/logout?client_id=rendkivuliugyek&post_logout_redirect_uri={REDIRECT_LOGOUT}"
+        f"{KC_SERVER_URL}/realms/passivist/protocol/openid-connect/logout?client_id=rendkivuliugyek&post_logout_redirect_uri={REDIRECT_LOGOUT}"
     )
 
 
